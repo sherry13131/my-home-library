@@ -63,6 +63,12 @@ public class MainFrame {
 	private JTextField textField_29;
 	private JTextField textField_30;
 	private JTextField textField_31;
+	private JTextField textField_32;
+	private JTextField textField_33;
+	private JTextField textField_34;
+	private JTextField textField_35;
+	private JTextField textField_36;
+	private JTextField textField_37;
 
 	/**
 	 * Launch the application.
@@ -677,6 +683,161 @@ public class MainFrame {
 		);
 		updateMovie.setLayout(gl_updateMovie);
 		
+		JPanel deleteBook = new JPanel();
+		frame.getContentPane().add(deleteBook, "deleteBook");
+		
+		JButton btnDeleteBook = new JButton("Delete Book");
+		
+		JLabel label = new JLabel("Book ISBN:");
+		
+		textField_32 = new JTextField();
+		textField_32.setColumns(10);
+		GroupLayout gl_deleteBook = new GroupLayout(deleteBook);
+		gl_deleteBook.setHorizontalGroup(
+			gl_deleteBook.createParallelGroup(Alignment.LEADING)
+				.addGap(0, 805, Short.MAX_VALUE)
+				.addGroup(gl_deleteBook.createSequentialGroup()
+					.addGap(107)
+					.addGroup(gl_deleteBook.createParallelGroup(Alignment.TRAILING)
+						.addComponent(btnDeleteBook)
+						.addGroup(gl_deleteBook.createSequentialGroup()
+							.addComponent(label)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(textField_32, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(198, Short.MAX_VALUE))
+		);
+		gl_deleteBook.setVerticalGroup(
+			gl_deleteBook.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_deleteBook.createSequentialGroup()
+					.addGap(32)
+					.addGroup(gl_deleteBook.createParallelGroup(Alignment.BASELINE)
+						.addComponent(label)
+						.addComponent(textField_32, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addComponent(btnDeleteBook)
+					.addContainerGap(453, Short.MAX_VALUE))
+		);
+		deleteBook.setLayout(gl_deleteBook);
+		
+		JPanel deleteAlbum = new JPanel();
+		frame.getContentPane().add(deleteAlbum, "deleteAlbum");
+		
+		JButton btnDeleteMusic = new JButton("Delete Music");
+		btnDeleteMusic.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		
+		JLabel label_1 = new JLabel("Music name:");
+		
+		JLabel label_2 = new JLabel("Album name:");
+		
+		JLabel label_3 = new JLabel("Year:");
+		
+		textField_33 = new JTextField();
+		textField_33.setColumns(10);
+		
+		textField_34 = new JTextField();
+		textField_34.setColumns(10);
+		
+		textField_35 = new JTextField();
+		textField_35.setColumns(10);
+		GroupLayout gl_deleteAlbum = new GroupLayout(deleteAlbum);
+		gl_deleteAlbum.setHorizontalGroup(
+			gl_deleteAlbum.createParallelGroup(Alignment.LEADING)
+				.addGap(0, 805, Short.MAX_VALUE)
+				.addGroup(gl_deleteAlbum.createSequentialGroup()
+					.addGap(107)
+					.addGroup(gl_deleteAlbum.createParallelGroup(Alignment.TRAILING)
+						.addComponent(btnDeleteMusic)
+						.addGroup(gl_deleteAlbum.createSequentialGroup()
+							.addGroup(gl_deleteAlbum.createParallelGroup(Alignment.LEADING)
+								.addComponent(label_1)
+								.addComponent(label_2)
+								.addComponent(label_3))
+							.addGap(18)
+							.addGroup(gl_deleteAlbum.createParallelGroup(Alignment.LEADING)
+								.addComponent(textField_33, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)
+								.addComponent(textField_34, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)
+								.addComponent(textField_35, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE))))
+					.addContainerGap(178, Short.MAX_VALUE))
+		);
+		gl_deleteAlbum.setVerticalGroup(
+			gl_deleteAlbum.createParallelGroup(Alignment.LEADING)
+				.addGap(0, 550, Short.MAX_VALUE)
+				.addGroup(gl_deleteAlbum.createSequentialGroup()
+					.addGap(32)
+					.addGroup(gl_deleteAlbum.createParallelGroup(Alignment.BASELINE)
+						.addComponent(label_2)
+						.addComponent(textField_33, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addGroup(gl_deleteAlbum.createParallelGroup(Alignment.BASELINE)
+						.addComponent(label_3)
+						.addComponent(textField_34, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addGroup(gl_deleteAlbum.createParallelGroup(Alignment.BASELINE)
+						.addComponent(label_1)
+						.addComponent(textField_35, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addComponent(btnDeleteMusic)
+					.addContainerGap(373, Short.MAX_VALUE))
+		);
+		deleteAlbum.setLayout(gl_deleteAlbum);
+		
+		JPanel deleteMovie = new JPanel();
+		frame.getContentPane().add(deleteMovie, "deleteMovie");
+		
+		JButton btnDeleteMovie = new JButton("Delete Movie");
+		btnDeleteMovie.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		
+		JLabel label_4 = new JLabel("Movie name:");
+		
+		JLabel label_5 = new JLabel("Release year:");
+		
+		textField_36 = new JTextField();
+		textField_36.setColumns(10);
+		
+		textField_37 = new JTextField();
+		textField_37.setColumns(10);
+		GroupLayout gl_deleteMovie = new GroupLayout(deleteMovie);
+		gl_deleteMovie.setHorizontalGroup(
+			gl_deleteMovie.createParallelGroup(Alignment.LEADING)
+				.addGap(0, 805, Short.MAX_VALUE)
+				.addGroup(gl_deleteMovie.createSequentialGroup()
+					.addGap(107)
+					.addGroup(gl_deleteMovie.createParallelGroup(Alignment.TRAILING)
+						.addComponent(btnDeleteMovie)
+						.addGroup(gl_deleteMovie.createSequentialGroup()
+							.addGroup(gl_deleteMovie.createParallelGroup(Alignment.LEADING)
+								.addComponent(label_4)
+								.addComponent(label_5))
+							.addGap(18)
+							.addGroup(gl_deleteMovie.createParallelGroup(Alignment.LEADING)
+								.addComponent(textField_36, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)
+								.addComponent(textField_37, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE))))
+					.addContainerGap(176, Short.MAX_VALUE))
+		);
+		gl_deleteMovie.setVerticalGroup(
+			gl_deleteMovie.createParallelGroup(Alignment.LEADING)
+				.addGap(0, 550, Short.MAX_VALUE)
+				.addGroup(gl_deleteMovie.createSequentialGroup()
+					.addGap(32)
+					.addGroup(gl_deleteMovie.createParallelGroup(Alignment.BASELINE)
+						.addComponent(label_4)
+						.addComponent(textField_36, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addGroup(gl_deleteMovie.createParallelGroup(Alignment.BASELINE)
+						.addComponent(label_5)
+						.addComponent(textField_37, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addComponent(btnDeleteMovie)
+					.addContainerGap(413, Short.MAX_VALUE))
+		);
+		deleteMovie.setLayout(gl_deleteMovie);
+		
 		
 		
 		
@@ -754,12 +915,33 @@ public class MainFrame {
 		menuBar.add(mnDelete);
 		
 		JMenuItem menuItem_3 = new JMenuItem("Book");
+		menuItem_3.addActionListener(new ActionListener() {
+	          public void actionPerformed(ActionEvent event) {
+	        	// go to insert book page
+	        	  CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
+	        	  c.show(frame.getContentPane(), "deleteBook");
+	          }
+	        });
 		mnDelete.add(menuItem_3);
 		
 		JMenuItem menuItem_4 = new JMenuItem("Album");
+		menuItem_4.addActionListener(new ActionListener() {
+	          public void actionPerformed(ActionEvent event) {
+	        	// go to insert book page
+	        	  CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
+	        	  c.show(frame.getContentPane(), "deleteAlbum");
+	          }
+	        });
 		mnDelete.add(menuItem_4);
 		
 		JMenuItem menuItem_5 = new JMenuItem("Movie");
+		menuItem_5.addActionListener(new ActionListener() {
+	          public void actionPerformed(ActionEvent event) {
+	        	// go to insert book page
+	        	  CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
+	        	  c.show(frame.getContentPane(), "deleteMovie");
+	          }
+	        });
 		mnDelete.add(menuItem_5);
 		
 		
