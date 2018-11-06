@@ -57,6 +57,12 @@ public class MainFrame {
 	private JTextField textField_25;
 	private JTextField textField_26;
 	private JTextField textField_27;
+	private JTextField textField_12;
+	private JTextField textField_15;
+	private JTextField textField_28;
+	private JTextField textField_29;
+	private JTextField textField_30;
+	private JTextField textField_31;
 
 	/**
 	 * Launch the application.
@@ -453,16 +459,16 @@ public class MainFrame {
 					.addGap(199)
 					.addGroup(gl_insertMovie.createParallelGroup(Alignment.TRAILING)
 						.addGroup(gl_insertMovie.createSequentialGroup()
-							.addPreferredGap(ComponentPlacement.RELATED, 248, GroupLayout.PREFERRED_SIZE)
 							.addComponent(button_2, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(button_3))
+							.addComponent(button_3, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED))
 						.addGroup(gl_insertMovie.createSequentialGroup()
 							.addGroup(gl_insertMovie.createParallelGroup(Alignment.TRAILING)
 								.addGroup(gl_insertMovie.createSequentialGroup()
 									.addComponent(button_4, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
 									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(button_5, GroupLayout.PREFERRED_SIZE, 71, GroupLayout.PREFERRED_SIZE))
+									.addComponent(button_5, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE))
 								.addGroup(gl_insertMovie.createSequentialGroup()
 									.addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
 										.addComponent(lblMovieName)
@@ -520,11 +526,156 @@ public class MainFrame {
 						.addComponent(textField_13, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
 					.addGroup(gl_insertMovie.createParallelGroup(Alignment.BASELINE)
-						.addComponent(button_2)
-						.addComponent(button_3))
+						.addComponent(button_3)
+						.addComponent(button_2))
 					.addGap(147))
 		);
 		insertMovie.setLayout(gl_insertMovie);
+		
+		JPanel updateBook = new JPanel();
+		frame.getContentPane().add(updateBook, "updateBook");
+		
+		JLabel lblNewLabel_1 = new JLabel("Book ISBN:");
+		
+		textField_12 = new JTextField();
+		textField_12.setColumns(10);
+		
+		JButton btnNewButton = new JButton("Search Book");
+		GroupLayout gl_updateBook = new GroupLayout(updateBook);
+		gl_updateBook.setHorizontalGroup(
+			gl_updateBook.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_updateBook.createSequentialGroup()
+					.addGroup(gl_updateBook.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_updateBook.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(btnNewButton))
+						.addGroup(Alignment.LEADING, gl_updateBook.createSequentialGroup()
+							.addGap(107)
+							.addComponent(lblNewLabel_1)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(textField_12, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(198, Short.MAX_VALUE))
+		);
+		gl_updateBook.setVerticalGroup(
+			gl_updateBook.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_updateBook.createSequentialGroup()
+					.addGap(32)
+					.addGroup(gl_updateBook.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblNewLabel_1)
+						.addComponent(textField_12, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addComponent(btnNewButton)
+					.addContainerGap(453, Short.MAX_VALUE))
+		);
+		updateBook.setLayout(gl_updateBook);
+		
+		JPanel updateAlbum = new JPanel();
+		frame.getContentPane().add(updateAlbum, "updateAlbum");
+		
+		JButton btnSearchMusic = new JButton("Search Music");
+		
+		JLabel lblAlbumName_1 = new JLabel("Album name:");
+		
+		textField_15 = new JTextField();
+		textField_15.setColumns(10);
+		
+		JLabel lblYear_1 = new JLabel("Year:");
+		
+		JLabel lblMusicName_1 = new JLabel("Music name:");
+		
+		textField_28 = new JTextField();
+		textField_28.setColumns(10);
+		
+		textField_29 = new JTextField();
+		textField_29.setColumns(10);
+		GroupLayout gl_updateAlbum = new GroupLayout(updateAlbum);
+		gl_updateAlbum.setHorizontalGroup(
+			gl_updateAlbum.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_updateAlbum.createSequentialGroup()
+					.addGap(107)
+					.addGroup(gl_updateAlbum.createParallelGroup(Alignment.TRAILING)
+						.addComponent(btnSearchMusic)
+						.addGroup(gl_updateAlbum.createSequentialGroup()
+							.addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
+								.addComponent(lblMusicName_1)
+								.addComponent(lblAlbumName_1)
+								.addComponent(lblYear_1))
+							.addGap(18)
+							.addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
+								.addComponent(textField_15, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)
+								.addComponent(textField_28, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)
+								.addComponent(textField_29, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE))))
+					.addContainerGap(178, Short.MAX_VALUE))
+		);
+		gl_updateAlbum.setVerticalGroup(
+			gl_updateAlbum.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_updateAlbum.createSequentialGroup()
+					.addGap(32)
+					.addGroup(gl_updateAlbum.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblAlbumName_1)
+						.addComponent(textField_15, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addGroup(gl_updateAlbum.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblYear_1)
+						.addComponent(textField_28, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addGroup(gl_updateAlbum.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblMusicName_1)
+						.addComponent(textField_29, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addComponent(btnSearchMusic)
+					.addContainerGap(373, Short.MAX_VALUE))
+		);
+		updateAlbum.setLayout(gl_updateAlbum);
+		
+		JPanel updateMovie = new JPanel();
+		frame.getContentPane().add(updateMovie, "updateMovie");
+		
+		JButton btnSearchMovie = new JButton("Search Movie");
+		
+		JLabel lblMovieName_2 = new JLabel("Movie name:");
+		
+		textField_30 = new JTextField();
+		textField_30.setColumns(10);
+		
+		JLabel lblReleaseYear_2 = new JLabel("Release year:");
+		
+		textField_31 = new JTextField();
+		textField_31.setColumns(10);
+		GroupLayout gl_updateMovie = new GroupLayout(updateMovie);
+		gl_updateMovie.setHorizontalGroup(
+			gl_updateMovie.createParallelGroup(Alignment.LEADING)
+				.addGap(0, 805, Short.MAX_VALUE)
+				.addGroup(gl_updateMovie.createSequentialGroup()
+					.addGap(107)
+					.addGroup(gl_updateMovie.createParallelGroup(Alignment.TRAILING)
+						.addComponent(btnSearchMovie)
+						.addGroup(gl_updateMovie.createSequentialGroup()
+							.addGroup(gl_updateMovie.createParallelGroup(Alignment.LEADING)
+								.addComponent(lblMovieName_2)
+								.addComponent(lblReleaseYear_2))
+							.addGap(18)
+							.addGroup(gl_updateMovie.createParallelGroup(Alignment.LEADING)
+								.addComponent(textField_30, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)
+								.addComponent(textField_31, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE))))
+					.addContainerGap(178, Short.MAX_VALUE))
+		);
+		gl_updateMovie.setVerticalGroup(
+			gl_updateMovie.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_updateMovie.createSequentialGroup()
+					.addGap(32)
+					.addGroup(gl_updateMovie.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblMovieName_2)
+						.addComponent(textField_30, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addGroup(gl_updateMovie.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblReleaseYear_2)
+						.addComponent(textField_31, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addComponent(btnSearchMovie)
+					.addContainerGap(413, Short.MAX_VALUE))
+		);
+		updateMovie.setLayout(gl_updateMovie);
 		
 		
 		
@@ -570,12 +721,33 @@ public class MainFrame {
 		menuBar.add(mnUpdate);
 		
 		JMenuItem menuItem = new JMenuItem("Book");
+		menuItem.addActionListener(new ActionListener() {
+	          public void actionPerformed(ActionEvent event) {
+	        	// go to insert book page
+	        	  CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
+	        	  c.show(frame.getContentPane(), "updateBook");
+	          }
+	        });
 		mnUpdate.add(menuItem);
 		
 		JMenuItem menuItem_1 = new JMenuItem("Album");
+		menuItem_1.addActionListener(new ActionListener() {
+	          public void actionPerformed(ActionEvent event) {
+	        	// go to insert book page
+	        	  CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
+	        	  c.show(frame.getContentPane(), "updateAlbum");
+	          }
+	        });
 		mnUpdate.add(menuItem_1);
 		
 		JMenuItem menuItem_2 = new JMenuItem("Movie");
+		menuItem_2.addActionListener(new ActionListener() {
+	          public void actionPerformed(ActionEvent event) {
+	        	// go to insert book page
+	        	  CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
+	        	  c.show(frame.getContentPane(), "updateMovie");
+	          }
+	        });
 		mnUpdate.add(menuItem_2);
 		
 		JMenu mnDelete = new JMenu("Delete");
