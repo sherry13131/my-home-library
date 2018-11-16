@@ -865,7 +865,7 @@ public class MainFrame {
 		      }
 		      // get casts name
 		      tempCrewName = castsTx.getText().split("\\s*,\\s*");
-		      List<String> castNameArrayList = new LinkedList<String>(Arrays.asList(tempCrewName));
+		      List<String> castNameList = new LinkedList<String>(Arrays.asList(tempCrewName));
 		      
 		      
 		      // check if the crews and cast exist in peopleInvolved table
@@ -892,19 +892,19 @@ public class MainFrame {
           }
 		      List<Integer> removalCast = new ArrayList<Integer>();
 		      // cast
-		      for (int i = 0 ; i < castNameArrayList.size() && i < 10; i ++) {
-            pplID = getPeopleID(castNameArrayList.get(i));
+		      for (int i = 0 ; i < castNameList.size() && i < 10; i ++) {
+            pplID = getPeopleID(castNameList.get(i));
             if (pplID == -1) {
               // author not exist
               System.out.println("movie crew not exist " + tempCrewName[i]);
               // add new crew
               try {
-                pplID = insertNewPeople(castNameArrayList.get(i));
+                pplID = insertNewPeople(castNameList.get(i));
               } catch (SQLException ex) {
                 ex.printStackTrace();
               }
               if (pplID == -1) {
-                System.out.println("The movie cast name "+ castNameArrayList.get(i) +" is not in a correct format. did not add to database.");
+                System.out.println("The movie cast name "+ castNameList.get(i) +" is not in a correct format. did not add to database.");
                 // add index to array for removal later - prevent from inserting into other tables
                 removalCast.add(i);
               }
@@ -916,15 +916,15 @@ public class MainFrame {
 		        }
 		      }
 		      // remove cast that name format is wrong
-		      if (castNameArrayList.size() > 10) {
-		        for (int i = castNameArrayList.size(); i>10; i--) {
-		          castNameArrayList.remove(i);
+		      if (castNameList.size() > 10) {
+		        for (int i = castNameList.size(); i>10; i--) {
+		          castNameList.remove(i);
 		        }
 		      }
 		      if (removalCast.size() > 0) {
 		        System.out.println(removalCast.get(0));
   		      for (int i=removalCast.size()-1 ; i>=0 ;i--) {
-  		        castNameArrayList.remove(i);
+  		        castNameList.remove(i);
   		      }
 		      }
 		      
@@ -942,7 +942,8 @@ public class MainFrame {
   		        insertMovie(movieName, movieYear);
   		        System.out.println("movie inserted");
   		        // insert award
-  		        
+  		        insertAward(movieName, movieYear, allCrewNameRole, castNameList);
+  		        System.out.println("award inserted - default all no award");
   		        // insert crewMember
   		        
   		        
@@ -1939,6 +1940,32 @@ public class MainFrame {
        e.printStackTrace();
      }
 	   return false;
+	 }
+	 
+	 public static boolean insertAward(String movieName, int movieYear, Map<String, String> allCrewNameRole, List<String> castNameList) {
+	   String sql = "insert ignore into award values (?,?,?,?);";
+	   PreparedStatement ps;
+	   try {
+       ps = con.prepareStatement(sql);
+       ps.setString(2, movieName);
+       ps.setInt(3, movieYear);
+       ps.setInt(4, 0);
+       // insert all crew
+       for (String name : castNameList) {
+         // get id
+         ps.setInt(1, getPeopleID(name));
+         ps.executeUpdate();
+       }
+       for (String name : allCrewNameRole.keySet()) {
+         // get id
+         ps.setInt(1, getPeopleID(name));
+         ps.executeUpdate();
+       }
+       return true;
+     } catch (SQLException e) {
+       e.printStackTrace();
+     }
+     return false;
 	 }
 	 
 	 public static int checkIfNumerical(JTextField text) {
