@@ -9,48 +9,58 @@ import javax.swing.JMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.JTextField;
-import javax.swing.BoxLayout;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-import com.jgoodies.forms.layout.FormSpecs;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import javax.swing.AbstractButton;
+import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JButton;
+import javax.swing.JRadioButton;
 
 public class MainFrame {
 
+
+	private static Connection con;
+		
 	private JFrame frame;
 	private JTextField insertbooktitle;
 	private JTextField insertbookisbn;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JTextField textField_2;
-	private JTextField textField_3;
-	private JTextField textField_4;
-	private JTextField textField_5;
-	private JTextField textField_6;
-	private JTextField textField_7;
-	private JTextField textField_8;
-	private JTextField textField_9;
-	private JTextField textField_11;
-	private JTextField textField_16;
-	private JTextField textField_17;
-	private JTextField textField_18;
-	private JTextField textField_19;
-	private JTextField textField_20;
-	private JTextField textField_21;
-	private JTextField textField_22;
-	private JTextField textField_23;
-	private JTextField textField_10;
+	private JTextField insertbookpub;
+	private JTextField insertpages;
+	private JTextField insertpubyear;
+	private JTextField insertedition;
+	private JTextField insertabstract;
+	private JTextField insertkeyword;
+	private JTextField insertauthor2;
+	private JTextField insertauthor1;
+	private JTextField insertauthor4;
+	private JTextField insertauthor3;
+	private JTextField insertauthor5;
+	private JTextField langTx;
+	private JTextField musicNameTx;
+	private JTextField yearTx;
+	private JTextField albumNameTx;
+	private JTextField ComposerTx;
+	private JTextField producerTx;
+	private JTextField songWriterTx;
+	private JTextField arrangerTx;
+	private ButtonGroup diskTypeTx;
 	private JTextField textField_13;
 	private JTextField textField_14;
 	private JTextField textField_24;
@@ -69,6 +79,7 @@ public class MainFrame {
 	private JTextField textField_35;
 	private JTextField textField_36;
 	private JTextField textField_37;
+	private JTextField singersTx;
 
 	/**
 	 * Launch the application.
@@ -88,15 +99,20 @@ public class MainFrame {
 
 	/**
 	 * Create the application.
+	 * @throws SQLException 
+	 * @throws ClassNotFoundException 
 	 */
-	public MainFrame() {
-		initialize();
+	public MainFrame() throws SQLException, ClassNotFoundException {
+
+		Class.forName("com.mysql.jdbc.Driver");
+		con=DriverManager.getConnection("jdbc:mysql://localhost:3306/hl", "root", "");
+		initialize(con);
 	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	private void initialize(Connection con) {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 823, 623);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -134,48 +150,192 @@ public class MainFrame {
 		
 		JLabel lblKeywords = new JLabel("Keywords:");
 		
-		textField = new JTextField();
-		textField.setColumns(10);
+		JLabel lblAuthors = new JLabel("Authors:");
 		
-		textField_1 = new JTextField();
-		textField_1.setColumns(10);
+		insertbookpub = new JTextField();
+		insertbookpub.setColumns(10);
 		
-		textField_2 = new JTextField();
-		textField_2.setColumns(10);
+		insertpages = new JTextField();
+		insertpages.setColumns(10);
 		
-		textField_3 = new JTextField();
-		textField_3.setColumns(10);
+		insertpubyear = new JTextField();
+		insertpubyear.setColumns(10);
 		
-		textField_4 = new JTextField();
-		textField_4.setColumns(10);
+		insertedition = new JTextField();
+		insertedition.setColumns(10);
 		
-		textField_5 = new JTextField();
-		textField_5.setColumns(10);
+		insertabstract = new JTextField();
+		insertabstract.setColumns(10);
 		
-		JButton btnCancel = new JButton("Cancel");
+		insertkeyword = new JTextField();
+		insertkeyword.setColumns(10);
 		
-		JButton btnSubmit = new JButton("Submit");
-		btnSubmit.addActionListener(new ActionListener() {
+		insertauthor2 = new JTextField();
+		insertauthor2.setColumns(10);
+		
+		insertauthor1 = new JTextField();
+		insertauthor1.setColumns(10);
+		
+		insertauthor4 = new JTextField();
+		insertauthor4.setColumns(10);
+		
+		insertauthor3 = new JTextField();
+		insertauthor3.setColumns(10);
+		
+		insertauthor5 = new JTextField();
+		insertauthor5.setColumns(10);
+		
+		JButton btnCancelbook = new JButton("Cancel");
+		btnCancelbook.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				clearInsertbook();
 			}
 		});
 		
-		JLabel lblAuthors = new JLabel("Authors:");
-		
-		textField_6 = new JTextField();
-		textField_6.setColumns(10);
-		
-		textField_7 = new JTextField();
-		textField_7.setColumns(10);
-		
-		textField_8 = new JTextField();
-		textField_8.setColumns(10);
-		
-		textField_9 = new JTextField();
-		textField_9.setColumns(10);
-		
-		textField_11 = new JTextField();
-		textField_11.setColumns(10);
+		JButton btnSubmitbookinsert = new JButton("Submit");
+		btnSubmitbookinsert.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String title = null, isbn = null, pub = null, author1 = null, bookabs = null;
+				int edition = -1;
+				String[] keywords = null;
+				// validate entry
+				if (insertbooktitle.getText().equals("")||insertbookisbn.getText().equals("")||insertbookpub.getText().equals("")||
+						insertpages.getText().equals("")||insertpubyear.getText().equals("") || insertauthor1.getText().equals("")||
+						insertbookisbn.getText().length() != 13) {
+					// show error - mandatory fields
+					System.out.println("fill in all mandatory fields and in correct format");
+				} else {
+					// get input
+					title = insertbooktitle.getText();
+					isbn = insertbookisbn.getText();
+					pub = insertbookpub.getText();
+					int pages = Integer.parseInt(insertpages.getText());
+					int year = Integer.parseInt(insertpubyear.getText());
+					author1 = insertauthor1.getText();
+					
+					// check if isbn exist already
+					boolean bookExist = bookexist(isbn);
+					
+					if (pages <= 0 || year <= 0) {
+						// show error - wrong range
+						System.out.println("range wrong");	
+					} else if (bookExist) {
+						// error - book isbn duplicated
+						System.out.println("ISBN already exist in the database");
+					} else {
+						
+						// get optional field
+						if (!insertedition.getText().equals("")) {
+							edition = Integer.parseInt(insertedition.getText());
+							if (edition < 0) {
+								// show error - wrong range
+							}
+						}
+						if (!insertabstract.getText().equals("")) {
+							bookabs = insertabstract.getText();
+						}
+						if (!insertkeyword.getText().equals("")) {
+							keywords = insertkeyword.getText().split("\\s*,\\s*");
+						}
+
+						List<String> authors = new ArrayList<String>();
+						authors.add(author1);
+						if (!insertauthor2.getText().equals("")) {
+							authors.add(insertauthor2.getText());
+						}
+						if (!insertauthor3.getText().equals("")) {
+							authors.add(insertauthor3.getText());
+						}
+						if (!insertauthor4.getText().equals("")) {
+							authors.add(insertauthor4.getText());
+						}
+						if (!insertauthor5.getText().equals("")) {
+							authors.add(insertauthor5.getText());
+						}
+						
+						
+						// if pass validation
+						String sql = "insert into Book values (?,?,?,?,?,?,?);";
+						PreparedStatement preparedStatement;
+						try {
+							// insert book
+							preparedStatement = con.prepareStatement(sql);
+							preparedStatement.setString(1, isbn);
+							preparedStatement.setString(2, title);
+							preparedStatement.setString(3, pub);
+							preparedStatement.setInt(4, pages);
+							preparedStatement.setInt(5, year);
+							if (edition == -1) {
+								preparedStatement.setInt(6, java.sql.Types.INTEGER);
+							} else {
+								preparedStatement.setInt(6, edition);
+							}
+							preparedStatement.setString(7, bookabs);
+							preparedStatement.executeUpdate();
+							
+							// insert authors
+							sql = "insert into Bookauthor values (?,?);";
+							int pplID = -1;
+							for (String author : authors) {
+								pplID = getPeopleID(author);
+								if (pplID == -1) {
+									// author not exist
+									System.out.println("author not exist");
+									// add new author
+									pplID = insertNewPeople(author);
+									if (pplID == -1) {
+										System.out.println("The author name "+author+" is not in a correct format. will not add to database.");
+										// revert - remove book
+//										removeBook(isbn);
+										break;
+									}
+								}
+								// insert author after found/added
+								preparedStatement = con.prepareStatement(sql);
+								preparedStatement.setString(1, isbn);
+								preparedStatement.setInt(2, pplID);
+								preparedStatement.executeUpdate();
+								
+							}
+							
+							// insert keywords
+							// find if keyword exist in db
+							// if not add keyword
+							int keyID = -1, nextKeyID = -1;
+							for (String keyword : keywords) {
+								nextKeyID = getNextKeywordID();
+								keyID = getKeywordID(keyword);
+								if (nextKeyID == -1) {
+									// sth wrong on getting next keyword id
+									System.out.println("sth wrong - keyword");
+								} else if (keyID < 0){
+									sql = "insert into Keyword values (?,?);";
+									preparedStatement = con.prepareStatement(sql);
+									preparedStatement.setInt(1, nextKeyID);
+									preparedStatement.setString(2, keyword);
+									preparedStatement.executeUpdate();
+									keyID = nextKeyID;
+								}
+								// if found keyword (or added new keyword), add into bookkeyword
+								sql = "insert into BookKeyword values (?,?);";
+								preparedStatement = con.prepareStatement(sql);
+								preparedStatement.setString(1, isbn);
+								preparedStatement.setInt(2, keyID);
+								preparedStatement.executeUpdate();								
+							}
+
+							// clear all fields if successfully insert all data
+							clearInsertbook();
+							
+						} catch (SQLException e) {
+							// TODO Auto-generated catch block
+							System.out.println("sth wrong");
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		});
 		GroupLayout gl_insertBook = new GroupLayout(insertBook);
 		gl_insertBook.setHorizontalGroup(
 			gl_insertBook.createParallelGroup(Alignment.TRAILING)
@@ -185,7 +345,7 @@ public class MainFrame {
 						.addGroup(gl_insertBook.createSequentialGroup()
 							.addComponent(lblNumberofPages)
 							.addGap(18)
-							.addComponent(textField_1, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+							.addComponent(insertpages, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_insertBook.createSequentialGroup()
 							.addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
 								.addComponent(lblBookTitle)
@@ -193,7 +353,7 @@ public class MainFrame {
 								.addComponent(lblNewLabel))
 							.addGap(53)
 							.addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING, false)
-								.addComponent(textField)
+								.addComponent(insertbookpub)
 								.addComponent(insertbookisbn)
 								.addComponent(insertbooktitle, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))
 						.addGroup(gl_insertBook.createSequentialGroup()
@@ -205,24 +365,24 @@ public class MainFrame {
 								.addComponent(lblAuthors))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
-								.addComponent(textField_5, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
-								.addComponent(textField_3, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
-								.addComponent(textField_2, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
-								.addComponent(textField_4, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
+								.addComponent(insertkeyword, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
+								.addComponent(insertedition, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
+								.addComponent(insertpubyear, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
+								.addComponent(insertabstract, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
 								.addGroup(gl_insertBook.createParallelGroup(Alignment.TRAILING)
 									.addGroup(gl_insertBook.createSequentialGroup()
-										.addComponent(textField_7, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
+										.addComponent(insertauthor1, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
 										.addGap(23)
-										.addComponent(textField_6, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE))
+										.addComponent(insertauthor2, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE))
 									.addGroup(gl_insertBook.createSequentialGroup()
-										.addComponent(textField_9, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
+										.addComponent(insertauthor3, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
 										.addGap(23)
-										.addComponent(textField_8, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE))
-									.addComponent(textField_11, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
+										.addComponent(insertauthor4, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE))
+									.addComponent(insertauthor5, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
 									.addGroup(gl_insertBook.createSequentialGroup()
-										.addComponent(btnSubmit, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
+										.addComponent(btnSubmitbookinsert, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
 										.addPreferredGap(ComponentPlacement.RELATED)
-										.addComponent(btnCancel))))))
+										.addComponent(btnCancelbook))))))
 					.addContainerGap(217, Short.MAX_VALUE))
 		);
 		gl_insertBook.setVerticalGroup(
@@ -241,42 +401,42 @@ public class MainFrame {
 					.addGap(18)
 					.addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNewLabel)
-						.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(insertbookpub, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
 					.addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNumberofPages)
-						.addComponent(textField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(insertpages, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
 					.addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblYearOfPublication)
-						.addComponent(textField_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(insertpubyear, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
 					.addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblEditionNumber)
-						.addComponent(textField_3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(insertedition, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
 					.addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblAbstract)
-						.addComponent(textField_4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(insertabstract, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
 					.addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblKeywords)
-						.addComponent(textField_5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(insertkeyword, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
 					.addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
 						.addComponent(lblAuthors)
-						.addComponent(textField_7, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(textField_6, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(insertauthor1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(insertauthor2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
-						.addComponent(textField_9, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(textField_8, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(insertauthor3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(insertauthor4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(textField_11, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addComponent(insertauthor5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
-						.addComponent(btnSubmit)
-						.addComponent(btnCancel))
+						.addComponent(btnSubmitbookinsert)
+						.addComponent(btnCancelbook))
 					.addContainerGap(99, Short.MAX_VALUE))
 		);
 		insertBook.setLayout(gl_insertBook);
@@ -284,14 +444,193 @@ public class MainFrame {
 		JPanel insertAlbum = new JPanel();
 		frame.getContentPane().add(insertAlbum, "insertAlbum");
 		
-		JButton button = new JButton("Submit");
+		JButton submitBtn = new JButton("Submit");
+		submitBtn.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent arg0) {
+		    String albumName = null, musicName = null, lang = null, producer = null, arranger = null, composer = null, songWriter = null;
+		    String[] singers = null; // at most 2 singer for each song
+		    int year = -1;
+		    diskType type = diskType.AUDIOCD;
+		    
+		    // check all fields are filled in or not
+		    if (albumNameTx.getText().equals("")|| musicNameTx.getText().equals("") || langTx.getText().equals("") || producerTx.getText().equals("") ||
+		        arrangerTx.getText().equals("") || ComposerTx.getText().equals("") || songWriterTx.getText().equals("") ||
+		        yearTx.getText().equals("") || singersTx.getText().equals("")) {
+		      // show error - mandatory fields
+          System.out.println("fill in all mandatory fields and in correct format");
+		    } else if (Integer.parseInt(yearTx.getText()) <= 0) {
+		      System.out.println("fill in the year in correct format (year > 0)");
+		    } else {
+		      // get the string values
+		      albumName = albumNameTx.getText();
+		      musicName = musicNameTx.getText();
+		      lang = langTx.getText();
+		      producer = producerTx.getText();
+		      arranger = arrangerTx.getText();
+		      composer = ComposerTx.getText();
+		      songWriter = songWriterTx.getText();
+		      year = Integer.parseInt(yearTx.getText());
+		      
+		      Map<String, String> musicpeoples = new HashMap<String,String>();
+		      musicpeoples.put("songWriter", songWriter);
+		      musicpeoples.put("composer", composer);
+		      musicpeoples.put("arranger", arranger);
+		      
+		      // split singers by ','
+          singers = singersTx.getText().split("\\s*,\\s*");
+          
+          // get diskType
+          String typeString = null;
+          for (Enumeration<AbstractButton> buttons = diskTypeTx.getElements(); buttons.hasMoreElements();) {
+            AbstractButton button = buttons.nextElement();
+            if (button.isSelected()) {
+              typeString = button.getText();
+            }
+          }
+          for (diskType d : type.getIteration()) {
+            if (d.getString().equalsIgnoreCase(typeString)) {
+              type = d.getEnum();
+            }
+          }
+
+          
+          int pplID = -1;
+          for (String s : singers) {
+            pplID = getPeopleID(s);
+            if (pplID == -1) {
+              // author not exist
+              System.out.println("singer not exist");
+              // add new author
+              try {
+                pplID = insertNewPeople(s);
+              } catch (SQLException e) {
+                e.printStackTrace();
+              }
+              if (pplID == -1) {
+                System.out.println("The author name "+ s +" is not in a correct format. will not add to database.");
+                // revert - remove 
+                break;
+              }
+            }
+          }
+          
+          for (String s : musicpeoples.values()) {
+            pplID = getPeopleID(s);
+            if (pplID == -1) {
+              // author not exist
+              System.out.println("music cast not exist");
+              // add new author
+              try {
+                pplID = insertNewPeople(s);
+              } catch (SQLException e) {
+                e.printStackTrace();
+              }
+              if (pplID == -1) {
+                System.out.println("The music cast name "+ s +" is not in a correct format. will not add to database.");
+                // revert - remove 
+                break;
+              }
+            }
+          }
+          
+          pplID = getPeopleID(producer);
+          if (pplID == -1) {
+            // producer not exist
+            System.out.println("producer not exist");
+            // add new producer
+            try {
+              pplID = insertNewPeople(producer);
+            } catch (SQLException e) {
+              e.printStackTrace();
+            }
+            if (pplID == -1) {
+              System.out.println("The producer name "+ producer +" is not in a correct format. will not add to database.");
+              // revert - remove 
+            }
+          }
+          
+          int id = -1;
+          
+          // update the hashmap to storing the id of musicpeoples
+          Map<String, Integer> musicpeopleid = new HashMap<String, Integer>();
+          musicpeopleid.put("songWriter", getPeopleID(songWriter));
+          musicpeopleid.put("composer", getPeopleID(composer));
+          musicpeopleid.put("arranger", getPeopleID(arranger));
+          
+          boolean success = true;
+          // check if the music album exist in Music, insert if not
+          if (!musicExist(albumName, year, musicName, producer)) {
+              System.out.println("here");
+              // insert only if that piece of soundtrack is not in db
+              // insert into Music table
+              success = insertAlbum(albumName, year, musicName, lang, type, producer);
+              // insert into MusicSinger
+              // only add at most 2 singers for each song
+              for (int i=0; i<singers.length ;i++) {
+                // add the people is exist in peopleInvolved
+                id = getPeopleID(singers[i]);
+                insertMusicSinger(albumName, year, musicName, id);
+                System.out.println("inserted music");
+              }
+              // insert into PeopleInvolvedMusic
+              // check the role for each people
+  
+              Map<String, Integer> temprole = new HashMap<String, Integer>();
+              // for each people, serach their roles in music
+              for (int ppl : musicpeopleid.values()) {
+                // check if this people is inserted already
+                if (!checkMusicCastExist(albumName, year, musicName, ppl)) {
+                  for (String role : musicpeopleid.keySet()) {
+                    if (musicpeopleid.get(role).equals(ppl)) {
+                      temprole.put(role, ppl);
+                    }
+                  }
+                  // insert
+                  int sw = 0, c=0, a=0;
+                  if (temprole.containsKey("songWriter")) {
+                    sw = 1;
+                  }
+                  if (temprole.containsKey("composer")) {
+                    c = 1;
+                  }
+                  if (temprole.containsKey("arranger")) {
+                    a = 1;
+                  }
+                  // insert 
+                  insertMusicPeopleInvolved(albumName, year, musicName, ppl, sw, c, a);
+                  System.out.println("inserted music people involved");
+                  // reset the hashmap
+                  temprole.clear();
+                  sw = 0; c = 0; a= 0;
+                }
+              }
+            } else {
+              System.out.println("music track of that album already existed.");
+            }
+		    }
+		  }
+		});
 		
 		JButton button_1 = new JButton("Cancel");
+		button_1.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent arg0) {
+        langTx.setText("");
+        musicNameTx.setText("");
+        yearTx.setText("");
+        albumNameTx.setText("");
+        ComposerTx.setText("");
+        producerTx.setText("");
+        songWriterTx.setText("");
+        arrangerTx.setText("");
+        singersTx.setText("");
+      }
+		});
+      
 		
 		JLabel lblLanguage = new JLabel("language:");
 		
-		textField_16 = new JTextField();
-		textField_16.setColumns(10);
+		langTx = new JTextField();
+		langTx.setColumns(10);
 		
 		JLabel lblAlbumName = new JLabel("Album name:");
 		
@@ -299,14 +638,14 @@ public class MainFrame {
 		
 		JLabel lblMusicName = new JLabel("Music name:");
 		
-		textField_17 = new JTextField();
-		textField_17.setColumns(10);
+		musicNameTx = new JTextField();
+		musicNameTx.setColumns(10);
 		
-		textField_18 = new JTextField();
-		textField_18.setColumns(10);
+		yearTx = new JTextField();
+		yearTx.setColumns(10);
 		
-		textField_19 = new JTextField();
-		textField_19.setColumns(10);
+		albumNameTx = new JTextField();
+		albumNameTx.setColumns(10);
 		
 		JLabel lblDiskType = new JLabel("Disk type:");
 		
@@ -318,103 +657,128 @@ public class MainFrame {
 		
 		JLabel lblArranger = new JLabel("Arranger:");
 		
-		textField_20 = new JTextField();
-		textField_20.setColumns(10);
+		ComposerTx = new JTextField();
+		ComposerTx.setColumns(10);
 		
-		textField_21 = new JTextField();
-		textField_21.setColumns(10);
+		producerTx = new JTextField();
+		producerTx.setColumns(10);
 		
-		textField_22 = new JTextField();
-		textField_22.setColumns(10);
+		songWriterTx = new JTextField();
+		songWriterTx.setColumns(10);
 		
-		textField_23 = new JTextField();
-		textField_23.setColumns(10);
+		arrangerTx = new JTextField();
+		arrangerTx.setColumns(10);
 		
-		textField_10 = new JTextField();
-		textField_10.setColumns(10);
-		GroupLayout gl_insertAlbum = new GroupLayout(insertAlbum);
+		JLabel lblSingers = new JLabel("Singers:");
+		
+		singersTx = new JTextField();
+		singersTx.setColumns(10);
+
+    JRadioButton audioCDtype = new JRadioButton("AudioCD");
+    audioCDtype.setText("audioCD");
+    audioCDtype.setSelected(true);
+    
+    JRadioButton vinylType = new JRadioButton("Vinyl");
+    vinylType.setText("vinyl");
+    GroupLayout gl_insertAlbum = new GroupLayout(insertAlbum);
+    
+		diskTypeTx = new ButtonGroup();
+		diskTypeTx.add(audioCDtype);
+		diskTypeTx.add(vinylType);
+		
 		gl_insertAlbum.setHorizontalGroup(
-			gl_insertAlbum.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_insertAlbum.createSequentialGroup()
-					.addGap(173)
-					.addGroup(gl_insertAlbum.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_insertAlbum.createSequentialGroup()
-							.addComponent(button, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(button_1))
-						.addGroup(gl_insertAlbum.createSequentialGroup()
-							.addGroup(gl_insertAlbum.createParallelGroup(Alignment.TRAILING)
-								.addGroup(gl_insertAlbum.createSequentialGroup()
-									.addGroup(gl_insertAlbum.createParallelGroup(Alignment.LEADING)
-										.addComponent(lblYear)
-										.addComponent(lblMusicName)
-										.addComponent(lblLanguage)
-										.addComponent(lblDiskType)
-										.addComponent(lblProducer)
-										.addComponent(lblSongWriter)
-										.addComponent(lblComposer)
-										.addComponent(lblArranger))
-									.addGap(22))
-								.addGroup(gl_insertAlbum.createSequentialGroup()
-									.addComponent(lblAlbumName)
-									.addGap(18)))
-							.addGroup(gl_insertAlbum.createParallelGroup(Alignment.LEADING, false)
-								.addComponent(textField_19, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
-								.addComponent(textField_20, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
-								.addComponent(textField_21, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
-								.addComponent(textField_22, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
-								.addComponent(textField_23, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
-								.addComponent(textField_16, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
-								.addComponent(textField_10, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
-								.addComponent(textField_18)
-								.addComponent(textField_17))))
-					.addContainerGap(239, Short.MAX_VALUE))
+		  gl_insertAlbum.createParallelGroup(Alignment.TRAILING)
+		    .addGroup(gl_insertAlbum.createSequentialGroup()
+		      .addGap(173)
+		      .addGroup(gl_insertAlbum.createParallelGroup(Alignment.TRAILING)
+		        .addGroup(gl_insertAlbum.createSequentialGroup()
+		          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.LEADING)
+		            .addComponent(lblYear)
+		            .addComponent(lblMusicName)
+		            .addComponent(lblLanguage)
+		            .addComponent(lblDiskType)
+		            .addComponent(lblProducer)
+		            .addComponent(lblSongWriter)
+		            .addComponent(lblComposer)
+		            .addComponent(lblArranger)
+		            .addComponent(lblSingers))
+		          .addGap(22))
+		        .addGroup(gl_insertAlbum.createSequentialGroup()
+		          .addComponent(lblAlbumName)
+		          .addGap(18)))
+		      .addGroup(gl_insertAlbum.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_insertAlbum.createParallelGroup(Alignment.LEADING, false)
+		          .addComponent(albumNameTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+		          .addComponent(ComposerTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+		          .addComponent(producerTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+		          .addComponent(songWriterTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+		          .addComponent(langTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+		          .addComponent(arrangerTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+		          .addComponent(yearTx)
+		          .addComponent(musicNameTx))
+		        .addComponent(singersTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
+		        .addGroup(gl_insertAlbum.createSequentialGroup()
+		          .addComponent(audioCDtype)
+		          .addGap(64)
+		          .addComponent(vinylType)))
+		      .addContainerGap(239, Short.MAX_VALUE))
+		    .addGroup(gl_insertAlbum.createSequentialGroup()
+		      .addContainerGap(401, Short.MAX_VALUE)
+		      .addComponent(submitBtn, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
+		      .addGap(18)
+		      .addComponent(button_1)
+		      .addGap(233))
 		);
 		gl_insertAlbum.setVerticalGroup(
-			gl_insertAlbum.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_insertAlbum.createSequentialGroup()
-					.addContainerGap(21, Short.MAX_VALUE)
-					.addGroup(gl_insertAlbum.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_insertAlbum.createSequentialGroup()
-							.addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-								.addComponent(textField_19, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(lblAlbumName))
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-								.addComponent(textField_18, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(lblYear))
-							.addGap(18)
-							.addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-								.addComponent(textField_17, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(lblMusicName))
-							.addGap(18)
-							.addComponent(textField_16, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addComponent(lblLanguage))
-					.addGap(18)
-					.addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-						.addComponent(textField_22, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblDiskType))
-					.addGap(18)
-					.addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-						.addComponent(textField_21, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblProducer))
-					.addGap(18)
-					.addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-						.addComponent(textField_23, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblSongWriter))
-					.addGap(18)
-					.addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-						.addComponent(textField_20, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblComposer))
-					.addGap(18)
-					.addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-						.addComponent(textField_10, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblArranger))
-					.addGap(56)
-					.addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-						.addComponent(button)
-						.addComponent(button_1))
-					.addGap(111))
+		  gl_insertAlbum.createParallelGroup(Alignment.LEADING)
+		    .addGroup(gl_insertAlbum.createSequentialGroup()
+		      .addContainerGap(15, Short.MAX_VALUE)
+		      .addGroup(gl_insertAlbum.createParallelGroup(Alignment.TRAILING)
+		        .addGroup(gl_insertAlbum.createSequentialGroup()
+		          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
+		            .addComponent(albumNameTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		            .addComponent(lblAlbumName))
+		          .addPreferredGap(ComponentPlacement.UNRELATED)
+		          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
+		            .addComponent(yearTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		            .addComponent(lblYear))
+		          .addGap(18)
+		          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
+		            .addComponent(musicNameTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		            .addComponent(lblMusicName))
+		          .addGap(18)
+		          .addComponent(langTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		        .addComponent(lblLanguage))
+		      .addGap(18)
+		      .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(lblDiskType)
+		        .addComponent(audioCDtype)
+		        .addComponent(vinylType))
+		      .addGap(18)
+		      .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(producerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		        .addComponent(lblProducer))
+		      .addGap(18)
+		      .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(songWriterTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		        .addComponent(lblSongWriter))
+		      .addGap(18)
+		      .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(ComposerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		        .addComponent(lblComposer))
+		      .addGap(18)
+		      .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(arrangerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		        .addComponent(lblArranger))
+		      .addGap(18)
+		      .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(lblSingers)
+		        .addComponent(singersTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(52)
+		      .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(submitBtn)
+		        .addComponent(button_1))
+		      .addGap(81))
 		);
 		insertAlbum.setLayout(gl_insertAlbum);
 		
@@ -845,8 +1209,11 @@ public class MainFrame {
 		JMenuBar menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
 		
+		JMenu mnData = new JMenu("Data");
+		menuBar.add(mnData);
+		
 		JMenu mnInsert = new JMenu("Insert");
-		menuBar.add(mnInsert);
+		mnData.add(mnInsert);
 		
 		JMenuItem mntmBook = new JMenuItem("Book");
 		mntmBook.addActionListener(new ActionListener() {
@@ -879,7 +1246,7 @@ public class MainFrame {
 		mnInsert.add(mntmMovie);
 		
 		JMenu mnUpdate = new JMenu("Update");
-		menuBar.add(mnUpdate);
+		mnData.add(mnUpdate);
 		
 		JMenuItem menuItem = new JMenuItem("Book");
 		menuItem.addActionListener(new ActionListener() {
@@ -912,7 +1279,7 @@ public class MainFrame {
 		mnUpdate.add(menuItem_2);
 		
 		JMenu mnDelete = new JMenu("Delete");
-		menuBar.add(mnDelete);
+		mnData.add(mnDelete);
 		
 		JMenuItem menuItem_3 = new JMenuItem("Book");
 		menuItem_3.addActionListener(new ActionListener() {
@@ -944,7 +1311,346 @@ public class MainFrame {
 	        });
 		mnDelete.add(menuItem_5);
 		
+		JMenu mnView = new JMenu("View");
+		menuBar.add(mnView);
+		
+		JMenuItem mntmView = new JMenuItem("view");
+		mnView.add(mntmView);
+		
+		JMenu mnReport = new JMenu("Report");
+		menuBar.add(mnReport);
+		
 		
 
 	}
+	
+	
+	// functions for insert book ----------------------------------------------------------------------
+	
+	public static int getPeopleID(String name) {
+		String sql = "Select ID from PeopleInvolved where concat(FirstName,' ',FamilyName) = ?;";
+		PreparedStatement preparedStatement;
+		try {
+			preparedStatement = con.prepareStatement(sql);
+			preparedStatement.setString(1, name);
+			ResultSet rs = preparedStatement.executeQuery();
+			if (rs.next()) {
+				return (rs.getInt("ID"));
+			}
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+		return -1;
+	}
+	
+	private void clearInsertbook() {
+		insertbooktitle.setText("");
+		insertbookisbn.setText("");
+		insertbookpub.setText("");
+		insertpages.setText("");
+		insertpubyear.setText("");
+		insertedition.setText("");
+		insertabstract.setText("");
+		insertkeyword.setText("");
+		insertauthor2.setText("");
+		insertauthor1.setText("");
+		insertauthor4.setText("");
+		insertauthor3.setText("");
+		insertauthor5.setText("");
+	}	
+	
+	private int getNextKeywordID() {
+		String sql = "Select count(*) from keyword;";
+		try {
+			PreparedStatement preparedStatement = con.prepareStatement(sql);
+			ResultSet rs = preparedStatement.executeQuery();
+			if (rs.next()) {
+				int id = rs.getInt("count(*)");
+				return id + 1;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return -1;
+	}
+
+	private int getKeywordID(String keyword) {
+		String sql = "Select ID from keyword where Tag = ?;";
+		try {
+			PreparedStatement preparedStatement = con.prepareStatement(sql);
+			preparedStatement.setString(1, keyword);
+			ResultSet rs = preparedStatement.executeQuery();
+			if (rs.next()) {
+				int id = rs.getInt("ID");
+				return id;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return -1;
+	}
+	
+	private int getNextPeopleID() {
+		String sql = "Select count(*) from PeopleInvolved;";
+		try {
+			PreparedStatement preparedStatement = con.prepareStatement(sql);
+			ResultSet rs = preparedStatement.executeQuery();
+			if (rs.next()) {
+				int id = rs.getInt("count(*)");
+				return id + 1;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return -1;
+	}
+	
+	private int insertNewPeople(String fullname) throws SQLException {
+		int nextID = getNextPeopleID();
+		String first=null, mid=null, last = null;
+		String[] name = fullname.split(" ");
+		if (nextID > 0) {
+			if (name.length == 2) {
+				first = name[0];
+				last = name[1];
+			} else if (name.length >= 3) {
+				first = name[0];
+				mid = name[1];
+				last = name[2];
+			} else {
+				// sth wrong
+				System.out.println("should be first + [mid] + last name");
+			}
+			if (name.length >= 2) {
+				// insert new author
+				String sql = "insert into PeopleInvolved values (?,?,?,?,?);";
+				try {
+					PreparedStatement preparedStatement;
+					preparedStatement = con.prepareStatement(sql);
+					preparedStatement.setInt(1, nextID);
+					preparedStatement.setString(2, first);
+					preparedStatement.setString(3, mid);
+					preparedStatement.setString(4, last);
+					preparedStatement.setString(5, null);
+					preparedStatement.executeUpdate();
+					System.out.println("added new people");
+					return nextID;
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		return -1;
+	}
+	
+	private boolean bookexist(String isbn) {
+		String sql = "select count(*) from Book where ISBN = ?;";
+		try {
+			PreparedStatement preparedStatement;
+			preparedStatement = con.prepareStatement(sql);
+			preparedStatement.setString(1, isbn);
+			ResultSet rs = preparedStatement.executeQuery();
+			if (rs.next()) {
+				if (rs.getInt("count(*)") > 0) {
+					return true;
+				}
+			}
+			return false;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return true;
+	}
+	
+	private void removeBook(String isbn) throws SQLException {
+		String sql = "delete from book where isbn = ?;";
+		PreparedStatement preparedStatement;
+		preparedStatement = con.prepareStatement(sql);
+		preparedStatement.setString(1, isbn);
+		preparedStatement.executeUpdate();
+	}
+	
+	// ---------------------------------------------------------------------------------
+	
+	// functions for inserting album ---------------------------------------------------------------
+	public enum diskType {
+	  AUDIOCD {
+	    public String getString() {
+	      return "audioCD";
+	    }
+
+      public diskType getEnum() {
+        return AUDIOCD;
+      }
+
+      @Override
+      public int getEnumValue() {
+        return 0;
+      }
+	  }, VINYL {
+	    public String getString() {
+        return "vinyl";
+      }
+
+      public diskType getEnum() {
+        return VINYL;
+      }
+
+      @Override
+      public int getEnumValue() {
+        return 1;
+      }
+	  };
+	  public List<diskType> getIteration() {
+	    List<diskType> diskTypes = new ArrayList<diskType>();
+	    for (diskType t : diskType.values()) {
+	      diskTypes.add(t.getEnum());
+	    }
+	    return diskTypes;
+	  }
+	  public abstract String getString();
+	  public abstract diskType getEnum();
+	  public abstract int getEnumValue();
+	}
+	
+	 public static List<String> getPeopleNames() {
+	    String sql = "Select concat(FirstName,' ',FamilyName) fullname from PeopleInvolved;";
+	    List<String> names = new ArrayList<String>();
+	    PreparedStatement preparedStatement;
+	    try {
+	      preparedStatement = con.prepareStatement(sql);
+	      ResultSet rs = preparedStatement.executeQuery();
+	      if (rs.next()) {
+	        names.add(rs.getString("fullname"));
+	      }
+	    } catch (Exception e){
+	      e.printStackTrace();
+	    }
+	    return names;
+	  }
+	 
+	 public static ResultSet getAlbums() {
+	   String sql = "Select AlbumName, Year, MusicName, Producer_ID from Music;";
+     ResultSet albumsInfo = null;
+     PreparedStatement preparedStatement;
+     try {
+       preparedStatement = con.prepareStatement(sql);
+       albumsInfo = preparedStatement.executeQuery();
+     } catch (Exception e){
+       e.printStackTrace();
+     }
+     return albumsInfo;
+
+	 }
+	 
+	 public static boolean musicExist(String albumName, int year, String musicName, String producer) {
+	   ResultSet rs = getAlbums();
+     try {
+       while(rs.next()) {
+        if (rs.getString("AlbumName").equalsIgnoreCase(albumName)) {
+           if (rs.getInt("Year") == year) {
+             if (rs.getString("MusicName").equalsIgnoreCase(musicName)) {
+               if (rs.getInt("Producer_ID") == getPeopleID(producer)) {
+                 // exist in music album
+                 return true;
+               }
+             }
+           }
+         }
+       }
+     } catch (SQLException e) {
+       e.printStackTrace();
+     }
+     return false;
+	 }
+	 
+	 public static boolean checkMusicCastExist(String albumName, int year, String musicName, int ppl) {
+	   String sql = "Select count(*) from PeopleInvolvedMusic " + 
+	       "group by AlbumName, Year, MusicName, PeopleInvolved_ID " + 
+	       "having AlbumName = ? and Year = ? and MusicName = ? and PeopleInvolved_ID = ?;";
+	   ResultSet rs = null;
+	   int found = -1;
+     PreparedStatement ps;
+     try {
+       ps = con.prepareStatement(sql);
+       ps.setString(1, albumName);
+       ps.setInt(2, year);
+       ps.setString(3, musicName);
+       ps.setInt(4, ppl);
+       rs = ps.executeQuery();
+       if (rs.next()) {
+         found = rs.getInt("count(*)");
+       }
+       if (found > 0) {
+         return true;
+       }
+     } catch (Exception e){
+       e.printStackTrace();
+     }
+     return false;
+	 }
+	 
+	 public static boolean insertAlbum(String albumName, int year, String musicName, String language, diskType diskType, String producer) {
+	   int producerID = getPeopleID(producer);
+	   String sql = "insert into Music values (?,?,?,?,?,?);";
+     try {
+       PreparedStatement ps = con.prepareStatement(sql);
+       ps.setString(1, albumName);
+       ps.setInt(2, year);
+       ps.setString(3, musicName);
+       ps.setString(4, language);
+       ps.setInt(5, diskType.getEnumValue());
+       ps.setInt(6, producerID);
+       ps.executeUpdate();
+  	   return true;
+     } catch (SQLException e){
+       e.printStackTrace();
+     }
+     return false;
+	 }
+	 
+	 public static boolean insertMusicSinger(String albumName, int year, String musicName, int id) {
+	   String sql = "insert into MusicSinger values (?,?,?,?);";
+     PreparedStatement ps;
+    try {
+      ps = con.prepareStatement(sql);
+      ps.setString(1, albumName);
+      ps.setInt(2, year);
+      ps.setString(3, musicName);
+      ps.setInt(4, id);
+      ps.executeUpdate();
+      return true;
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return false;
+	 }
+	 
+	 public static boolean insertMusicPeopleInvolved(String albumName, int year, String musicName, int ppl, int sw, int c, int a) {
+	   String sql = "insert into PeopleInvolvedMusic values (?,?,?,?,?,?,?);";
+	   PreparedStatement ps;
+    try {
+      ps = con.prepareStatement(sql);
+      ps.setString(1, albumName);
+      ps.setInt(2, year);
+      ps.setString(3, musicName);
+      ps.setInt(4, ppl);
+      ps.setInt(5, sw);
+      ps.setInt(6, c);
+      ps.setInt(7, a);
+      ps.executeUpdate();
+      return true;
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return false;
+	 }
+	 
+	 // ------------------------------------------------------------------------------------------------------------------------
+	 // -------------- functions for inserting movies -------------------------------------------------------------------------
+	 
 }
