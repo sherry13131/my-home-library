@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JButton;
 import javax.swing.JRadioButton;
+import javax.swing.JComboBox;
 
 public class MainFrame {
 
@@ -61,12 +63,11 @@ public class MainFrame {
 	private JTextField songWriterTx;
 	private JTextField arrangerTx;
 	private ButtonGroup diskTypeTx;
-	private JTextField textField_13;
-	private JTextField textField_14;
-	private JTextField textField_24;
-	private JTextField textField_25;
-	private JTextField textField_26;
-	private JTextField textField_27;
+	private JTextField producersTx;
+	private JTextField scriptWritersTx;
+	private JTextField directorsTx;
+	private JTextField movieYearTx;
+	private JTextField movieNameTx;
 	private JTextField textField_12;
 	private JTextField textField_15;
 	private JTextField textField_28;
@@ -80,6 +81,10 @@ public class MainFrame {
 	private JTextField textField_36;
 	private JTextField textField_37;
 	private JTextField singersTx;
+	private JTextField composersTx;
+	private JTextField editorsTx;
+	private JTextField costumeDesignersTx;
+	private JTextField castsTx;
 
 	/**
 	 * Launch the application.
@@ -114,7 +119,7 @@ public class MainFrame {
 	 */
 	private void initialize(Connection con) {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 823, 623);
+		frame.setBounds(100, 100, 815, 624);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		frame.getContentPane().setLayout(new CardLayout(0, 0));
@@ -791,114 +796,362 @@ public class MainFrame {
 		
 		JLabel lblReleaseYear = new JLabel("Release year:");
 		
-		JLabel lblMovieName_1 = new JLabel("Movie name:");
+		JLabel lblMovieName_1 = new JLabel("Director (1 to 3):");
 		
-		JLabel lblReleaseYear_1 = new JLabel("Release year:");
+		JLabel lblReleaseYear_1 = new JLabel("Script Writer (1 to 3):");
 		
-		JLabel lblCrewName = new JLabel("Crew name:");
+		JLabel lblCrewName = new JLabel("Producer (1 to 3):");
 		
-		JLabel lblRole = new JLabel("Role:");
+		JLabel lblRole = new JLabel("Composer (1 to 3):");
 		
 		JLabel lblMovieName = new JLabel("Movie name:");
 		
-		textField_13 = new JTextField();
-		textField_13.setColumns(10);
+		producersTx = new JTextField();
+		producersTx.setColumns(10);
 		
-		textField_14 = new JTextField();
-		textField_14.setColumns(10);
+		scriptWritersTx = new JTextField();
+		scriptWritersTx.setColumns(10);
 		
-		textField_24 = new JTextField();
-		textField_24.setColumns(10);
+		directorsTx = new JTextField();
+		directorsTx.setColumns(10);
 		
-		textField_25 = new JTextField();
-		textField_25.setColumns(10);
+		movieYearTx = new JTextField();
+		movieYearTx.setColumns(10);
 		
-		textField_26 = new JTextField();
-		textField_26.setColumns(10);
+		movieNameTx = new JTextField();
+		movieNameTx.setColumns(10);
 		
-		textField_27 = new JTextField();
-		textField_27.setColumns(10);
+	  JTextField[] insertMovieFields = {movieNameTx, movieYearTx};
+	  
 		
 		JButton button_4 = new JButton("Submit");
+		button_4.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent e) {
+        int movieYear = checkIfNumerical(movieYearTx);
+		    // validate input field
+		    if (movieNameTx.getText().equals("") || movieYearTx.getText().equals("") || directorsTx.getText().equals("") || scriptWritersTx.getText().equals("") ||
+		        producersTx.getText().equals("") || composersTx.getText().equals("") || editorsTx.getText().equals("") || costumeDesignersTx.getText().equals("") ||
+		        castsTx.getText().equals("")) {
+		      System.out.println("Please enter all fields");
+		    } else if (movieYear < 0) {
+		      System.out.println("Please enter a valid year");
+		    } else {
+		      // get inputs
+		      // get crews name and roles
+//		      JTextField[] insertMovieCrewFields = {directorsTx, scriptWritersTx, producersTx, composersTx, editorsTx, costumeDesignersTx};
+		      Map<JTextField, String> MovieCrewJFields = new HashMap<JTextField, String>();
+		      MovieCrewJFields.put(directorsTx, "director");
+		      MovieCrewJFields.put(scriptWritersTx, "script writer");
+		      MovieCrewJFields.put(producersTx, "producer");
+		      MovieCrewJFields.put(composersTx, "composer");
+		      MovieCrewJFields.put(editorsTx, "editor");
+		      MovieCrewJFields.put(costumeDesignersTx, "costume designer");
+		      
+		      int counter = 0;
+		      String[] tempCrewName = null;
+		      Map<String, String> allCrewNameRole = new HashMap<String, String>();  // key: name, value:role
+		      for (JTextField crewTx: MovieCrewJFields.keySet()) {		        
+		        // split by ','
+		        tempCrewName = crewTx.getText().split("\\s*,\\s*");
+		        // try to put in a hashmap with name as key and role as value
+		        // the pair with the same key will replace the previous value
+		        for (String name : tempCrewName) {
+		          if (counter < 3) {
+		            allCrewNameRole.put(name, MovieCrewJFields.get(crewTx));
+		            counter++;
+		          }
+		        }
+		        counter = 0;
+		      }
+		      // get casts name
+		      tempCrewName = castsTx.getText().split("\\s*,\\s*");
+		      List<String> castNameArrayList = new LinkedList<String>(Arrays.asList(tempCrewName));
+		      
+		      
+		      // check if the crews and cast exist in peopleInvolved table
+		      // crew
+		      int pplID;
+		      List<String> removalKey = new ArrayList<String>();
+		      for (String crewName : allCrewNameRole.keySet()) {
+            pplID = getPeopleID(crewName);
+            if (pplID == -1) {
+              // author not exist
+              System.out.println("movie crew not exist " + crewName);
+              // add new crew
+              try {
+                pplID = insertNewPeople(crewName);
+              } catch (SQLException ex) {
+                ex.printStackTrace();
+              }
+              if (pplID == -1) {
+                System.out.println("The movie crew name "+ crewName +" is not in a correct format. did not add to database.");
+                // remove from hashmap - prevent from inserting into other tables
+                removalKey.add(crewName);
+              }
+            }
+          }
+		      List<Integer> removalCast = new ArrayList<Integer>();
+		      // cast
+		      for (int i = 0 ; i < castNameArrayList.size() && i < 10; i ++) {
+            pplID = getPeopleID(castNameArrayList.get(i));
+            if (pplID == -1) {
+              // author not exist
+              System.out.println("movie crew not exist " + tempCrewName[i]);
+              // add new crew
+              try {
+                pplID = insertNewPeople(castNameArrayList.get(i));
+              } catch (SQLException ex) {
+                ex.printStackTrace();
+              }
+              if (pplID == -1) {
+                System.out.println("The movie cast name "+ castNameArrayList.get(i) +" is not in a correct format. did not add to database.");
+                // add index to array for removal later - prevent from inserting into other tables
+                removalCast.add(i);
+              }
+            }
+          }
+		      if (removalKey.size() > 0) {
+		        for (String k : removalKey) {
+		          allCrewNameRole.remove(k);
+		        }
+		      }
+		      // remove cast that name format is wrong
+		      if (castNameArrayList.size() > 10) {
+		        for (int i = castNameArrayList.size(); i>10; i--) {
+		          castNameArrayList.remove(i);
+		        }
+		      }
+		      if (removalCast.size() > 0) {
+		        System.out.println(removalCast.get(0));
+  		      for (int i=removalCast.size()-1 ; i>=0 ;i--) {
+  		        castNameArrayList.remove(i);
+  		      }
+		      }
+		      
+		      // get movie name
+		      String movieName = movieNameTx.getText();
+		      
+		      
+		      
+		      
+		      // check if it's a number
+		      if (movieYear >= 0) {
+  		      // check if movie exist
+  		      if (!checkMovieExist(movieName, movieYear)) {
+  		        // insert movie if not exist
+  		        insertMovie(movieName, movieYear);
+  		        System.out.println("movie inserted");
+  		        // insert award
+  		        
+  		        // insert crewMember
+  		        
+  		        
+  		      } else {
+  		        System.out.println("movie already exist");
+  		        // clear textfields
+  		        clearFields(insertMovieFields);
+  		      }
+		      }
+		    }
+		  }
+		});
 		
 		JButton button_5 = new JButton("Cancel");
+		button_5.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        movieNameTx.setText("");
+        movieYearTx.setText("");
+      }
+    });
+		
+		String[] movieCastRoles = {"director", "script writer", "cast", "producer",
+		    "composer", "editor", "costume designer"};
+		
+		JComboBox movieRolesTx = new JComboBox(movieCastRoles);
+		
+		JLabel lblGender = new JLabel("Editor (1 to 3):");
+		
+		JRadioButton rdbtnMale = new JRadioButton("male");
+		rdbtnMale.setSelected(true);
+		
+		JRadioButton rdbtnFemale = new JRadioButton("female");
+		
+		JLabel lblGotAward = new JLabel("Costume designer (1 to 3):");
+		
+		JRadioButton rdbtnYes = new JRadioButton("Yes");
+		
+		JRadioButton rdbtnNo = new JRadioButton("No");
+		
+		ButtonGroup castGenderGroup = new ButtonGroup();
+		castGenderGroup.add(rdbtnMale);
+		castGenderGroup.add(rdbtnFemale);
+		
+		ButtonGroup castRewardGroup = new ButtonGroup();
+		castRewardGroup.add(rdbtnNo);
+		castRewardGroup.add(rdbtnYes);
+		
+		rdbtnNo.setSelected(true);
+		
+		JLabel lblCrewsAndCasts = new JLabel("Crews and casts");
+		
+		composersTx = new JTextField();
+		composersTx.setColumns(10);
+		
+		editorsTx = new JTextField();
+		editorsTx.setColumns(10);
+		
+		JLabel lblCast = new JLabel("Cast (1 to 10):");
+		
+		costumeDesignersTx = new JTextField();
+		costumeDesignersTx.setColumns(10);
+		
+		castsTx = new JTextField();
+		castsTx.setColumns(10);
 		GroupLayout gl_insertMovie = new GroupLayout(insertMovie);
 		gl_insertMovie.setHorizontalGroup(
-			gl_insertMovie.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_insertMovie.createSequentialGroup()
-					.addGap(199)
-					.addGroup(gl_insertMovie.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_insertMovie.createSequentialGroup()
-							.addComponent(button_2, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(button_3, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED))
-						.addGroup(gl_insertMovie.createSequentialGroup()
-							.addGroup(gl_insertMovie.createParallelGroup(Alignment.TRAILING)
-								.addGroup(gl_insertMovie.createSequentialGroup()
-									.addComponent(button_4, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(button_5, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE))
-								.addGroup(gl_insertMovie.createSequentialGroup()
-									.addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
-										.addComponent(lblMovieName)
-										.addComponent(lblReleaseYear)
-										.addComponent(lblMovieName_1)
-										.addComponent(lblReleaseYear_1)
-										.addComponent(lblCrewName)
-										.addComponent(lblRole))
-									.addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
-										.addGroup(gl_insertMovie.createSequentialGroup()
-											.addGap(22)
-											.addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING, false)
-												.addComponent(textField_26)
-												.addComponent(textField_27, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)))
-										.addGroup(gl_insertMovie.createSequentialGroup()
-											.addGap(18)
-											.addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
-												.addComponent(textField_24, GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
-												.addComponent(textField_14, GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
-												.addComponent(textField_25, GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
-												.addComponent(textField_13, GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE))))))
-							.addGap(9)))
-					.addGap(198))
+		  gl_insertMovie.createParallelGroup(Alignment.LEADING)
+		    .addGroup(gl_insertMovie.createSequentialGroup()
+		      .addGap(44)
+		      .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
+		        .addGroup(Alignment.TRAILING, gl_insertMovie.createSequentialGroup()
+		          .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
+		            .addGroup(gl_insertMovie.createSequentialGroup()
+		              .addComponent(button_4, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
+		              .addPreferredGap(ComponentPlacement.RELATED, 397, Short.MAX_VALUE)
+		              .addComponent(rdbtnNo)
+		              .addGap(144))
+		            .addGroup(gl_insertMovie.createSequentialGroup()
+		              .addGap(110)
+		              .addComponent(button_5, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
+		              .addPreferredGap(ComponentPlacement.RELATED)))
+		          .addGap(182))
+		        .addGroup(gl_insertMovie.createSequentialGroup()
+		          .addComponent(lblCast)
+		          .addGap(41)
+		          .addComponent(castsTx, GroupLayout.PREFERRED_SIZE, 230, GroupLayout.PREFERRED_SIZE)
+		          .addContainerGap())
+		        .addGroup(gl_insertMovie.createSequentialGroup()
+		          .addComponent(lblGotAward)
+		          .addGap(37)
+		          .addComponent(costumeDesignersTx, GroupLayout.PREFERRED_SIZE, 228, GroupLayout.PREFERRED_SIZE)
+		          .addContainerGap())
+		        .addGroup(gl_insertMovie.createSequentialGroup()
+		          .addGroup(gl_insertMovie.createParallelGroup(Alignment.TRAILING)
+		            .addGroup(gl_insertMovie.createSequentialGroup()
+		              .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
+		                .addComponent(lblCrewsAndCasts)
+		                .addGroup(gl_insertMovie.createSequentialGroup()
+		                  .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
+		                    .addComponent(lblMovieName)
+		                    .addComponent(lblMovieName_1)
+		                    .addComponent(lblReleaseYear_1)
+		                    .addComponent(lblCrewName)
+		                    .addComponent(lblRole)
+		                    .addComponent(lblGender))
+		                  .addPreferredGap(ComponentPlacement.RELATED, 5, Short.MAX_VALUE)
+		                  .addGroup(gl_insertMovie.createParallelGroup(Alignment.TRAILING, false)
+		                    .addGroup(gl_insertMovie.createSequentialGroup()
+		                      .addPreferredGap(ComponentPlacement.RELATED)
+		                      .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING, false)
+		                        .addComponent(scriptWritersTx, Alignment.TRAILING)
+		                        .addComponent(directorsTx, Alignment.TRAILING)
+		                        .addComponent(composersTx, GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE)
+		                        .addComponent(producersTx, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
+		                        .addComponent(editorsTx, GroupLayout.PREFERRED_SIZE, 224, GroupLayout.PREFERRED_SIZE)
+		                        .addComponent(movieNameTx))
+		                      .addPreferredGap(ComponentPlacement.UNRELATED)
+		                      .addComponent(lblReleaseYear)
+		                      .addGap(18)
+		                      .addComponent(movieYearTx, GroupLayout.PREFERRED_SIZE, 169, GroupLayout.PREFERRED_SIZE))
+		                    .addGroup(gl_insertMovie.createSequentialGroup()
+		                      .addComponent(button_2, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
+		                      .addGap(64)
+		                      .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
+		                        .addComponent(rdbtnFemale)
+		                        .addComponent(rdbtnMale))
+		                      .addGap(39)))))
+		              .addPreferredGap(ComponentPlacement.RELATED))
+		            .addGroup(gl_insertMovie.createSequentialGroup()
+		              .addComponent(rdbtnYes)
+		              .addGap(74)))
+		          .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
+		            .addComponent(button_3, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
+		            .addGroup(gl_insertMovie.createSequentialGroup()
+		              .addPreferredGap(ComponentPlacement.RELATED)
+		              .addComponent(movieRolesTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+		          .addGap(127))))
 		);
 		gl_insertMovie.setVerticalGroup(
-			gl_insertMovie.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_insertMovie.createSequentialGroup()
-					.addGap(69)
-					.addGroup(gl_insertMovie.createParallelGroup(Alignment.BASELINE)
-						.addComponent(textField_27, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblMovieName))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_insertMovie.createParallelGroup(Alignment.BASELINE)
-						.addComponent(textField_26, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblReleaseYear))
-					.addGap(18)
-					.addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
-						.addComponent(button_4)
-						.addComponent(button_5))
-					.addPreferredGap(ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
-					.addGroup(gl_insertMovie.createParallelGroup(Alignment.BASELINE)
-						.addComponent(textField_25, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblMovieName_1))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_insertMovie.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblReleaseYear_1)
-						.addComponent(textField_24, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(23)
-					.addGroup(gl_insertMovie.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblCrewName)
-						.addComponent(textField_14, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addGroup(gl_insertMovie.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblRole)
-						.addComponent(textField_13, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addGroup(gl_insertMovie.createParallelGroup(Alignment.BASELINE)
-						.addComponent(button_3)
-						.addComponent(button_2))
-					.addGap(147))
+		  gl_insertMovie.createParallelGroup(Alignment.LEADING)
+		    .addGroup(gl_insertMovie.createSequentialGroup()
+		      .addGap(22)
+		      .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_insertMovie.createSequentialGroup()
+		          .addGap(72)
+		          .addComponent(directorsTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		          .addGap(18)
+		          .addGroup(gl_insertMovie.createParallelGroup(Alignment.BASELINE)
+		            .addComponent(scriptWritersTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		            .addComponent(lblReleaseYear_1))
+		          .addGap(18)
+		          .addGroup(gl_insertMovie.createParallelGroup(Alignment.BASELINE)
+		            .addComponent(producersTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		            .addComponent(lblCrewName))
+		          .addGap(18)
+		          .addGroup(gl_insertMovie.createParallelGroup(Alignment.BASELINE)
+		            .addComponent(composersTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		            .addComponent(lblRole))
+		          .addGap(18)
+		          .addGroup(gl_insertMovie.createParallelGroup(Alignment.BASELINE)
+		            .addComponent(editorsTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		            .addComponent(lblGender)))
+		        .addGroup(gl_insertMovie.createSequentialGroup()
+		          .addGroup(gl_insertMovie.createParallelGroup(Alignment.BASELINE)
+		            .addComponent(lblMovieName)
+		            .addComponent(lblReleaseYear)
+		            .addComponent(movieYearTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		            .addComponent(movieNameTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		          .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING, false)
+		            .addGroup(gl_insertMovie.createSequentialGroup()
+		              .addGap(18)
+		              .addComponent(lblCrewsAndCasts)
+		              .addGap(21)
+		              .addComponent(lblMovieName_1)
+		              .addGap(179)
+		              .addGroup(gl_insertMovie.createParallelGroup(Alignment.BASELINE)
+		                .addComponent(lblGotAward)
+		                .addComponent(costumeDesignersTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		              .addGap(18)
+		              .addGroup(gl_insertMovie.createParallelGroup(Alignment.BASELINE)
+		                .addComponent(lblCast)
+		                .addComponent(castsTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		              .addGap(60)
+		              .addComponent(button_4)
+		              .addGap(19)
+		              .addComponent(button_5)
+		              .addGap(30)
+		              .addComponent(button_2))
+		            .addGroup(gl_insertMovie.createSequentialGroup()
+		              .addPreferredGap(ComponentPlacement.UNRELATED)
+		              .addGroup(gl_insertMovie.createParallelGroup(Alignment.TRAILING)
+		                .addGroup(gl_insertMovie.createSequentialGroup()
+		                  .addComponent(rdbtnMale)
+		                  .addPreferredGap(ComponentPlacement.RELATED, 258, Short.MAX_VALUE)
+		                  .addComponent(rdbtnFemale))
+		                .addGroup(gl_insertMovie.createSequentialGroup()
+		                  .addComponent(rdbtnNo)
+		                  .addGap(13)
+		                  .addComponent(movieRolesTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		                  .addGap(70)))
+		              .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
+		                .addGroup(gl_insertMovie.createSequentialGroup()
+		                  .addGap(19)
+		                  .addComponent(button_3))
+		                .addGroup(gl_insertMovie.createSequentialGroup()
+		                  .addGap(28)
+		                  .addComponent(rdbtnYes)))
+		              .addGap(126)))))
+		      .addGap(32))
 		);
 		insertMovie.setLayout(gl_insertMovie);
 		
@@ -1438,7 +1691,6 @@ public class MainFrame {
 					System.out.println("added new people");
 					return nextID;
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -1650,7 +1902,59 @@ public class MainFrame {
     return false;
 	 }
 	 
-	 // ------------------------------------------------------------------------------------------------------------------------
-	 // -------------- functions for inserting movies -------------------------------------------------------------------------
+   //--------------------------------------------------------------------------------------------------------------------------------
+	 // ---------------------------------------------insert movie functions ---------------------------------------------------------
+	 public static boolean checkMovieExist(String movieName, int movieYear) {
+	   String sql = "select count(*) from Movie where MovieName = ? and Year = ?;";
+	   int found = -1;
+	   PreparedStatement ps;
+	   try {
+       ps = con.prepareStatement(sql);
+       ps.setString(1, movieName);
+       ps.setInt(2, movieYear);
+       ResultSet rs = null;
+       rs = ps.executeQuery();
+       if (rs.next()) {
+         found = rs.getInt("count(*)");
+       }
+       if (found == 0) {
+         return false;
+       }
+	   } catch (SQLException e) {
+       e.printStackTrace();
+     }
+	   return true;
+	 }
 	 
+	 public static boolean insertMovie(String movieName, int movieYear) {
+	   String sql = "insert into Movie values (?,?);";
+	   PreparedStatement ps;
+	   try {
+       ps = con.prepareStatement(sql);
+       ps.setString(1, movieName);
+       ps.setInt(2, movieYear);
+       ps.executeUpdate();
+       return true;
+     } catch (SQLException e) {
+       e.printStackTrace();
+     }
+	   return false;
+	 }
+	 
+	 public static int checkIfNumerical(JTextField text) {
+	   int result = -1;
+	   try {
+       result = Integer.parseInt(text.getText());
+     } catch (NumberFormatException nfe) {
+       // Not a number
+       result = -1;
+     }
+	   return result;
+	 }
+	 
+	 public static void clearFields(JTextField[] list) {
+	   for (int i = 0; i < list.length ; i++) {
+	     list[i].setText("");
+	   }
+	 }
 }
