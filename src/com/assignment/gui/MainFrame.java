@@ -70,10 +70,10 @@ public class MainFrame {
 	private JTextField directorsTx;
 	private JTextField movieYearTx;
 	private JTextField movieNameTx;
-	private JTextField textField_12;
-	private JTextField textField_15;
-	private JTextField textField_28;
-	private JTextField textField_29;
+	private JTextField upISBNSearch;
+	private JTextField upAlbumSearch;
+	private JTextField upMusicYearSearch;
+	private JTextField upMusicNameSearch;
 	private JTextField textField_30;
 	private JTextField textField_31;
 	private JTextField delISBNTx;
@@ -87,6 +87,28 @@ public class MainFrame {
 	private JTextField editorsTx;
 	private JTextField costumeDesignersTx;
 	private JTextField castsTx;
+	private JTextField upBookYearTx;
+	private JTextField upEditionTx;
+	private JTextField upAbstractTx;
+	private JTextField upKeywordsTx;
+	private JTextField upAuthorTx1;
+	private JTextField upAuthorTx3;
+	private JTextField upAuthorTx5;
+	private JTextField upAuthorTx4;
+	private JTextField upAuthorTx2;
+	private JTextField upBookTitleTx;
+	private JTextField upISBN;
+	private JTextField upPublisherTx;
+	private JTextField upPagesTx;
+	private JTextField upAlbumNameTx;
+	private JTextField upComposerTx;
+	private JTextField upMusicProducerTx;
+	private JTextField upSongWriterTx;
+	private JTextField upLangTx;
+	private JTextField upArrangerTx;
+	private JTextField upMusicYearTx;
+	private JTextField upMusicNameTx;
+	private JTextField upSingersTx;
 
 	/**
 	 * Launch the application.
@@ -121,7 +143,7 @@ public class MainFrame {
 	 */
 	private void initialize(Connection con) {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 815, 624);
+		frame.setBounds(100, 100, 856, 689);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		frame.getContentPane().setLayout(new CardLayout(0, 0));
@@ -711,9 +733,6 @@ public class MainFrame {
 		movieNameTx = new JTextField();
 		movieNameTx.setColumns(10);
 		
-	  JTextField[] insertMovieFields = {movieNameTx, movieYearTx};
-	  
-		
 		JButton button_4 = new JButton("Submit");
 		button_4.addActionListener(new ActionListener() {
 		  public void actionPerformed(ActionEvent e) {
@@ -874,26 +893,17 @@ public class MainFrame {
 		
 		JLabel lblGender = new JLabel("Editor (1 to 3):");
 		
-		JRadioButton rdbtnMale = new JRadioButton("male");
-		rdbtnMale.setSelected(true);
-		
 		JRadioButton rdbtnFemale = new JRadioButton("female");
 		
 		JLabel lblGotAward = new JLabel("Costume designer (1 to 3):");
 		
 		JRadioButton rdbtnYes = new JRadioButton("Yes");
 		
-		JRadioButton rdbtnNo = new JRadioButton("No");
-		
 		ButtonGroup castGenderGroup = new ButtonGroup();
-		castGenderGroup.add(rdbtnMale);
 		castGenderGroup.add(rdbtnFemale);
 		
 		ButtonGroup castRewardGroup = new ButtonGroup();
-		castRewardGroup.add(rdbtnNo);
 		castRewardGroup.add(rdbtnYes);
-		
-		rdbtnNo.setSelected(true);
 		
 		JLabel lblCrewsAndCasts = new JLabel("Crews and casts");
 		
@@ -915,68 +925,60 @@ public class MainFrame {
 		  gl_insertMovie.createParallelGroup(Alignment.LEADING)
 		    .addGroup(gl_insertMovie.createSequentialGroup()
 		      .addGap(44)
-		      .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
-		        .addGroup(Alignment.TRAILING, gl_insertMovie.createSequentialGroup()
+		      .addGroup(gl_insertMovie.createParallelGroup(Alignment.TRAILING)
+		        .addGroup(gl_insertMovie.createSequentialGroup()
+		          .addComponent(button_4, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
+		          .addContainerGap(604, Short.MAX_VALUE))
+		        .addGroup(gl_insertMovie.createSequentialGroup()
 		          .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
-		            .addGroup(gl_insertMovie.createSequentialGroup()
-		              .addComponent(button_4, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
-		              .addPreferredGap(ComponentPlacement.RELATED, 397, Short.MAX_VALUE)
-		              .addComponent(rdbtnNo)
-		              .addGap(144))
-		            .addGroup(gl_insertMovie.createSequentialGroup()
-		              .addGap(110)
-		              .addComponent(button_5, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
-		              .addPreferredGap(ComponentPlacement.RELATED)))
-		          .addGap(182))
-		        .addGroup(gl_insertMovie.createSequentialGroup()
-		          .addComponent(lblCast)
-		          .addGap(41)
-		          .addComponent(castsTx, GroupLayout.PREFERRED_SIZE, 230, GroupLayout.PREFERRED_SIZE)
-		          .addContainerGap())
-		        .addGroup(gl_insertMovie.createSequentialGroup()
-		          .addComponent(lblGotAward)
-		          .addGap(37)
-		          .addComponent(costumeDesignersTx, GroupLayout.PREFERRED_SIZE, 228, GroupLayout.PREFERRED_SIZE)
-		          .addContainerGap())
-		        .addGroup(gl_insertMovie.createSequentialGroup()
-		          .addGroup(gl_insertMovie.createParallelGroup(Alignment.TRAILING)
-		            .addGroup(gl_insertMovie.createSequentialGroup()
-		              .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
-		                .addComponent(lblCrewsAndCasts)
-		                .addGroup(gl_insertMovie.createSequentialGroup()
-		                  .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
-		                    .addComponent(lblMovieName)
-		                    .addComponent(lblMovieName_1)
-		                    .addComponent(lblReleaseYear_1)
-		                    .addComponent(lblCrewName)
-		                    .addComponent(lblRole)
-		                    .addComponent(lblGender))
-		                  .addPreferredGap(ComponentPlacement.RELATED, 5, Short.MAX_VALUE)
-		                  .addGroup(gl_insertMovie.createParallelGroup(Alignment.TRAILING, false)
-		                    .addGroup(gl_insertMovie.createSequentialGroup()
-		                      .addPreferredGap(ComponentPlacement.RELATED)
-		                      .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING, false)
-		                        .addComponent(scriptWritersTx, Alignment.TRAILING)
-		                        .addComponent(directorsTx, Alignment.TRAILING)
-		                        .addComponent(composersTx, GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE)
-		                        .addComponent(producersTx, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
-		                        .addComponent(editorsTx, GroupLayout.PREFERRED_SIZE, 224, GroupLayout.PREFERRED_SIZE)
-		                        .addComponent(movieNameTx))
-		                      .addPreferredGap(ComponentPlacement.UNRELATED)
-		                      .addComponent(lblReleaseYear)
-		                      .addGap(18)
-		                      .addComponent(movieYearTx, GroupLayout.PREFERRED_SIZE, 169, GroupLayout.PREFERRED_SIZE))
-		                    .addGroup(gl_insertMovie.createSequentialGroup()
-		                      .addComponent(button_2, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
-		                      .addGap(64)
-		                      .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
+		            .addGroup(gl_insertMovie.createParallelGroup(Alignment.TRAILING)
+		              .addGroup(gl_insertMovie.createSequentialGroup()
+		                .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
+		                  .addComponent(lblCrewsAndCasts)
+		                  .addGroup(gl_insertMovie.createSequentialGroup()
+		                    .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
+		                      .addComponent(lblMovieName)
+		                      .addComponent(lblMovieName_1)
+		                      .addComponent(lblReleaseYear_1)
+		                      .addComponent(lblCrewName)
+		                      .addComponent(lblRole)
+		                      .addComponent(lblGender))
+		                    .addPreferredGap(ComponentPlacement.RELATED, 5, Short.MAX_VALUE)
+		                    .addGroup(gl_insertMovie.createParallelGroup(Alignment.TRAILING, false)
+		                      .addGroup(gl_insertMovie.createSequentialGroup()
+		                        .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING, false)
+		                          .addComponent(scriptWritersTx, Alignment.TRAILING)
+		                          .addComponent(directorsTx, Alignment.TRAILING)
+		                          .addComponent(composersTx, GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE)
+		                          .addComponent(producersTx, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
+		                          .addComponent(editorsTx, GroupLayout.PREFERRED_SIZE, 224, GroupLayout.PREFERRED_SIZE)
+		                          .addComponent(movieNameTx))
+		                        .addPreferredGap(ComponentPlacement.UNRELATED)
+		                        .addComponent(lblReleaseYear)
+		                        .addGap(18)
+		                        .addComponent(movieYearTx, GroupLayout.PREFERRED_SIZE, 169, GroupLayout.PREFERRED_SIZE))
+		                      .addGroup(gl_insertMovie.createSequentialGroup()
+		                        .addComponent(button_2, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
+		                        .addGap(64)
 		                        .addComponent(rdbtnFemale)
-		                        .addComponent(rdbtnMale))
-		                      .addGap(39)))))
-		              .addPreferredGap(ComponentPlacement.RELATED))
+		                        .addGap(39)))))
+		                .addPreferredGap(ComponentPlacement.RELATED))
+		              .addGroup(gl_insertMovie.createSequentialGroup()
+		                .addComponent(rdbtnYes)
+		                .addGap(74)))
 		            .addGroup(gl_insertMovie.createSequentialGroup()
-		              .addComponent(rdbtnYes)
-		              .addGap(74)))
+		              .addGroup(gl_insertMovie.createParallelGroup(Alignment.TRAILING)
+		                .addGroup(gl_insertMovie.createSequentialGroup()
+		                  .addComponent(lblGotAward)
+		                  .addGap(37)
+		                  .addComponent(costumeDesignersTx, GroupLayout.PREFERRED_SIZE, 228, GroupLayout.PREFERRED_SIZE))
+		                .addGroup(Alignment.LEADING, gl_insertMovie.createSequentialGroup()
+		                  .addComponent(lblCast)
+		                  .addGap(46)
+		                  .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
+		                    .addComponent(button_5, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
+		                    .addComponent(castsTx, GroupLayout.PREFERRED_SIZE, 230, GroupLayout.PREFERRED_SIZE))))
+		              .addPreferredGap(ComponentPlacement.RELATED)))
 		          .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
 		            .addComponent(button_3, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
 		            .addGroup(gl_insertMovie.createSequentialGroup()
@@ -1029,21 +1031,16 @@ public class MainFrame {
 		                .addComponent(lblCast)
 		                .addComponent(castsTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 		              .addGap(60)
-		              .addComponent(button_4)
-		              .addGap(19)
-		              .addComponent(button_5)
-		              .addGap(30)
+		              .addGroup(gl_insertMovie.createParallelGroup(Alignment.BASELINE)
+		                .addComponent(button_4)
+		                .addComponent(button_5))
+		              .addGap(74)
 		              .addComponent(button_2))
 		            .addGroup(gl_insertMovie.createSequentialGroup()
-		              .addPreferredGap(ComponentPlacement.UNRELATED)
+		              .addPreferredGap(ComponentPlacement.UNRELATED, 263, Short.MAX_VALUE)
 		              .addGroup(gl_insertMovie.createParallelGroup(Alignment.TRAILING)
+		                .addComponent(rdbtnFemale)
 		                .addGroup(gl_insertMovie.createSequentialGroup()
-		                  .addComponent(rdbtnMale)
-		                  .addPreferredGap(ComponentPlacement.RELATED, 258, Short.MAX_VALUE)
-		                  .addComponent(rdbtnFemale))
-		                .addGroup(gl_insertMovie.createSequentialGroup()
-		                  .addComponent(rdbtnNo)
-		                  .addGap(13)
 		                  .addComponent(movieRolesTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 		                  .addGap(70)))
 		              .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
@@ -1063,35 +1060,189 @@ public class MainFrame {
 		
 		JLabel lblNewLabel_1 = new JLabel("Book ISBN:");
 		
-		textField_12 = new JTextField();
-		textField_12.setColumns(10);
+		upISBNSearch = new JTextField();
+		upISBNSearch.setColumns(10);
 		
 		JButton btnNewButton = new JButton("Search Book");
+		
+		JLabel lblNewLabel_2 = new JLabel("Book title:");
+		
+		JLabel label_6 = new JLabel("Book ISBN:");
+		
+		JLabel lblPublisher = new JLabel("Publisher:");
+		
+		JLabel lblNumberOfPages = new JLabel("Number of pages:");
+		
+		JLabel label_7 = new JLabel("Year of publication:");
+		
+		upBookYearTx = new JTextField();
+		upBookYearTx.setColumns(10);
+		
+		JLabel label_8 = new JLabel("Edition number:");
+		
+		upEditionTx = new JTextField();
+		upEditionTx.setColumns(10);
+		
+		JLabel label_9 = new JLabel("Abstract:");
+		
+		upAbstractTx = new JTextField();
+		upAbstractTx.setColumns(10);
+		
+		JLabel label_10 = new JLabel("Keywords:");
+		
+		upKeywordsTx = new JTextField();
+		upKeywordsTx.setColumns(10);
+		
+		JLabel label_11 = new JLabel("Authors:");
+		
+		upAuthorTx1 = new JTextField();
+		upAuthorTx1.setColumns(10);
+		
+		upAuthorTx3 = new JTextField();
+		upAuthorTx3.setColumns(10);
+		
+		upAuthorTx5 = new JTextField();
+		upAuthorTx5.setColumns(10);
+		
+		upAuthorTx4 = new JTextField();
+		upAuthorTx4.setColumns(10);
+		
+		upAuthorTx2 = new JTextField();
+		upAuthorTx2.setColumns(10);
+		
+		upBookTitleTx = new JTextField();
+		upBookTitleTx.setColumns(10);
+		
+		upISBN = new JTextField();
+		upISBN.setColumns(10);
+		
+		upPublisherTx = new JTextField();
+		upPublisherTx.setColumns(10);
+		
+		upPagesTx = new JTextField();
+		upPagesTx.setColumns(10);
 		GroupLayout gl_updateBook = new GroupLayout(updateBook);
 		gl_updateBook.setHorizontalGroup(
-			gl_updateBook.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_updateBook.createSequentialGroup()
-					.addGroup(gl_updateBook.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_updateBook.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(btnNewButton))
-						.addGroup(Alignment.LEADING, gl_updateBook.createSequentialGroup()
-							.addGap(107)
-							.addComponent(lblNewLabel_1)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(textField_12, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(198, Short.MAX_VALUE))
+		  gl_updateBook.createParallelGroup(Alignment.LEADING)
+		    .addGroup(gl_updateBook.createSequentialGroup()
+		      .addGap(107)
+		      .addGroup(gl_updateBook.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_updateBook.createSequentialGroup()
+		          .addGroup(gl_updateBook.createParallelGroup(Alignment.LEADING)
+		            .addComponent(lblNewLabel_2)
+		            .addComponent(label_6, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
+		            .addComponent(lblPublisher))
+		          .addGap(53)
+		          .addGroup(gl_updateBook.createParallelGroup(Alignment.LEADING)
+		            .addComponent(upPublisherTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
+		            .addComponent(upISBN, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
+		            .addComponent(upBookTitleTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))
+		        .addGroup(gl_updateBook.createParallelGroup(Alignment.TRAILING)
+		          .addGroup(gl_updateBook.createParallelGroup(Alignment.LEADING)
+		            .addGroup(gl_updateBook.createSequentialGroup()
+		              .addComponent(label_8, GroupLayout.PREFERRED_SIZE, 91, GroupLayout.PREFERRED_SIZE)
+		              .addGap(25)
+		              .addComponent(upEditionTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+		            .addGroup(gl_updateBook.createSequentialGroup()
+		              .addComponent(label_9, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE)
+		              .addGap(64)
+		              .addComponent(upAbstractTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+		            .addGroup(gl_updateBook.createSequentialGroup()
+		              .addComponent(label_10, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
+		              .addGap(56)
+		              .addComponent(upKeywordsTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+		            .addGroup(gl_updateBook.createSequentialGroup()
+		              .addComponent(label_11, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)
+		              .addGap(67)
+		              .addComponent(upAuthorTx1, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
+		              .addGap(23)
+		              .addComponent(upAuthorTx2, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE))
+		            .addGroup(gl_updateBook.createSequentialGroup()
+		              .addGap(116)
+		              .addComponent(upAuthorTx3, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
+		              .addGap(23)
+		              .addComponent(upAuthorTx4, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE))
+		            .addGroup(gl_updateBook.createSequentialGroup()
+		              .addGap(116)
+		              .addComponent(upAuthorTx5, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE))
+		            .addGroup(gl_updateBook.createSequentialGroup()
+		              .addComponent(label_7, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
+		              .addGap(5)
+		              .addComponent(upBookYearTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))
+		          .addGroup(gl_updateBook.createSequentialGroup()
+		            .addComponent(lblNumberOfPages)
+		            .addPreferredGap(ComponentPlacement.UNRELATED)
+		            .addComponent(upPagesTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))
+		        .addGroup(gl_updateBook.createParallelGroup(Alignment.TRAILING)
+		          .addComponent(btnNewButton)
+		          .addGroup(gl_updateBook.createSequentialGroup()
+		            .addComponent(lblNewLabel_1)
+		            .addPreferredGap(ComponentPlacement.UNRELATED)
+		            .addComponent(upISBNSearch, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE))))
+		      .addGap(190))
 		);
 		gl_updateBook.setVerticalGroup(
-			gl_updateBook.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_updateBook.createSequentialGroup()
-					.addGap(32)
-					.addGroup(gl_updateBook.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblNewLabel_1)
-						.addComponent(textField_12, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addComponent(btnNewButton)
-					.addContainerGap(453, Short.MAX_VALUE))
+		  gl_updateBook.createParallelGroup(Alignment.LEADING)
+		    .addGroup(gl_updateBook.createSequentialGroup()
+		      .addGap(32)
+		      .addGroup(gl_updateBook.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(lblNewLabel_1)
+		        .addComponent(upISBNSearch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addComponent(btnNewButton)
+		      .addGap(18)
+		      .addGroup(gl_updateBook.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_updateBook.createSequentialGroup()
+		          .addComponent(lblNewLabel_2)
+		          .addGap(18)
+		          .addGroup(gl_updateBook.createParallelGroup(Alignment.BASELINE)
+		            .addComponent(label_6)
+		            .addComponent(upISBN, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		          .addGap(18)
+		          .addGroup(gl_updateBook.createParallelGroup(Alignment.BASELINE)
+		            .addComponent(lblPublisher)
+		            .addComponent(upPublisherTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		          .addGap(18)
+		          .addGroup(gl_updateBook.createParallelGroup(Alignment.BASELINE)
+		            .addComponent(lblNumberOfPages)
+		            .addComponent(upPagesTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+		        .addComponent(upBookTitleTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addPreferredGap(ComponentPlacement.UNRELATED)
+		      .addGroup(gl_updateBook.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_updateBook.createSequentialGroup()
+		          .addGap(3)
+		          .addComponent(label_7))
+		        .addComponent(upBookYearTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addGroup(gl_updateBook.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_updateBook.createSequentialGroup()
+		          .addGap(3)
+		          .addComponent(label_8))
+		        .addComponent(upEditionTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addGroup(gl_updateBook.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_updateBook.createSequentialGroup()
+		          .addGap(3)
+		          .addComponent(label_9))
+		        .addComponent(upAbstractTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addGroup(gl_updateBook.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_updateBook.createSequentialGroup()
+		          .addGap(3)
+		          .addComponent(label_10))
+		        .addComponent(upKeywordsTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addGroup(gl_updateBook.createParallelGroup(Alignment.LEADING)
+		        .addComponent(label_11)
+		        .addComponent(upAuthorTx1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		        .addComponent(upAuthorTx2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(7)
+		      .addGroup(gl_updateBook.createParallelGroup(Alignment.LEADING)
+		        .addComponent(upAuthorTx3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		        .addComponent(upAuthorTx4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(7)
+		      .addComponent(upAuthorTx5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		      .addContainerGap(47, Short.MAX_VALUE))
 		);
 		updateBook.setLayout(gl_updateBook);
 		
@@ -1102,55 +1253,229 @@ public class MainFrame {
 		
 		JLabel lblAlbumName_1 = new JLabel("Album name:");
 		
-		textField_15 = new JTextField();
-		textField_15.setColumns(10);
+		upAlbumSearch = new JTextField();
+		upAlbumSearch.setColumns(10);
 		
 		JLabel lblYear_1 = new JLabel("Year:");
 		
 		JLabel lblMusicName_1 = new JLabel("Music name:");
 		
-		textField_28 = new JTextField();
-		textField_28.setColumns(10);
+		upMusicYearSearch = new JTextField();
+		upMusicYearSearch.setColumns(10);
 		
-		textField_29 = new JTextField();
-		textField_29.setColumns(10);
+		upMusicNameSearch = new JTextField();
+		upMusicNameSearch.setColumns(10);
+		
+		JLabel label_12 = new JLabel("Year:");
+		
+		JLabel label_13 = new JLabel("Music name:");
+		
+		JLabel label_14 = new JLabel("language:");
+		
+		JLabel label_15 = new JLabel("Disk type:");
+		
+		JLabel label_16 = new JLabel("Producer:");
+		
+		JLabel label_17 = new JLabel("Song writer:");
+		
+		JLabel label_18 = new JLabel("Composer:");
+		
+		JLabel label_19 = new JLabel("Arranger:");
+		
+		JLabel label_20 = new JLabel("Singers:");
+		
+		JLabel label_21 = new JLabel("Album name:");
+		
+		upAlbumNameTx = new JTextField();
+		upAlbumNameTx.setColumns(10);
+		
+		upComposerTx = new JTextField();
+		upComposerTx.setColumns(10);
+		
+		upMusicProducerTx = new JTextField();
+		upMusicProducerTx.setColumns(10);
+		
+		upSongWriterTx = new JTextField();
+		upSongWriterTx.setColumns(10);
+		
+		upLangTx = new JTextField();
+		upLangTx.setColumns(10);
+		
+		upArrangerTx = new JTextField();
+		upArrangerTx.setColumns(10);
+		
+		upMusicYearTx = new JTextField();
+		upMusicYearTx.setColumns(10);
+		
+		upMusicNameTx = new JTextField();
+		upMusicNameTx.setColumns(10);
+		
+		upSingersTx = new JTextField();
+		upSingersTx.setColumns(10);
+		
+		JRadioButton upAudioCDBtn = new JRadioButton("audioCD");
+		upAudioCDBtn.setSelected(true);
+		
+		JRadioButton upVinylBtn = new JRadioButton("vinyl");
+		
+		JButton btnNewButton_1 = new JButton("Cancel");
+		
+		JButton btnNewButton_2 = new JButton("Update");
 		GroupLayout gl_updateAlbum = new GroupLayout(updateAlbum);
 		gl_updateAlbum.setHorizontalGroup(
-			gl_updateAlbum.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_updateAlbum.createSequentialGroup()
-					.addGap(107)
-					.addGroup(gl_updateAlbum.createParallelGroup(Alignment.TRAILING)
-						.addComponent(btnSearchMusic)
-						.addGroup(gl_updateAlbum.createSequentialGroup()
-							.addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
-								.addComponent(lblMusicName_1)
-								.addComponent(lblAlbumName_1)
-								.addComponent(lblYear_1))
-							.addGap(18)
-							.addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
-								.addComponent(textField_15, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)
-								.addComponent(textField_28, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)
-								.addComponent(textField_29, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE))))
-					.addContainerGap(178, Short.MAX_VALUE))
+		  gl_updateAlbum.createParallelGroup(Alignment.LEADING)
+		    .addGroup(gl_updateAlbum.createSequentialGroup()
+		      .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_updateAlbum.createSequentialGroup()
+		          .addGap(108)
+		          .addGroup(gl_updateAlbum.createParallelGroup(Alignment.TRAILING)
+		            .addComponent(btnSearchMusic)
+		            .addGroup(gl_updateAlbum.createSequentialGroup()
+		              .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
+		                .addComponent(lblMusicName_1)
+		                .addComponent(lblYear_1))
+		              .addGap(18)
+		              .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
+		                .addComponent(upMusicYearSearch, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)
+		                .addComponent(upMusicNameSearch, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)))
+		            .addGroup(gl_updateAlbum.createSequentialGroup()
+		              .addComponent(lblAlbumName_1)
+		              .addGap(18)
+		              .addComponent(upAlbumSearch, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE))
+		            .addGroup(gl_updateAlbum.createSequentialGroup()
+		              .addComponent(btnNewButton_2)
+		              .addGap(18)
+		              .addComponent(btnNewButton_1))))
+		        .addGroup(gl_updateAlbum.createSequentialGroup()
+		          .addGap(171)
+		          .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
+		            .addGroup(gl_updateAlbum.createSequentialGroup()
+		              .addComponent(label_21, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
+		              .addGap(18)
+		              .addComponent(upAlbumNameTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+		            .addGroup(gl_updateAlbum.createSequentialGroup()
+		              .addComponent(label_12, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
+		              .addGap(64)
+		              .addComponent(upMusicYearTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+		            .addGroup(gl_updateAlbum.createSequentialGroup()
+		              .addComponent(label_13, GroupLayout.PREFERRED_SIZE, 73, GroupLayout.PREFERRED_SIZE)
+		              .addGap(22)
+		              .addComponent(upMusicNameTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+		            .addGroup(gl_updateAlbum.createSequentialGroup()
+		              .addComponent(label_14, GroupLayout.PREFERRED_SIZE, 57, GroupLayout.PREFERRED_SIZE)
+		              .addGap(38)
+		              .addComponent(upLangTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+		            .addGroup(gl_updateAlbum.createSequentialGroup()
+		              .addComponent(label_15)
+		              .addGap(39)
+		              .addComponent(upAudioCDBtn, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
+		              .addGap(64)
+		              .addComponent(upVinylBtn, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE))
+		            .addGroup(gl_updateAlbum.createSequentialGroup()
+		              .addComponent(label_16)
+		              .addGap(39)
+		              .addComponent(upMusicProducerTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+		            .addGroup(gl_updateAlbum.createSequentialGroup()
+		              .addComponent(label_17, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE)
+		              .addGap(23)
+		              .addComponent(upSongWriterTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+		            .addGroup(gl_updateAlbum.createSequentialGroup()
+		              .addComponent(label_18, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
+		              .addGap(32)
+		              .addComponent(upComposerTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+		            .addGroup(gl_updateAlbum.createSequentialGroup()
+		              .addComponent(label_19)
+		              .addGap(39)
+		              .addComponent(upArrangerTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+		            .addGroup(gl_updateAlbum.createSequentialGroup()
+		              .addComponent(label_20, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
+		              .addGap(47)
+		              .addComponent(upSingersTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))))
+		      .addContainerGap(185, Short.MAX_VALUE))
 		);
 		gl_updateAlbum.setVerticalGroup(
-			gl_updateAlbum.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_updateAlbum.createSequentialGroup()
-					.addGap(32)
-					.addGroup(gl_updateAlbum.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblAlbumName_1)
-						.addComponent(textField_15, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addGroup(gl_updateAlbum.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblYear_1)
-						.addComponent(textField_28, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addGroup(gl_updateAlbum.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblMusicName_1)
-						.addComponent(textField_29, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addComponent(btnSearchMusic)
-					.addContainerGap(373, Short.MAX_VALUE))
+		  gl_updateAlbum.createParallelGroup(Alignment.LEADING)
+		    .addGroup(gl_updateAlbum.createSequentialGroup()
+		      .addContainerGap()
+		      .addGroup(gl_updateAlbum.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(lblAlbumName_1)
+		        .addComponent(upAlbumSearch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addPreferredGap(ComponentPlacement.UNRELATED)
+		      .addGroup(gl_updateAlbum.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(lblYear_1)
+		        .addComponent(upMusicYearSearch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addGroup(gl_updateAlbum.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(lblMusicName_1)
+		        .addComponent(upMusicNameSearch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addComponent(btnSearchMusic)
+		      .addGap(18)
+		      .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_updateAlbum.createSequentialGroup()
+		          .addGap(3)
+		          .addComponent(label_21))
+		        .addComponent(upAlbumNameTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(13)
+		      .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_updateAlbum.createSequentialGroup()
+		          .addGap(3)
+		          .addComponent(label_12))
+		        .addComponent(upMusicYearTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_updateAlbum.createSequentialGroup()
+		          .addGap(3)
+		          .addComponent(label_13))
+		        .addComponent(upMusicNameTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_updateAlbum.createSequentialGroup()
+		          .addGap(6)
+		          .addComponent(label_14))
+		        .addComponent(upLangTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_updateAlbum.createSequentialGroup()
+		          .addGap(4)
+		          .addComponent(label_15))
+		        .addComponent(upAudioCDBtn)
+		        .addComponent(upVinylBtn))
+		      .addGap(18)
+		      .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_updateAlbum.createSequentialGroup()
+		          .addGap(3)
+		          .addComponent(label_16))
+		        .addComponent(upMusicProducerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_updateAlbum.createSequentialGroup()
+		          .addGap(3)
+		          .addComponent(label_17))
+		        .addComponent(upSongWriterTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_updateAlbum.createSequentialGroup()
+		          .addGap(3)
+		          .addComponent(label_18))
+		        .addComponent(upComposerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_updateAlbum.createSequentialGroup()
+		          .addGap(3)
+		          .addComponent(label_19))
+		        .addComponent(upArrangerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_updateAlbum.createSequentialGroup()
+		          .addGap(3)
+		          .addComponent(label_20))
+		        .addComponent(upSingersTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addPreferredGap(ComponentPlacement.UNRELATED)
+		      .addGroup(gl_updateAlbum.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(btnNewButton_1)
+		        .addComponent(btnNewButton_2))
+		      .addContainerGap(27, Short.MAX_VALUE))
 		);
 		updateAlbum.setLayout(gl_updateAlbum);
 		
@@ -2278,5 +2603,4 @@ public class MainFrame {
       }
 	  }
 	}
-	 
 }
