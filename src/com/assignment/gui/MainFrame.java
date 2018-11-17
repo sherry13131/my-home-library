@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JTextField;
 import javax.swing.AbstractButton;
@@ -75,9 +77,9 @@ public class MainFrame {
 	private JTextField textField_30;
 	private JTextField textField_31;
 	private JTextField delISBNTx;
-	private JTextField textField_33;
-	private JTextField textField_34;
-	private JTextField textField_35;
+	private JTextField delAlbumTx;
+	private JTextField delYearTx;
+	private JTextField delMusicTx;
 	private JTextField textField_36;
 	private JTextField textField_37;
 	private JTextField singersTx;
@@ -1207,9 +1209,22 @@ public class MainFrame {
 		JButton btnDeleteBook = new JButton("Delete Book");
 		btnDeleteBook.addActionListener(new ActionListener() {
 		  public void actionPerformed(ActionEvent e) {
-		    // check if book exist in db
-//		    boolean found = 
-		    // delete if exist
+		    String isbn = delISBNTx.getText();
+		    // check isbn regex
+        if (checkHelper.checkIsbnFormat(isbn)) {
+          // check if book exist in db
+          boolean found = SelectHelper.bookexist(isbn);
+          // delete if found
+          if (found) {
+            TransactionHelper.deleteBookTransaction(isbn);
+            System.out.println("book deleted");
+          } else {
+            System.out.println("No such book");  
+          }
+        } else {
+          System.out.println("please enter ISBN with 13 digits");
+        }
+        delISBNTx.setText("");
 		  }
 		});
 		
@@ -1250,6 +1265,20 @@ public class MainFrame {
 		JButton btnDeleteMusic = new JButton("Delete Music");
 		btnDeleteMusic.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+			  if (delAlbumTx.getText().equals("") || delMusicTx.getText().equals("") || checkHelper.checkIfNumerical(delYearTx) < 0) {
+			    System.out.println("Please enter valid information for all fields");
+			  } else {
+			    String albumName = delAlbumTx.getText();
+			    String musicName = delMusicTx.getText();
+			    int year = Integer.parseInt(delYearTx.getText());
+			    // find if the music exist
+			    if (checkHelper.musicExist(albumName, year, musicName)) {
+  			    TransactionHelper.deleteMusicTransaction(albumName, year, musicName);
+  			    System.out.println("music is deleted");
+			    } else {
+			      System.out.println("music not exist");
+			    }
+			  }
 			}
 		});
 		
@@ -1259,14 +1288,14 @@ public class MainFrame {
 		
 		JLabel label_3 = new JLabel("Year:");
 		
-		textField_33 = new JTextField();
-		textField_33.setColumns(10);
+		delAlbumTx = new JTextField();
+		delAlbumTx.setColumns(10);
 		
-		textField_34 = new JTextField();
-		textField_34.setColumns(10);
+		delYearTx = new JTextField();
+		delYearTx.setColumns(10);
 		
-		textField_35 = new JTextField();
-		textField_35.setColumns(10);
+		delMusicTx = new JTextField();
+		delMusicTx.setColumns(10);
 		GroupLayout gl_deleteAlbum = new GroupLayout(deleteAlbum);
 		gl_deleteAlbum.setHorizontalGroup(
 			gl_deleteAlbum.createParallelGroup(Alignment.LEADING)
@@ -1282,9 +1311,9 @@ public class MainFrame {
 								.addComponent(label_3))
 							.addGap(18)
 							.addGroup(gl_deleteAlbum.createParallelGroup(Alignment.LEADING)
-								.addComponent(textField_33, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)
-								.addComponent(textField_34, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)
-								.addComponent(textField_35, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE))))
+								.addComponent(delAlbumTx, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)
+								.addComponent(delYearTx, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)
+								.addComponent(delMusicTx, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE))))
 					.addContainerGap(178, Short.MAX_VALUE))
 		);
 		gl_deleteAlbum.setVerticalGroup(
@@ -1294,15 +1323,15 @@ public class MainFrame {
 					.addGap(32)
 					.addGroup(gl_deleteAlbum.createParallelGroup(Alignment.BASELINE)
 						.addComponent(label_2)
-						.addComponent(textField_33, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(delAlbumTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
 					.addGroup(gl_deleteAlbum.createParallelGroup(Alignment.BASELINE)
 						.addComponent(label_3)
-						.addComponent(textField_34, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(delYearTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
 					.addGroup(gl_deleteAlbum.createParallelGroup(Alignment.BASELINE)
 						.addComponent(label_1)
-						.addComponent(textField_35, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(delMusicTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
 					.addComponent(btnDeleteMusic)
 					.addContainerGap(373, Short.MAX_VALUE))
@@ -1694,17 +1723,27 @@ public class MainFrame {
 	
 	public static class checkHelper {
 	  
-	  public static boolean musicExist(String albumName, int year, String musicName, String producer) {
+	  public static boolean checkIsbnFormat(String isbn) {
+	    String pattern = "^\\d{13}$";
+	    Pattern r = Pattern.compile(pattern);
+	    Matcher m = r.matcher(isbn);
+	    if (m.find()) {
+	      return true;
+	    }
+	    return false;
+	  }
+	  
+	  public static boolean musicExist(String albumName, int year, String musicName) {
 	     ResultSet rs = SelectHelper.getAlbums();
 	     try {
 	       while(rs.next()) {
 	        if (rs.getString("AlbumName").equalsIgnoreCase(albumName)) {
 	           if (rs.getInt("Year") == year) {
 	             if (rs.getString("MusicName").equalsIgnoreCase(musicName)) {
-	               if (rs.getInt("Producer_ID") == SelectHelper.getPeopleID(producer)) {
-	                 // exist in music album
+//	               if (rs.getInt("Producer_ID") == SelectHelper.getPeopleID(producer)) {
+////	                  exist in music album
 	                 return true;
-	               }
+//	               }
 	             }
 	           }
 	         }
@@ -1736,7 +1775,79 @@ public class MainFrame {
   	    preparedStatement.setString(1, isbn);
   	    preparedStatement.executeUpdate();
   	  }
+	    
+	    public static void removeBookKeyword(String isbn) throws SQLException {
+	      String sql = "delete from bookkeyword where isbn = ?;";
+	      PreparedStatement preparedStatement;
+        preparedStatement = con.prepareStatement(sql);
+        preparedStatement.setString(1, isbn);
+        preparedStatement.executeUpdate();
+	    }
+	    
+	    public static void removeBookAuthor(String isbn) throws SQLException {
+	      String sql = "delete from BookAuthor where isbn = ?;";
+        PreparedStatement preparedStatement;
+        preparedStatement = con.prepareStatement(sql);
+        preparedStatement.setString(1, isbn);
+        preparedStatement.executeUpdate();
+	    }
+	    
+	    public static void removeMusic(String albumName, int year, String musicName) throws SQLException {
+	      String sql = "delete from Music where AlbumName = ? and Year = ? and MusicName = ?;";
+        PreparedStatement preparedStatement;
+        preparedStatement = con.prepareStatement(sql);
+        preparedStatement.setString(1, albumName);
+        preparedStatement.setInt(2, year);
+        preparedStatement.setString(3, musicName);
+        preparedStatement.executeUpdate();
+	    }
+	    
+	    public static void removeMusicSingers(String albumName, int year, String musicName) throws SQLException {
+	      String sql = "delete from MusicSinger where AlbumName = ? and Year = ? and MusicName = ?;";
+        PreparedStatement preparedStatement;
+        preparedStatement = con.prepareStatement(sql);
+        preparedStatement.setString(1, albumName);
+        preparedStatement.setInt(2, year);
+        preparedStatement.setString(3, musicName);
+        preparedStatement.executeUpdate();
+	    }
+	    
+	    public static void removeMusicPeopleInvolved(String albumName, int year, String musicName) throws SQLException {
+	      String sql = "delete from PeopleInvolvedMusic where AlbumName = ? and Year = ? and MusicName = ?;";
+        PreparedStatement preparedStatement;
+        preparedStatement = con.prepareStatement(sql);
+        preparedStatement.setString(1, albumName);
+        preparedStatement.setInt(2, year);
+        preparedStatement.setString(3, musicName);
+        preparedStatement.executeUpdate();
+	    }
 	  
+	    public static void removeMovie(String movieName, int year) throws SQLException {
+	      String sql = "delete from Movie where movieName = ? and Year = ?;";
+        PreparedStatement preparedStatement;
+        preparedStatement = con.prepareStatement(sql);
+        preparedStatement.setString(1, movieName);
+        preparedStatement.setInt(2, year);
+        preparedStatement.executeUpdate();
+	    }
+	    
+	    public static void removeMovieAward(String movieName, int year) throws SQLException {
+	      String sql = "delete from Award where movieName = ? and Year = ?;";
+        PreparedStatement preparedStatement;
+        preparedStatement = con.prepareStatement(sql);
+        preparedStatement.setString(1, movieName);
+        preparedStatement.setInt(2, year);
+        preparedStatement.executeUpdate();
+	    }
+	    
+	    public static void removeMovieCrew(String movieName, int year) throws SQLException {
+	      String sql = "delete from CrewMember where movieName = ? and Year = ?;";
+        PreparedStatement preparedStatement;
+        preparedStatement = con.prepareStatement(sql);
+        preparedStatement.setString(1, movieName);
+        preparedStatement.setInt(2, year);
+        preparedStatement.executeUpdate();
+	    }
 	}
 		 
 	 
@@ -2010,7 +2121,7 @@ public class MainFrame {
          musicpeopleid.put("arranger", SelectHelper.getPeopleID(musicpeoples.get("arranger")));
          
          // check if the music album exist in Music, insert if not
-         if (!checkHelper.musicExist(albumName, year, musicName, producer)) {
+         if (!checkHelper.musicExist(albumName, year, musicName)) {
              System.out.println("here");
              // insert only if that piece of soundtrack is not in db
              // insert into Music table
@@ -2077,7 +2188,80 @@ public class MainFrame {
          }
        }
      }
-	   
+	  
+	  public static void deleteBookTransaction(String isbn) {
+	    try {
+	      con.setAutoCommit(false);
+        DeleteHelper.removeBookKeyword(isbn);
+        DeleteHelper.removeBookAuthor(isbn);
+        DeleteHelper.removeBook(isbn);
+        con.commit();
+      } catch (SQLException e) {
+        System.out.println("something wrong");
+        System.out.println("rolling back now ...");
+        try {
+          con.rollback();
+        } catch (SQLException e1) {
+          e1.printStackTrace();
+        }
+      } finally {
+        try {
+          con.setAutoCommit(true);
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
+      }
+	  }
+	  
+	  public static void deleteMusicTransaction(String albumName, int year, String musicName) {
+	    try {
+        con.setAutoCommit(false);
+        DeleteHelper.removeMusicSingers(albumName, year, musicName);;
+        DeleteHelper.removeMusicPeopleInvolved(albumName, year, musicName);
+        DeleteHelper.removeMusic(albumName, year, musicName);
+        con.commit();
+      } catch (SQLException e) {
+        e.printStackTrace();
+        System.out.println("something wrong");
+        System.out.println("rolling back now ...");
+        try {
+          con.rollback();
+        } catch (SQLException e1) {
+          e1.printStackTrace();
+        }
+      } finally {
+        try {
+          con.setAutoCommit(true);
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
+      }
+	  }
+	  
+	  public static void deleteMovieTransaction(String movieName, int year) {
+	    try {
+        con.setAutoCommit(false);
+        DeleteHelper.removeMovieAward(movieName, year);
+        DeleteHelper.removeMovieCrew(movieName, year);
+        DeleteHelper.removeMovie(movieName, year);
+        con.commit();
+      } catch (SQLException e) {
+        e.printStackTrace();
+        System.out.println("something wrong");
+        System.out.println("rolling back now ...");
+        try {
+          con.rollback();
+        } catch (SQLException e1) {
+          e1.printStackTrace();
+        }
+      } finally {
+        try {
+          con.setAutoCommit(true);
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
+      }
+	  }
 	}
 	 
 }
