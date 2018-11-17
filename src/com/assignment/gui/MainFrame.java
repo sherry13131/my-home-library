@@ -846,26 +846,34 @@ public class MainFrame {
 		      MovieCrewJFields.put(composersTx, "composer");
 		      MovieCrewJFields.put(editorsTx, "editor");
 		      MovieCrewJFields.put(costumeDesignersTx, "costume designer");
+		      MovieCrewJFields.put(castsTx, "cast");
 		      
 		      int counter = 0;
 		      String[] tempCrewName = null;
 		      Map<String, String> allCrewNameRole = new HashMap<String, String>();  // key: name, value:role
 		      for (JTextField crewTx: MovieCrewJFields.keySet()) {		        
 		        // split by ','
-		        tempCrewName = crewTx.getText().split("\\s*,\\s*");
+		        tempCrewName = crewTx.getText().toLowerCase().split("\\s*,\\s*");
 		        // try to put in a hashmap with name as key and role as value
 		        // the pair with the same key will replace the previous value
 		        for (String name : tempCrewName) {
-		          if (counter < 3) {
-		            allCrewNameRole.put(name, MovieCrewJFields.get(crewTx));
-		            counter++;
+		          if (MovieCrewJFields.get(crewTx).equals("cast")) {
+		            if (counter < 10) {
+		              allCrewNameRole.put(name, MovieCrewJFields.get(crewTx));
+	                counter++;
+		            }
+		          } else {
+		            if (counter < 3) {
+  		            allCrewNameRole.put(name, MovieCrewJFields.get(crewTx));
+  		            counter++;
+		            }
 		          }
 		        }
 		        counter = 0;
 		      }
 		      // get casts name
-		      tempCrewName = castsTx.getText().split("\\s*,\\s*");
-		      List<String> castNameList = new LinkedList<String>(Arrays.asList(tempCrewName));
+//		      tempCrewName = castsTx.getText().split("\\s*,\\s*");
+//		      List<String> castNameList = new LinkedList<String>(Arrays.asList(tempCrewName));
 		      
 		      
 		      // check if the crews and cast exist in peopleInvolved table
@@ -890,47 +898,50 @@ public class MainFrame {
               }
             }
           }
-		      List<Integer> removalCast = new ArrayList<Integer>();
-		      // cast
-		      for (int i = 0 ; i < castNameList.size() && i < 10; i ++) {
-            pplID = getPeopleID(castNameList.get(i));
-            if (pplID == -1) {
-              // author not exist
-              System.out.println("movie crew not exist " + tempCrewName[i]);
-              // add new crew
-              try {
-                pplID = insertNewPeople(castNameList.get(i));
-              } catch (SQLException ex) {
-                ex.printStackTrace();
-              }
-              if (pplID == -1) {
-                System.out.println("The movie cast name "+ castNameList.get(i) +" is not in a correct format. did not add to database.");
-                // add index to array for removal later - prevent from inserting into other tables
-                removalCast.add(i);
-              }
-            }
-          }
+//		      List<Integer> removalCast = new ArrayList<Integer>();
+//		      // cast
+//		      for (int i = 0 ; i < castNameList.size() && i < 10; i ++) {
+//            pplID = getPeopleID(castNameList.get(i));
+//            if (pplID == -1) {
+//              // author not exist
+//              System.out.println("movie crew not exist " + tempCrewName[i]);
+//              // add new crew
+//              try {
+//                pplID = insertNewPeople(castNameList.get(i));
+//              } catch (SQLException ex) {
+//                ex.printStackTrace();
+//              }
+//              if (pplID == -1) {
+//                System.out.println("The movie cast name "+ castNameList.get(i) +" is not in a correct format. did not add to database.");
+//                // add index to array for removal later - prevent from inserting into other tables
+//                removalCast.add(i);
+//              }
+//            }
+//          }
 		      if (removalKey.size() > 0) {
 		        for (String k : removalKey) {
 		          allCrewNameRole.remove(k);
 		        }
 		      }
-		      // remove cast that name format is wrong
-		      if (castNameList.size() > 10) {
-		        for (int i = castNameList.size(); i>10; i--) {
-		          castNameList.remove(i);
-		        }
-		      }
-		      if (removalCast.size() > 0) {
-		        System.out.println(removalCast.get(0));
-  		      for (int i=removalCast.size()-1 ; i>=0 ;i--) {
-  		        castNameList.remove(i);
-  		      }
-		      }
+//		      // remove cast that name format is wrong
+//		      if (castNameList.size() > 10) {
+//		        for (int i = castNameList.size(); i>10; i--) {
+//		          castNameList.remove(i);
+//		        }
+//		      }
+//		      if (removalCast.size() > 0) {
+//		        System.out.println(removalCast.get(0));
+//  		      for (int i=removalCast.size()-1 ; i>=0 ;i--) {
+//  		        castNameList.remove(i);
+//  		      }
+//		      }
 		      
 		      // get movie name
 		      String movieName = movieNameTx.getText();
 		      
+//		      for (String name: allCrewNameRole.keySet()) {
+//		        System.out.println(name + " " + allCrewNameRole.get(name) + " " + getRoleID(allCrewNameRole.get(name)));
+//		      }
 		      
 		      
 		      
@@ -942,11 +953,13 @@ public class MainFrame {
   		        insertMovie(movieName, movieYear);
   		        System.out.println("movie inserted");
   		        // insert award
-  		        insertAward(movieName, movieYear, allCrewNameRole, castNameList);
+//  		        insertAward(movieName, movieYear, allCrewNameRole, castNameList);
+  		        insertAward(movieName, movieYear, allCrewNameRole);
   		        System.out.println("award inserted - default all no award");
-  		        // insert crewMember
-  		        
-  		        
+  		        // insert crew into crewMember
+  		        insertCrewMember(movieName, movieYear, allCrewNameRole);
+//  		        System.out.println(allCrewNameRole.get("n1 p3") + " " + getRoleID(allCrewNameRole.get("n1 p3")));
+  		        System.out.println("crewMember inserted");
   		      } else {
   		        System.out.println("movie already exist");
   		        // clear textfields
@@ -1942,7 +1955,8 @@ public class MainFrame {
 	   return false;
 	 }
 	 
-	 public static boolean insertAward(String movieName, int movieYear, Map<String, String> allCrewNameRole, List<String> castNameList) {
+//	 public static boolean insertAward(String movieName, int movieYear, Map<String, String> allCrewNameRole, List<String> castNameList) {
+	 public static boolean insertAward(String movieName, int movieYear, Map<String, String> allCrewNameRole) {
 	   String sql = "insert ignore into award values (?,?,?,?);";
 	   PreparedStatement ps;
 	   try {
@@ -1950,12 +1964,12 @@ public class MainFrame {
        ps.setString(2, movieName);
        ps.setInt(3, movieYear);
        ps.setInt(4, 0);
-       // insert all crew
-       for (String name : castNameList) {
-         // get id
-         ps.setInt(1, getPeopleID(name));
-         ps.executeUpdate();
-       }
+//       // insert all crew
+//       for (String name : castNameList) {
+//         // get id
+//         ps.setInt(1, getPeopleID(name));
+//         ps.executeUpdate();
+//       }
        for (String name : allCrewNameRole.keySet()) {
          // get id
          ps.setInt(1, getPeopleID(name));
@@ -1966,6 +1980,42 @@ public class MainFrame {
        e.printStackTrace();
      }
      return false;
+	 }
+	 
+	 public static int getRoleID(String role) {
+	   String sql = "select ID from role where Description = ?;";
+	   PreparedStatement ps;
+	   try {
+       ps = con.prepareStatement(sql);
+       ps.setString(1, role);
+       ResultSet rs = ps.executeQuery();
+       if (rs.next()) {
+         return rs.getInt("ID");
+       }      
+     } catch (SQLException e) {
+       e.printStackTrace();
+     }
+	   return -1;
+	 }
+	 
+	 public static boolean insertCrewMember(String movieName, int movieYear, Map<String, String> allCrewNameRole) {
+	   String sql = "insert into CrewMember values (?,?,?,?);";
+	   PreparedStatement ps;
+	   try {
+      ps = con.prepareStatement(sql);
+      ps.setString(2, movieName);
+      ps.setInt(3, movieYear);
+      for (String name : allCrewNameRole.keySet()) {
+        // get peopleID for people
+        ps.setInt(1, getPeopleID(name));
+        ps.setInt(4, getRoleID(allCrewNameRole.get(name)));
+        ps.executeUpdate();
+      }
+      return true;
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return false;
 	 }
 	 
 	 public static int checkIfNumerical(JTextField text) {
