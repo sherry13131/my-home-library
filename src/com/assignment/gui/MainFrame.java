@@ -78,7 +78,7 @@ public class MainFrame {
 	private JTextField textField_31;
 	private JTextField delISBNTx;
 	private JTextField delAlbumTx;
-	private JTextField delYearTx;
+	private JTextField delAlbumTx2;
 	private JTextField delMusicTx;
 	private JTextField delMovieNameTx;
 	private JTextField delMovieYearTx;
@@ -238,8 +238,8 @@ public class MainFrame {
 					title = insertbooktitle.getText();
 					isbn = insertbookisbn.getText();
 					pub = insertbookpub.getText();
-					int pages = Integer.parseInt(insertpages.getText());
-					int year = Integer.parseInt(insertpubyear.getText());
+					int pages = checkHelper.checkIfNumerical(insertpages);
+					int year = checkHelper.checkIfNumerical(insertpubyear);
 					author1 = insertauthor1.getText();
 					
 					// check if isbn exist already
@@ -255,9 +255,8 @@ public class MainFrame {
 						
 						// get optional field
 						if (!insertedition.getText().equals("")) {
-							edition = Integer.parseInt(insertedition.getText());
-							if (edition < 0) {
-								// show error - wrong range
+							if (checkHelper.checkIfNumerical(editorsTx) > 0) {
+								edition = Integer.parseInt(insertedition.getText());
 							}
 						}
 						if (!insertabstract.getText().equals("")) {
@@ -282,85 +281,12 @@ public class MainFrame {
 							authors.add(insertauthor5.getText());
 						}
 						
-						
-						// if pass validation
-						String sql = "insert into Book values (?,?,?,?,?,?,?);";
-						PreparedStatement preparedStatement;
-						try {
-							// insert book
-							preparedStatement = con.prepareStatement(sql);
-							preparedStatement.setString(1, isbn);
-							preparedStatement.setString(2, title);
-							preparedStatement.setString(3, pub);
-							preparedStatement.setInt(4, pages);
-							preparedStatement.setInt(5, year);
-							if (edition == -1) {
-								preparedStatement.setInt(6, java.sql.Types.INTEGER);
-							} else {
-								preparedStatement.setInt(6, edition);
-							}
-							preparedStatement.setString(7, bookabs);
-							preparedStatement.executeUpdate();
-							
-							// insert authors
-							sql = "insert into Bookauthor values (?,?);";
-							int pplID = -1;
-							for (String author : authors) {
-								pplID = SelectHelper.getPeopleID(author);
-								if (pplID == -1) {
-									// author not exist
-									System.out.println("author not exist");
-									// add new author
-									pplID = InserterHelper.insertNewPeople(author);
-									if (pplID == -1) {
-										System.out.println("The author name "+author+" is not in a correct format. will not add to database.");
-										// revert - remove book
-//										DeleteHelper.removeBook(isbn);
-										break;
-									}
-								}
-								// insert author after found/added
-								preparedStatement = con.prepareStatement(sql);
-								preparedStatement.setString(1, isbn);
-								preparedStatement.setInt(2, pplID);
-								preparedStatement.executeUpdate();
-								
-							}
-							
-							// insert keywords
-							// find if keyword exist in db
-							// if not add keyword
-							int keyID = -1, nextKeyID = -1;
-							for (String keyword : keywords) {
-								nextKeyID = SelectHelper.getNextKeywordID();
-								keyID = SelectHelper.getKeywordID(keyword);
-								if (nextKeyID == -1) {
-									// sth wrong on getting next keyword id
-									System.out.println("sth wrong - keyword");
-								} else if (keyID < 0){
-									sql = "insert into Keyword values (?,?);";
-									preparedStatement = con.prepareStatement(sql);
-									preparedStatement.setInt(1, nextKeyID);
-									preparedStatement.setString(2, keyword);
-									preparedStatement.executeUpdate();
-									keyID = nextKeyID;
-								}
-								// if found keyword (or added new keyword), add into bookkeyword
-								sql = "insert into BookKeyword values (?,?);";
-								preparedStatement = con.prepareStatement(sql);
-								preparedStatement.setString(1, isbn);
-								preparedStatement.setInt(2, keyID);
-								preparedStatement.executeUpdate();								
-							}
+					  // insert book
+						TransactionHelper.insertBookTransaction(isbn, title, pub, pages, year, edition, bookabs, authors, keywords);
 
-							// clear all fields if successfully insert all data
-							clearInsertbook();
-							
-						} catch (SQLException e) {
-							// TODO Auto-generated catch block
-							System.out.println("sth wrong");
-							e.printStackTrace();
-						}
+						// clear all fields if successfully insert all data
+						clearInsertbook();
+						
 					}
 				}
 			}
@@ -1064,6 +990,60 @@ public class MainFrame {
 		upISBNSearch.setColumns(10);
 		
 		JButton btnNewButton = new JButton("Search Book");
+		btnNewButton.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent arg0) {
+		    // clear all fields
+		    clearUpdateBook();
+		    // validate the field input
+		    String isbn = upISBNSearch.getText();
+		    if (checkHelper.checkIsbnFormat(isbn)) {
+		      // check if isbn exist
+		      if (SelectHelper.bookexist(isbn)) {
+		        // get data set
+		        ResultSet bookResult = null, bookKeyword = null, bookAuthors = null;
+		        bookResult = SelectHelper.getBookInfo(isbn);
+		        bookKeyword = SelectHelper.getBookKeyword(isbn);
+		        bookAuthors = SelectHelper.getBookAuthorName(isbn);
+		        // show data textfield
+		        try {
+              upBookTitleTx.setText(bookResult.getString("Title"));
+              upISBN.setText(bookResult.getString("ISBN"));
+              upPublisherTx.setText(bookResult.getString("Publisher"));
+              upPagesTx.setText(bookResult.getString("NumberOfPages"));
+              upBookYearTx.setText(String.valueOf(bookResult.getInt("YearOfPublication")));
+              upEditionTx.setText(String.valueOf(bookResult.getInt("EditionNumber")));
+              upAbstractTx.setText(bookResult.getString("Abstract"));
+              String keywords = bookKeyword.getString("Tag");
+              while (bookKeyword.next()) {
+                keywords += "," + bookKeyword.getString("Tag");
+              }
+              upKeywordsTx.setText(keywords);
+              upAuthorTx1.setText(bookAuthors.getString("FullName"));
+              if (bookAuthors.next()) {
+                upAuthorTx2.setText(bookAuthors.getString("FullName"));
+              }
+              if (bookAuthors.next()) {
+                upAuthorTx3.setText(bookAuthors.getString("FullName"));
+              }
+              if (bookAuthors.next()) {
+                upAuthorTx4.setText(bookAuthors.getString("FullName"));
+              }
+              if (bookAuthors.next()) {
+                upAuthorTx5.setText(bookAuthors.getString("FullName"));
+              }
+            } catch (SQLException e) {
+              e.printStackTrace();
+            }
+		        
+		      } else {
+		        System.out.println("Book not exist");
+		      }
+		    } else {
+		      System.out.println("ISBN wrong format");
+		    }
+		    
+		  }
+		});
 		
 		JLabel lblNewLabel_2 = new JLabel("Book title:");
 		
@@ -1121,6 +1101,14 @@ public class MainFrame {
 		
 		upPagesTx = new JTextField();
 		upPagesTx.setColumns(10);
+		
+		JButton btnNewButton_3 = new JButton("Update");
+		btnNewButton_3.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent arg0) {
+		    // get validate input
+		    // check if 
+		  }
+		});
 		GroupLayout gl_updateBook = new GroupLayout(updateBook);
 		gl_updateBook.setHorizontalGroup(
 		  gl_updateBook.createParallelGroup(Alignment.LEADING)
@@ -1178,7 +1166,8 @@ public class MainFrame {
 		          .addGroup(gl_updateBook.createSequentialGroup()
 		            .addComponent(lblNewLabel_1)
 		            .addPreferredGap(ComponentPlacement.UNRELATED)
-		            .addComponent(upISBNSearch, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE))))
+		            .addComponent(upISBNSearch, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE))
+		          .addComponent(btnNewButton_3)))
 		      .addGap(190))
 		);
 		gl_updateBook.setVerticalGroup(
@@ -1242,7 +1231,9 @@ public class MainFrame {
 		        .addComponent(upAuthorTx4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 		      .addGap(7)
 		      .addComponent(upAuthorTx5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-		      .addContainerGap(47, Short.MAX_VALUE))
+		      .addPreferredGap(ComponentPlacement.RELATED)
+		      .addComponent(btnNewButton_3)
+		      .addContainerGap(80, Short.MAX_VALUE))
 		);
 		updateBook.setLayout(gl_updateBook);
 		
@@ -1590,15 +1581,14 @@ public class MainFrame {
 		JButton btnDeleteMusic = new JButton("Delete Music");
 		btnDeleteMusic.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-			  if (delAlbumTx.getText().equals("") || delMusicTx.getText().equals("") || checkHelper.checkIfNumerical(delYearTx) < 0) {
+			  if (delAlbumTx.getText().equals("") || delMusicTx.getText().equals("")) {
 			    System.out.println("Please enter valid information for all fields");
 			  } else {
 			    String albumName = delAlbumTx.getText();
 			    String musicName = delMusicTx.getText();
-			    int year = Integer.parseInt(delYearTx.getText());
 			    // find if the music exist
-			    if (checkHelper.musicExist(albumName, year, musicName)) {
-  			    TransactionHelper.deleteMusicTransaction(albumName, year, musicName);
+			    if (checkHelper.musicExistNoYear(albumName, musicName)) {
+  			    TransactionHelper.deleteMusicTransaction(albumName, musicName);
   			    System.out.println("music is deleted");
 			    } else {
 			      System.out.println("music not exist");
@@ -1611,55 +1601,81 @@ public class MainFrame {
 		
 		JLabel label_2 = new JLabel("Album name:");
 		
-		JLabel label_3 = new JLabel("Year:");
+		JLabel lblAlbumName_2 = new JLabel("Album name:");
 		
 		delAlbumTx = new JTextField();
 		delAlbumTx.setColumns(10);
 		
-		delYearTx = new JTextField();
-		delYearTx.setColumns(10);
+		delAlbumTx2 = new JTextField();
+		delAlbumTx2.setColumns(10);
 		
 		delMusicTx = new JTextField();
 		delMusicTx.setColumns(10);
+		
+		JButton btnDeleteAlbum = new JButton("Delete Album");
+		btnDeleteAlbum.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent e) {
+		    // validate input
+		    if (delAlbumTx2.getText().equals("")) {
+		      System.out.println("Please enter the album name");
+		    } else {
+		      String albumName = delAlbumTx2.getText();
+		      // if exist delete album
+		      if (checkHelper.albumExist(albumName)) {
+		        TransactionHelper.deleteAlbumTransaction(albumName);
+		        System.out.println("album " + albumName+ " deleted");
+		      } else {
+		        System.out.println("album not exist");
+		      }
+		    }
+		  }
+		});
 		GroupLayout gl_deleteAlbum = new GroupLayout(deleteAlbum);
 		gl_deleteAlbum.setHorizontalGroup(
-			gl_deleteAlbum.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 805, Short.MAX_VALUE)
-				.addGroup(gl_deleteAlbum.createSequentialGroup()
-					.addGap(107)
-					.addGroup(gl_deleteAlbum.createParallelGroup(Alignment.TRAILING)
-						.addComponent(btnDeleteMusic)
-						.addGroup(gl_deleteAlbum.createSequentialGroup()
-							.addGroup(gl_deleteAlbum.createParallelGroup(Alignment.LEADING)
-								.addComponent(label_1)
-								.addComponent(label_2)
-								.addComponent(label_3))
-							.addGap(18)
-							.addGroup(gl_deleteAlbum.createParallelGroup(Alignment.LEADING)
-								.addComponent(delAlbumTx, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)
-								.addComponent(delYearTx, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)
-								.addComponent(delMusicTx, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE))))
-					.addContainerGap(178, Short.MAX_VALUE))
+		  gl_deleteAlbum.createParallelGroup(Alignment.TRAILING)
+		    .addGroup(gl_deleteAlbum.createSequentialGroup()
+		      .addGap(107)
+		      .addGroup(gl_deleteAlbum.createParallelGroup(Alignment.LEADING, false)
+		        .addGroup(Alignment.TRAILING, gl_deleteAlbum.createSequentialGroup()
+		          .addComponent(lblAlbumName_2)
+		          .addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+		          .addComponent(delAlbumTx2, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE))
+		        .addGroup(gl_deleteAlbum.createSequentialGroup()
+		          .addComponent(label_1)
+		          .addGap(18)
+		          .addComponent(delMusicTx))
+		        .addGroup(gl_deleteAlbum.createSequentialGroup()
+		          .addComponent(label_2)
+		          .addPreferredGap(ComponentPlacement.UNRELATED)
+		          .addComponent(delAlbumTx, GroupLayout.PREFERRED_SIZE, 431, GroupLayout.PREFERRED_SIZE)))
+		      .addContainerGap(211, Short.MAX_VALUE))
+		    .addGroup(gl_deleteAlbum.createSequentialGroup()
+		      .addContainerGap(575, Short.MAX_VALUE)
+		      .addGroup(gl_deleteAlbum.createParallelGroup(Alignment.TRAILING)
+		        .addComponent(btnDeleteAlbum, GroupLayout.PREFERRED_SIZE, 122, GroupLayout.PREFERRED_SIZE)
+		        .addComponent(btnDeleteMusic))
+		      .addGap(141))
 		);
 		gl_deleteAlbum.setVerticalGroup(
-			gl_deleteAlbum.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 550, Short.MAX_VALUE)
-				.addGroup(gl_deleteAlbum.createSequentialGroup()
-					.addGap(32)
-					.addGroup(gl_deleteAlbum.createParallelGroup(Alignment.BASELINE)
-						.addComponent(label_2)
-						.addComponent(delAlbumTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addGroup(gl_deleteAlbum.createParallelGroup(Alignment.BASELINE)
-						.addComponent(label_3)
-						.addComponent(delYearTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addGroup(gl_deleteAlbum.createParallelGroup(Alignment.BASELINE)
-						.addComponent(label_1)
-						.addComponent(delMusicTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addComponent(btnDeleteMusic)
-					.addContainerGap(373, Short.MAX_VALUE))
+		  gl_deleteAlbum.createParallelGroup(Alignment.LEADING)
+		    .addGroup(gl_deleteAlbum.createSequentialGroup()
+		      .addGap(32)
+		      .addGroup(gl_deleteAlbum.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(label_2)
+		        .addComponent(delAlbumTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addGroup(gl_deleteAlbum.createParallelGroup(Alignment.LEADING)
+		        .addComponent(label_1)
+		        .addComponent(delMusicTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(27)
+		      .addComponent(btnDeleteMusic)
+		      .addGap(38)
+		      .addGroup(gl_deleteAlbum.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(delAlbumTx2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		        .addComponent(lblAlbumName_2))
+		      .addGap(18)
+		      .addComponent(btnDeleteAlbum)
+		      .addContainerGap(367, Short.MAX_VALUE))
 		);
 		deleteAlbum.setLayout(gl_deleteAlbum);
 		
@@ -1897,6 +1913,22 @@ public class MainFrame {
 	  castsTx.setText("");
 	}
 	
+	private void clearUpdateBook() {
+	  upBookTitleTx.setText("");
+    upISBN.setText("");
+    upPublisherTx.setText("");
+    upPagesTx.setText("");
+    upBookYearTx.setText("");
+    upEditionTx.setText("");
+    upAbstractTx.setText("");
+    upKeywordsTx.setText("");
+    upAuthorTx1.setText("");
+    upAuthorTx2.setText("");
+    upAuthorTx3.setText("");
+    upAuthorTx4.setText("");
+    upAuthorTx5.setText("");
+	}
+	
 	
 	public enum diskType {
     AUDIOCD {
@@ -1939,6 +1971,79 @@ public class MainFrame {
   }
 	
 	public static class InserterHelper {
+	  
+	  public static void insertBook(String isbn, String title, String pub, int pages, int year, int edition, String bookabs) throws SQLException {
+	    String sql = "insert into Book values (?,?,?,?,?,?,?);";
+      PreparedStatement preparedStatement;
+      // insert book
+      preparedStatement = con.prepareStatement(sql);
+      preparedStatement.setString(1, isbn);
+      preparedStatement.setString(2, title);
+      preparedStatement.setString(3, pub);
+      preparedStatement.setInt(4, pages);
+      preparedStatement.setInt(5, year);
+      if (edition == -1) {
+        preparedStatement.setNull(6, java.sql.Types.NULL);
+      } else {
+        preparedStatement.setInt(6, edition);
+      }
+      preparedStatement.setString(7, bookabs);
+      preparedStatement.executeUpdate();
+	  }
+	  
+	  public static void insertBookAuthor(String isbn, List<String> authors) throws SQLException {
+	    String sql = "insert into Bookauthor values (?,?);";
+      PreparedStatement preparedStatement;
+      int pplID = -1;
+      for (String author : authors) {
+        pplID = SelectHelper.getPeopleID(author);
+        if (pplID == -1) {
+          // author not exist
+          System.out.println("author not exist");
+          // add new author
+          pplID = InserterHelper.insertNewPeople(author);
+          if (pplID == -1) {
+            System.out.println("The author name "+author+" is not in a correct format. will not add to database.");            break;
+          }
+        }
+        // insert author after found/added
+        preparedStatement = con.prepareStatement(sql);
+        preparedStatement.setString(1, isbn);
+        preparedStatement.setInt(2, pplID);
+        preparedStatement.executeUpdate();
+        
+      }
+	  }
+	  
+	  public static void insertBookKeyword(String isbn, int keyID) throws SQLException {
+      String sql = "insert into BookKeyword values (?,?);";
+      PreparedStatement preparedStatement;
+      preparedStatement = con.prepareStatement(sql);
+      preparedStatement.setString(1, isbn);
+      preparedStatement.setInt(2, keyID);
+      preparedStatement.executeUpdate();
+    }
+	  
+	  public static void insertKeyword(String isbn, String[] keywords) throws SQLException {
+	    int keyID = -1, nextKeyID = -1;
+	    String sql = "insert into Keyword values (?,?);";
+	    PreparedStatement preparedStatement;
+      for (String keyword : keywords) {
+        nextKeyID = SelectHelper.getNextKeywordID();
+        keyID = SelectHelper.getKeywordID(keyword);
+        if (nextKeyID == -1) {
+          // sth wrong on getting next keyword id
+          System.out.println("sth wrong - keyword");
+        } else if (keyID < 0){
+          preparedStatement = con.prepareStatement(sql);
+          preparedStatement.setInt(1, nextKeyID);
+          preparedStatement.setString(2, keyword);
+          preparedStatement.executeUpdate();
+          keyID = nextKeyID;
+          insertBookKeyword(isbn, keyID);
+        }
+      }
+	  }
 	  
 	  public static int insertNewPeople(String fullname) throws SQLException {
 	    int nextID = SelectHelper.getNextPeopleID();
@@ -2063,6 +2168,13 @@ public class MainFrame {
 	
 	public static class checkHelper {
 	  
+	  public static boolean albumExist(String albumName) {
+	    if (SelectHelper.getAlbumMusicsCount(albumName) > 0) {
+	      return true;
+	    }
+	    return false;
+	  }
+	  
 	  public static boolean checkIsbnFormat(String isbn) {
 	    String pattern = "^\\d{13}$";
 	    Pattern r = Pattern.compile(pattern);
@@ -2093,6 +2205,22 @@ public class MainFrame {
 	     }
 	     return false;
 	   }
+	  
+	  public static boolean musicExistNoYear(String albumName, String musicName) {
+      ResultSet rs = SelectHelper.getAlbums();
+      try {
+        while(rs.next()) {
+         if (rs.getString("AlbumName").equalsIgnoreCase(albumName)) {
+            if (rs.getString("MusicName").equalsIgnoreCase(musicName)) {
+              return true;
+            }
+          }
+        }
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return false;
+    }
 	   
 	   public static int checkIfNumerical(JTextField text) {
 	     int result = -1;
@@ -2132,33 +2260,30 @@ public class MainFrame {
         preparedStatement.executeUpdate();
 	    }
 	    
-	    public static void removeMusic(String albumName, int year, String musicName) throws SQLException {
-	      String sql = "delete from Music where AlbumName = ? and Year = ? and MusicName = ?;";
+	    public static void removeMusic(String albumName,String musicName) throws SQLException {
+	      String sql = "delete from Music where AlbumName = ? and MusicName = ?;";
         PreparedStatement preparedStatement;
         preparedStatement = con.prepareStatement(sql);
         preparedStatement.setString(1, albumName);
-        preparedStatement.setInt(2, year);
-        preparedStatement.setString(3, musicName);
+        preparedStatement.setString(2, musicName);
         preparedStatement.executeUpdate();
 	    }
 	    
-	    public static void removeMusicSingers(String albumName, int year, String musicName) throws SQLException {
-	      String sql = "delete from MusicSinger where AlbumName = ? and Year = ? and MusicName = ?;";
+	    public static void removeMusicSingers(String albumName,String musicName) throws SQLException {
+	      String sql = "delete from MusicSinger where AlbumName = ? and MusicName = ?;";
         PreparedStatement preparedStatement;
         preparedStatement = con.prepareStatement(sql);
         preparedStatement.setString(1, albumName);
-        preparedStatement.setInt(2, year);
-        preparedStatement.setString(3, musicName);
+        preparedStatement.setString(2, musicName);
         preparedStatement.executeUpdate();
 	    }
 	    
-	    public static void removeMusicPeopleInvolved(String albumName, int year, String musicName) throws SQLException {
-	      String sql = "delete from PeopleInvolvedMusic where AlbumName = ? and Year = ? and MusicName = ?;";
+	    public static void removeMusicPeopleInvolved(String albumName, String musicName) throws SQLException {
+	      String sql = "delete from PeopleInvolvedMusic where AlbumName = ? and MusicName = ?;";
         PreparedStatement preparedStatement;
         preparedStatement = con.prepareStatement(sql);
         preparedStatement.setString(1, albumName);
-        preparedStatement.setInt(2, year);
-        preparedStatement.setString(3, musicName);
+        preparedStatement.setString(2, musicName);
         preparedStatement.executeUpdate();
 	    }
 	  
@@ -2192,6 +2317,84 @@ public class MainFrame {
 		 
 	 
 	public static class SelectHelper {
+	  
+	  public static ResultSet getAlbumMusics(String albumName) {
+	    String sql = "Select MusicName from music where AlbumName=?;";
+	    ResultSet rs = null;
+	    PreparedStatement ps;
+      try {
+        ps = con.prepareStatement(sql);
+        ps.setString(1, albumName);
+        rs = ps.executeQuery();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return rs;
+	  }
+	  public static int getAlbumMusicsCount(String albumName) {
+	    String sql = "Select count(*) from music where albumName=?;";
+	    ResultSet rs = null;
+      PreparedStatement ps;
+      int count = -1;
+      try {
+        ps = con.prepareStatement(sql);
+        ps.setString(1, albumName);
+        rs = ps.executeQuery();
+        rs.next();
+        count = rs.getInt("count(*)");
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return count;
+	  }
+	  public static ResultSet getBookInfo(String isbn) {
+	    String sql = "Select * from book where ISBN = ?;";
+      ResultSet rs = null;
+	    PreparedStatement ps;
+      try {
+        ps = con.prepareStatement(sql);
+        ps.setString(1, isbn);
+        rs = ps.executeQuery();
+        rs.next();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+	    return rs;
+	  }
+	  public static ResultSet getBookAuthorName(String isbn) {
+	    String sql = "SELECT CASE WHEN ISNULL(p.MiddleName) " + 
+	        "THEN concat(p.firstName, ' ', p.familyname) " + 
+	        "ELSE concat(p.firstName, ' ',p.middlename, ' ', p.familyname) " + 
+	        "END FullName " + 
+	        "FROM peopleinvolved p, bookauthor a where p.ID = a.author_id and a.isbn = ?;";
+	    ResultSet rs = null;
+	    PreparedStatement ps;
+	    try {
+	      ps = con.prepareStatement(sql);
+	      ps.setString(1, isbn);
+	      rs = ps.executeQuery();
+	      rs.next();
+	    } catch (SQLException e) {
+	      e.printStackTrace();
+	    }
+	    return rs;
+	  }
+	  public static ResultSet getBookKeyword(String isbn) {
+	    String sql = "select k.tag from bookkeyword bk, keyword k " + 
+	        "where bk.keyword_id = k.id and bk.isbn = ?;";
+	    ResultSet rs = null;
+      PreparedStatement ps;
+      try {
+        ps = con.prepareStatement(sql);
+        ps.setString(1, isbn);
+        rs = ps.executeQuery();
+        rs.next();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return rs;
+	  }
+	  
 	   public static int getPeopleID(String name) {
 	     String sql = "Select ID from PeopleInvolved where concat(FirstName,' ',FamilyName) = ?;";
 	     PreparedStatement preparedStatement;
@@ -2218,7 +2421,6 @@ public class MainFrame {
 	         return id + 1;
 	       }
 	     } catch (SQLException e) {
-	       // TODO Auto-generated catch block
 	       e.printStackTrace();
 	     }
 	     return -1;
@@ -2250,7 +2452,6 @@ public class MainFrame {
 	         return id + 1;
 	       }
 	     } catch (SQLException e) {
-	       // TODO Auto-generated catch block
 	       e.printStackTrace();
 	     }
 	     return -1;
@@ -2270,7 +2471,6 @@ public class MainFrame {
 	       }
 	       return false;
 	     } catch (SQLException e) {
-	       // TODO Auto-generated catch block
 	       e.printStackTrace();
 	     }
 	     return true;
@@ -2372,6 +2572,38 @@ public class MainFrame {
 	 }
 	 
 	public static class TransactionHelper {
+	  
+	  public static void insertBookTransaction(String isbn, String title, String pub, int pages, int year, int edition,
+	      String bookabs, List<String> authors, String[] keywords) {
+      try {
+        con.setAutoCommit(false);
+        // insert book
+        InserterHelper.insertBook(isbn, title, pub, pages, year, edition, bookabs);
+        System.out.println("book inserted");
+        // insert authors
+        InserterHelper.insertBookAuthor(isbn, authors);
+        System.out.println("book authors inserted");
+        // insert keywords
+        InserterHelper.insertKeyword(isbn, keywords);
+        System.out.println("book keywords inserted");
+        con.commit();
+      } catch (SQLException e) {
+        try {
+          con.rollback();
+          System.out.println("Something wrong when inserting data");
+          System.out.println("Rolling back data...");
+        } catch (SQLException e1) {
+          e1.printStackTrace();
+        }
+        e.printStackTrace();
+      } finally {
+        try {
+          con.setAutoCommit(true);
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
+      }
+	  }
 	  
 	  public static void insertMovieTransaction(String movieName, int movieYear, Map<String, String> allCrewNameRole) {
       try {
@@ -2553,12 +2785,12 @@ public class MainFrame {
       }
 	  }
 	  
-	  public static void deleteMusicTransaction(String albumName, int year, String musicName) {
+	  public static void deleteMusicTransaction(String albumName, String musicName) {
 	    try {
         con.setAutoCommit(false);
-        DeleteHelper.removeMusicSingers(albumName, year, musicName);;
-        DeleteHelper.removeMusicPeopleInvolved(albumName, year, musicName);
-        DeleteHelper.removeMusic(albumName, year, musicName);
+        DeleteHelper.removeMusicSingers(albumName, musicName);
+        DeleteHelper.removeMusicPeopleInvolved(albumName, musicName);
+        DeleteHelper.removeMusic(albumName, musicName);
         con.commit();
       } catch (SQLException e) {
         e.printStackTrace();
@@ -2577,6 +2809,37 @@ public class MainFrame {
         }
       }
 	  }
+	  
+	  public static void deleteAlbumTransaction(String albumName) {
+	    try {
+        con.setAutoCommit(false);
+        // search all music in that album
+        ResultSet rs = SelectHelper.getAlbumMusics(albumName);
+        String musicName = "";
+        while (rs.next()) {
+          musicName = rs.getString("MusicName");
+          DeleteHelper.removeMusicSingers(albumName, musicName);
+          DeleteHelper.removeMusicPeopleInvolved(albumName, musicName);
+          DeleteHelper.removeMusic(albumName, musicName);
+        }
+        con.commit();
+      } catch (SQLException e) {
+        e.printStackTrace();
+        System.out.println("something wrong");
+        System.out.println("rolling back now ...");
+        try {
+          con.rollback();
+        } catch (SQLException e1) {
+          e1.printStackTrace();
+        }
+      } finally {
+        try {
+          con.setAutoCommit(true);
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
+      }
+    }
 	  
 	  public static void deleteMovieTransaction(String movieName, int year) {
 	    try {
