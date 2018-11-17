@@ -21,9 +21,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -2137,12 +2139,6 @@ public class MainFrame {
        ps.setString(2, movieName);
        ps.setInt(3, movieYear);
        ps.setInt(4, 0);
-//	       // insert all crew
-//	       for (String name : castNameList) {
-//	         // get id
-//	         ps.setInt(1, SelectHelper.getPeopleID(name));
-//	         ps.executeUpdate();
-//	       }
        for (String name : allCrewNameRole.keySet()) {
          // get id
          ps.setInt(1, SelectHelper.getPeopleID(name));
@@ -2150,9 +2146,10 @@ public class MainFrame {
        }
 	   }
 	   
-	   public static void insertCrewMember(String movieName, int movieYear, Map<String, String> allCrewNameRole) throws SQLException {
-	     String sql = "insert into CrewMember values (?,?,?,?);";
-	     PreparedStatement ps;
+	  public static void insertCrewMember(String movieName, int movieYear, Map<String, String> allCrewNameRole) throws SQLException {
+	    String sql = "insert into CrewMember values (?,?,?,?);";
+	    Set<String> flags = new HashSet<String>();  
+	    PreparedStatement ps;
       ps = con.prepareStatement(sql);
       ps.setString(2, movieName);
       ps.setInt(3, movieYear);
@@ -2161,8 +2158,13 @@ public class MainFrame {
         ps.setInt(1, SelectHelper.getPeopleID(name));
         ps.setInt(4, SelectHelper.getRoleID(allCrewNameRole.get(name)));
         ps.executeUpdate();
-	      }
-	   }
+        flags.add(allCrewNameRole.get(name));
+	    }
+      // check if all the roles have at least 1 people
+      if (flags.size() != 7) {
+        throw new SQLException();
+      }
+	  }
 	   
 	}
 	
@@ -2192,10 +2194,7 @@ public class MainFrame {
 	        if (rs.getString("AlbumName").equalsIgnoreCase(albumName)) {
 	           if (rs.getInt("Year") == year) {
 	             if (rs.getString("MusicName").equalsIgnoreCase(musicName)) {
-//	               if (rs.getInt("Producer_ID") == SelectHelper.getPeopleID(producer)) {
-////	                  exist in music album
 	                 return true;
-//	               }
 	             }
 	           }
 	         }
@@ -2608,16 +2607,15 @@ public class MainFrame {
 	  public static void insertMovieTransaction(String movieName, int movieYear, Map<String, String> allCrewNameRole) {
       try {
 	      con.setAutoCommit(false);
-	   // insert movie if not exist
+	       // insert movie if not exist
 	      InserterHelper.insertMovie(movieName, movieYear);
 	      System.out.println("movie inserted");
-	      // insert award
-//	      InserterHelper.insertMovie(movieName, movieYear, allCrewNameRole, castNameList);
-	      InserterHelper.insertAward(movieName, movieYear, allCrewNameRole);
-	      System.out.println("award inserted - default all no award");
 	      // insert crew into crewMember
 	      InserterHelper.insertCrewMember(movieName, movieYear, allCrewNameRole);
 	      System.out.println("crewMember inserted");
+        // insert award
+        InserterHelper.insertAward(movieName, movieYear, allCrewNameRole);
+        System.out.println("award inserted - default all no award");
 	      con.commit();
 	    } catch (SQLException e) {
 	      try {
