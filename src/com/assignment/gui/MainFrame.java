@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import java.awt.CardLayout;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -15,6 +16,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,9 +38,13 @@ import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.JButton;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JComboBox;
+import javax.swing.JCheckBox;
 
 public class MainFrame {
 
@@ -111,6 +118,8 @@ public class MainFrame {
 	private JTextField upMusicYearTx;
 	private JTextField upMusicNameTx;
 	private JTextField upSingersTx;
+	private JTextField searchNameTx;
+	private JTextField searchYearTx;
 
 	/**
 	 * Launch the application.
@@ -1750,6 +1759,117 @@ public class MainFrame {
 		);
 		deleteMovie.setLayout(gl_deleteMovie);
 		
+		JPanel view = new JPanel();
+		frame.getContentPane().add(view, "viewPanel");
+		
+		JLabel lblProductName = new JLabel("Product name:");
+		
+		searchNameTx = new JTextField();
+		searchNameTx.setColumns(10);
+		
+		JLabel lblReleaseYear_3 = new JLabel("Release year:");
+		
+		searchYearTx = new JTextField();
+		searchYearTx.setColumns(10);		
+
+    JCheckBox chckbxBook = new JCheckBox("Book");
+    
+    JCheckBox chckbxAlbum = new JCheckBox("Album");
+    
+    JCheckBox chckbxMovie = new JCheckBox("Movie");
+		
+		JButton btnNewButton_4 = new JButton("Search");
+		btnNewButton_4.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent e) {
+		    // validate input fields
+		    String name = searchNameTx.getText();
+		    if (name.equals("") || checkHelper.checkIfNumerical(searchYearTx) < 0) {
+		      System.out.println("please enter valid information");
+		    } else {
+		      int year = Integer.parseInt(searchYearTx.getText());
+		      ResultSet rs = null;
+		      try {
+            // get selected types
+            Map<String, Boolean> types = new HashMap<String, Boolean>();
+            if (chckbxBook.isSelected()) {
+              types.put("book", true);
+            } else {
+              types.put("book", false);
+            }
+            if (chckbxAlbum.isSelected()) {
+              types.put("album", true);
+            } else {
+              types.put("album", false);
+            }
+            if (chckbxMovie.isSelected()) {
+              types.put("movie", true);
+            } else {
+              types.put("movie", false);
+            }
+            // build result set
+            rs = SelectHelper.createView(name, year, types);
+            if (rs != null) {
+              JTable table = new JTable(buildTableModel(rs));
+              // show views
+              JOptionPane.showMessageDialog(null, new JScrollPane(table), "Data Table Preview", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+              JOptionPane.showMessageDialog(null, "Please select at least one type (book, album, movie)", "No selected data", JOptionPane.ERROR_MESSAGE);
+            }
+          } catch (SQLException e1) {
+            
+            e1.printStackTrace();
+          }
+		    }
+		  }
+		});
+		
+		JButton btnCancel = new JButton("Cancel");
+		GroupLayout gl_view = new GroupLayout(view);
+		gl_view.setHorizontalGroup(
+		  gl_view.createParallelGroup(Alignment.LEADING)
+		    .addGroup(gl_view.createSequentialGroup()
+		      .addGap(75)
+		      .addGroup(gl_view.createParallelGroup(Alignment.LEADING)
+		        .addComponent(lblProductName)
+		        .addComponent(lblReleaseYear_3)
+		        .addComponent(chckbxBook))
+		      .addGap(43)
+		      .addGroup(gl_view.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_view.createSequentialGroup()
+		          .addComponent(searchYearTx, GroupLayout.PREFERRED_SIZE, 338, GroupLayout.PREFERRED_SIZE)
+		          .addGap(58)
+		          .addComponent(btnNewButton_4)
+		          .addGap(33)
+		          .addComponent(btnCancel))
+		        .addGroup(gl_view.createSequentialGroup()
+		          .addComponent(chckbxAlbum)
+		          .addGap(59)
+		          .addComponent(chckbxMovie))
+		        .addComponent(searchNameTx, GroupLayout.PREFERRED_SIZE, 338, GroupLayout.PREFERRED_SIZE))
+		      .addContainerGap(63, Short.MAX_VALUE))
+		);
+		gl_view.setVerticalGroup(
+		  gl_view.createParallelGroup(Alignment.LEADING)
+		    .addGroup(gl_view.createSequentialGroup()
+		      .addGap(44)
+		      .addGroup(gl_view.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(chckbxBook)
+		        .addComponent(chckbxAlbum)
+		        .addComponent(chckbxMovie))
+		      .addGap(34)
+		      .addGroup(gl_view.createParallelGroup(Alignment.LEADING)
+		        .addComponent(searchNameTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		        .addComponent(lblProductName))
+		      .addGap(22)
+		      .addGroup(gl_view.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(lblReleaseYear_3)
+		        .addComponent(searchYearTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		        .addComponent(btnNewButton_4)
+		        .addComponent(btnCancel))
+		      .addContainerGap(444, Short.MAX_VALUE))
+		);
+		view.setLayout(gl_view);
+		
 		
 		
 		
@@ -1863,6 +1983,13 @@ public class MainFrame {
 		menuBar.add(mnView);
 		
 		JMenuItem mntmView = new JMenuItem("view");
+		mntmView.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent event) {
+      // go to insert book page
+        CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
+        c.show(frame.getContentPane(), "viewPanel");
+      }
+    });
 		mnView.add(mntmView);
 		
 		JMenu mnReport = new JMenu("Report");
@@ -2568,7 +2695,95 @@ public class MainFrame {
        }
        return false;
      }
+     
+     public static ResultSet getResultByQuery(String name, int year, String sql, int count) {
+       PreparedStatement ps;
+       ResultSet rs = null;
+       try {
+        ps = con.prepareStatement(sql);
+        for (int i = 1; i <= count; i++) {
+          ps.setString(i, "%" + name + "%");
+        }
+        if (count > 0) {
+          rs = ps.executeQuery();
+        }
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+       return rs;
+     }
+     
+     public static ResultSet createView(String name, int year, Map<String, Boolean> types) {
+       // build query
+       String sql = BuildQueryHelper.bulidForView(types);
+       // count how many box checked
+       int count = 0;
+       for (String b : types.keySet()) {
+         if (types.get(b)) {
+           count++;
+         }
+       }
+       // run query
+       ResultSet rs = SelectHelper.getResultByQuery(name, year, sql, count);
+       return rs;
+     }
 	 }
+	
+	public static class BuildQueryHelper {
+	  
+	  public static String bulidForView(Map<String, Boolean> types) {
+	    String sql = "";
+	    int count = 0;
+	    for (String b: types.keySet()) {	      
+	      // if it's checked
+	      if (types.get(b)) {
+	        // if there's sql in sql string
+	        if (!sql.equals("")) {
+	          sql += ") union (";
+	        }
+  	      if (b.equals("book")) {
+  	        sql += "select b.title ProductName, b.YearOfPublication Year, 'B' Type, min(CASE WHEN ISNULL(p.MiddleName) " + 
+  	            "THEN concat(p.firstName, ' ', p.familyname) " + 
+  	            "ELSE concat(p.firstName, ' ',p.middlename, ' ', p.familyname) " + 
+  	            "END) 'Author/singer/director' " + 
+  	            "from book b, bookauthor ba, peopleInvolved p " + 
+  	            "where b.isbn = ba.isbn and ba.author_id = p.id and b.title like ? " + 
+  	            "group by ProductName " + 
+  	            "order by p.familyname";
+  	      } else if (b.equals("album")) {
+  	        sql += "select mu.albumName ProductName, mu.Year Year, 'M' Type, min(CASE WHEN ISNULL(p.MiddleName) " + 
+  	            "THEN concat(p.firstName, ' ', p.familyname) " + 
+  	            "ELSE concat(p.firstName, ' ',p.middlename, ' ', p.familyname) " + 
+  	            "END) 'Author/singer/director' " + 
+  	            "from music mu, musicsinger mus, peopleinvolved p " + 
+  	            "where (mu.albumName,mu.year,mu.musicName) = (mus.albumName,mus.year,mus.musicName) and mus.peopleInvolved_id = p.id and mu.albumName like ? " + 
+  	            "group by ProductName " + 
+  	            "order by p.familyname";
+  	      } else if (b.equals("movie")) {
+  	        sql += "select mv.MovieName ProductName, mv.year Year, 'F' Type, min(CASE WHEN ISNULL(p.MiddleName) " + 
+  	            "THEN concat(p.firstName, ' ', p.familyname) " + 
+  	            "ELSE concat(p.firstName, ' ',p.middlename, ' ', p.familyname) " + 
+  	            "END) 'Author/singer/director' " + 
+  	            "from movie mv, crewmember cm, peopleinvolved p, role r " + 
+  	            "where (mv.MovieName, mv.year) = (cm.MovieName, cm.ReleaseYear) and cm.PeopleInvolved_id = p.id and cm.role_id = r.id and mv.MovieName like ? " + 
+  	            "group by ProductName " + 
+  	            "order by p.familyname";
+  	      }
+          count++;
+	      }
+        if (count == 2) {
+          sql = "(" + sql;
+        }
+ 	    }
+	    // end query
+	    if (count > 1) {
+	      sql += ");";
+	    } else {
+	      sql += ";";
+	    }
+	    return sql;
+	  }
+	}
 	 
 	public static class TransactionHelper {
 	  
@@ -2864,4 +3079,30 @@ public class MainFrame {
       }
 	  }
 	}
+	
+	public static DefaultTableModel buildTableModel(ResultSet rs)
+      throws SQLException {
+
+      ResultSetMetaData metaData = rs.getMetaData();
+
+      // names of columns
+      Vector<String> columnNames = new Vector<String>();
+      int columnCount = metaData.getColumnCount();
+      for (int column = 1; column <= columnCount; column++) {
+          columnNames.add(metaData.getColumnName(column));
+      }
+
+      // data of the table
+      Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+      while (rs.next()) {
+          Vector<Object> vector = new Vector<Object>();
+          for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+              vector.add(rs.getObject(columnIndex));
+          }
+          data.add(vector);
+      }
+
+      return new DefaultTableModel(data, columnNames);
+
+  }
 }
