@@ -80,8 +80,8 @@ public class MainFrame {
 	private JTextField delAlbumTx;
 	private JTextField delYearTx;
 	private JTextField delMusicTx;
-	private JTextField textField_36;
-	private JTextField textField_37;
+	private JTextField delMovieNameTx;
+	private JTextField delMovieYearTx;
 	private JTextField singersTx;
 	private JTextField composersTx;
 	private JTextField editorsTx;
@@ -1344,6 +1344,21 @@ public class MainFrame {
 		JButton btnDeleteMovie = new JButton("Delete Movie");
 		btnDeleteMovie.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+			  // validate all fields
+			  if (delMovieNameTx.getText().equals("") || checkHelper.checkIfNumerical(delMovieYearTx) < 0) {
+			    System.out.println("Please enter valid information");
+			  } else {
+			    String movieName = delMovieNameTx.getText();
+			    int year = Integer.parseInt(delMovieYearTx.getText());
+			    // find if the movie exist
+			    if (SelectHelper.checkMovieExist(movieName, year)) {
+			      TransactionHelper.deleteMovieTransaction(movieName, year);
+			      System.out.println("Movie is deleted");
+			    } else {
+			      System.out.println("Movie not exist");
+			    }
+			  }
+			  
 			}
 		});
 		
@@ -1351,11 +1366,11 @@ public class MainFrame {
 		
 		JLabel label_5 = new JLabel("Release year:");
 		
-		textField_36 = new JTextField();
-		textField_36.setColumns(10);
+		delMovieNameTx = new JTextField();
+		delMovieNameTx.setColumns(10);
 		
-		textField_37 = new JTextField();
-		textField_37.setColumns(10);
+		delMovieYearTx = new JTextField();
+		delMovieYearTx.setColumns(10);
 		GroupLayout gl_deleteMovie = new GroupLayout(deleteMovie);
 		gl_deleteMovie.setHorizontalGroup(
 			gl_deleteMovie.createParallelGroup(Alignment.LEADING)
@@ -1370,8 +1385,8 @@ public class MainFrame {
 								.addComponent(label_5))
 							.addGap(18)
 							.addGroup(gl_deleteMovie.createParallelGroup(Alignment.LEADING)
-								.addComponent(textField_36, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)
-								.addComponent(textField_37, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE))))
+								.addComponent(delMovieNameTx, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)
+								.addComponent(delMovieYearTx, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE))))
 					.addContainerGap(176, Short.MAX_VALUE))
 		);
 		gl_deleteMovie.setVerticalGroup(
@@ -1381,11 +1396,11 @@ public class MainFrame {
 					.addGap(32)
 					.addGroup(gl_deleteMovie.createParallelGroup(Alignment.BASELINE)
 						.addComponent(label_4)
-						.addComponent(textField_36, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(delMovieNameTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
 					.addGroup(gl_deleteMovie.createParallelGroup(Alignment.BASELINE)
 						.addComponent(label_5)
-						.addComponent(textField_37, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(delMovieYearTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
 					.addComponent(btnDeleteMovie)
 					.addContainerGap(413, Short.MAX_VALUE))
@@ -1841,7 +1856,7 @@ public class MainFrame {
 	    }
 	    
 	    public static void removeMovieCrew(String movieName, int year) throws SQLException {
-	      String sql = "delete from CrewMember where movieName = ? and Year = ?;";
+	      String sql = "delete from CrewMember where movieName = ? and ReleaseYear = ?;";
         PreparedStatement preparedStatement;
         preparedStatement = con.prepareStatement(sql);
         preparedStatement.setString(1, movieName);
