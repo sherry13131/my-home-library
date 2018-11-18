@@ -45,6 +45,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JComboBox;
 import javax.swing.JCheckBox;
+import java.awt.Font;
+import java.awt.BorderLayout;
+import javax.swing.BoxLayout;
+import java.awt.GridBagLayout;
+import javax.swing.SpringLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 
 public class MainFrame {
 
@@ -79,7 +86,6 @@ public class MainFrame {
 	private JTextField directorsTx;
 	private JTextField movieYearTx;
 	private JTextField movieNameTx;
-	private JTextField upISBNSearch;
 	private JTextField upAlbumSearch;
 	private JTextField upMusicYearSearch;
 	private JTextField upMusicNameSearch;
@@ -120,6 +126,21 @@ public class MainFrame {
 	private JTextField upSingersTx;
 	private JTextField searchNameTx;
 	private JTextField searchYearTx;
+	private JTextField textField_6;
+	private JTextField textField_7;
+	private JTextField textField_8;
+	private JTextField textField;
+	private JTextField textField_1;
+	private JTextField textField_2;
+	private JTextField textField_3;
+	private JTextField textField_4;
+	private JTextField textField_5;
+	private JTextField textField_9;
+	private JTextField textField_10;
+	private JTextField textField_11;
+	private JTextField textField_12;
+	private JTextField textField_13;
+	private JTextField textField_14;
 
 	/**
 	 * Launch the application.
@@ -154,7 +175,7 @@ public class MainFrame {
 	 */
 	private void initialize(Connection con) {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 856, 689);
+		frame.setBounds(100, 100, 1150, 1039);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		frame.getContentPane().setLayout(new CardLayout(0, 0));
@@ -999,67 +1020,6 @@ public class MainFrame {
 		JPanel updateBook = new JPanel();
 		frame.getContentPane().add(updateBook, "updateBook");
 		
-		JLabel lblNewLabel_1 = new JLabel("Book ISBN:");
-		
-		upISBNSearch = new JTextField();
-		upISBNSearch.setColumns(10);
-		
-		JButton btnNewButton = new JButton("Search Book");
-		btnNewButton.addActionListener(new ActionListener() {
-		  public void actionPerformed(ActionEvent arg0) {
-		    // clear all fields
-		    clearUpdateBook();
-		    // validate the field input
-		    String isbn = upISBNSearch.getText();
-		    if (checkHelper.checkIsbnFormat(isbn)) {
-		      // check if isbn exist
-		      if (SelectHelper.bookexist(isbn)) {
-		        // get data set
-		        ResultSet bookResult = null, bookKeyword = null, bookAuthors = null;
-		        bookResult = SelectHelper.getBookInfo(isbn);
-		        bookKeyword = SelectHelper.getBookKeyword(isbn);
-		        bookAuthors = SelectHelper.getBookAuthorName(isbn);
-		        // show data textfield
-		        try {
-              upBookTitleTx.setText(bookResult.getString("Title"));
-              upISBN.setText(bookResult.getString("ISBN"));
-              upPublisherTx.setText(bookResult.getString("Publisher"));
-              upPagesTx.setText(bookResult.getString("NumberOfPages"));
-              upBookYearTx.setText(String.valueOf(bookResult.getInt("YearOfPublication")));
-              upEditionTx.setText(String.valueOf(bookResult.getInt("EditionNumber")));
-              upAbstractTx.setText(bookResult.getString("Abstract"));
-              String keywords = bookKeyword.getString("Tag");
-              while (bookKeyword.next()) {
-                keywords += "," + bookKeyword.getString("Tag");
-              }
-              upKeywordsTx.setText(keywords);
-              upAuthorTx1.setText(bookAuthors.getString("FullName"));
-              if (bookAuthors.next()) {
-                upAuthorTx2.setText(bookAuthors.getString("FullName"));
-              }
-              if (bookAuthors.next()) {
-                upAuthorTx3.setText(bookAuthors.getString("FullName"));
-              }
-              if (bookAuthors.next()) {
-                upAuthorTx4.setText(bookAuthors.getString("FullName"));
-              }
-              if (bookAuthors.next()) {
-                upAuthorTx5.setText(bookAuthors.getString("FullName"));
-              }
-            } catch (SQLException e) {
-              e.printStackTrace();
-            }
-		        
-		      } else {
-		        System.out.println("Book not exist");
-		      }
-		    } else {
-		      System.out.println("ISBN wrong format");
-		    }
-		    
-		  }
-		});
-		
 		JLabel lblNewLabel_2 = new JLabel("Book title:");
 		
 		JLabel label_6 = new JLabel("Book ISBN:");
@@ -1124,77 +1084,77 @@ public class MainFrame {
 		    // check if 
 		  }
 		});
+		
+		JLabel lblChangeTheValues = new JLabel("Change the values and click update to update the information of this book");
+		lblChangeTheValues.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		GroupLayout gl_updateBook = new GroupLayout(updateBook);
 		gl_updateBook.setHorizontalGroup(
 		  gl_updateBook.createParallelGroup(Alignment.LEADING)
 		    .addGroup(gl_updateBook.createSequentialGroup()
-		      .addGap(107)
 		      .addGroup(gl_updateBook.createParallelGroup(Alignment.LEADING)
 		        .addGroup(gl_updateBook.createSequentialGroup()
-		          .addGroup(gl_updateBook.createParallelGroup(Alignment.LEADING)
-		            .addComponent(lblNewLabel_2)
-		            .addComponent(label_6, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
-		            .addComponent(lblPublisher))
-		          .addGap(53)
-		          .addGroup(gl_updateBook.createParallelGroup(Alignment.LEADING)
-		            .addComponent(upPublisherTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
-		            .addComponent(upISBN, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
-		            .addComponent(upBookTitleTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))
-		        .addGroup(gl_updateBook.createParallelGroup(Alignment.TRAILING)
+		          .addGap(31)
+		          .addComponent(lblChangeTheValues))
+		        .addGroup(gl_updateBook.createSequentialGroup()
+		          .addGap(131)
 		          .addGroup(gl_updateBook.createParallelGroup(Alignment.LEADING)
 		            .addGroup(gl_updateBook.createSequentialGroup()
-		              .addComponent(label_8, GroupLayout.PREFERRED_SIZE, 91, GroupLayout.PREFERRED_SIZE)
-		              .addGap(25)
-		              .addComponent(upEditionTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+		              .addGroup(gl_updateBook.createParallelGroup(Alignment.LEADING)
+		                .addComponent(lblNewLabel_2)
+		                .addComponent(label_6, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
+		                .addComponent(lblPublisher))
+		              .addGap(53)
+		              .addGroup(gl_updateBook.createParallelGroup(Alignment.LEADING)
+		                .addComponent(upPublisherTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
+		                .addComponent(upISBN, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
+		                .addComponent(upBookTitleTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))
+		            .addGroup(gl_updateBook.createParallelGroup(Alignment.TRAILING)
+		              .addGroup(gl_updateBook.createParallelGroup(Alignment.LEADING)
+		                .addGroup(gl_updateBook.createSequentialGroup()
+		                  .addComponent(label_8, GroupLayout.PREFERRED_SIZE, 91, GroupLayout.PREFERRED_SIZE)
+		                  .addGap(25)
+		                  .addComponent(upEditionTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+		                .addGroup(gl_updateBook.createSequentialGroup()
+		                  .addComponent(label_9, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE)
+		                  .addGap(64)
+		                  .addComponent(upAbstractTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+		                .addGroup(gl_updateBook.createSequentialGroup()
+		                  .addComponent(label_10, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
+		                  .addGap(56)
+		                  .addComponent(upKeywordsTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+		                .addGroup(gl_updateBook.createSequentialGroup()
+		                  .addComponent(label_11, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)
+		                  .addGap(67)
+		                  .addComponent(upAuthorTx1, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
+		                  .addGap(23)
+		                  .addComponent(upAuthorTx2, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE))
+		                .addGroup(gl_updateBook.createSequentialGroup()
+		                  .addGap(116)
+		                  .addComponent(upAuthorTx3, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
+		                  .addGap(23)
+		                  .addComponent(upAuthorTx4, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE))
+		                .addGroup(gl_updateBook.createSequentialGroup()
+		                  .addGap(116)
+		                  .addComponent(upAuthorTx5, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE))
+		                .addGroup(gl_updateBook.createSequentialGroup()
+		                  .addComponent(label_7, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
+		                  .addGap(5)
+		                  .addComponent(upBookYearTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))
+		              .addGroup(gl_updateBook.createSequentialGroup()
+		                .addComponent(lblNumberOfPages)
+		                .addPreferredGap(ComponentPlacement.UNRELATED)
+		                .addComponent(upPagesTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))
 		            .addGroup(gl_updateBook.createSequentialGroup()
-		              .addComponent(label_9, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE)
-		              .addGap(64)
-		              .addComponent(upAbstractTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
-		            .addGroup(gl_updateBook.createSequentialGroup()
-		              .addComponent(label_10, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
-		              .addGap(56)
-		              .addComponent(upKeywordsTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
-		            .addGroup(gl_updateBook.createSequentialGroup()
-		              .addComponent(label_11, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)
-		              .addGap(67)
-		              .addComponent(upAuthorTx1, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
-		              .addGap(23)
-		              .addComponent(upAuthorTx2, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE))
-		            .addGroup(gl_updateBook.createSequentialGroup()
-		              .addGap(116)
-		              .addComponent(upAuthorTx3, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
-		              .addGap(23)
-		              .addComponent(upAuthorTx4, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE))
-		            .addGroup(gl_updateBook.createSequentialGroup()
-		              .addGap(116)
-		              .addComponent(upAuthorTx5, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE))
-		            .addGroup(gl_updateBook.createSequentialGroup()
-		              .addComponent(label_7, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
-		              .addGap(5)
-		              .addComponent(upBookYearTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))
-		          .addGroup(gl_updateBook.createSequentialGroup()
-		            .addComponent(lblNumberOfPages)
-		            .addPreferredGap(ComponentPlacement.UNRELATED)
-		            .addComponent(upPagesTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))
-		        .addGroup(gl_updateBook.createParallelGroup(Alignment.TRAILING)
-		          .addComponent(btnNewButton)
-		          .addGroup(gl_updateBook.createSequentialGroup()
-		            .addComponent(lblNewLabel_1)
-		            .addPreferredGap(ComponentPlacement.UNRELATED)
-		            .addComponent(upISBNSearch, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE))
-		          .addComponent(btnNewButton_3)))
-		      .addGap(190))
+		              .addGap(427)
+		              .addComponent(btnNewButton_3)))))
+		      .addContainerGap(213, Short.MAX_VALUE))
 		);
 		gl_updateBook.setVerticalGroup(
 		  gl_updateBook.createParallelGroup(Alignment.LEADING)
 		    .addGroup(gl_updateBook.createSequentialGroup()
-		      .addGap(32)
-		      .addGroup(gl_updateBook.createParallelGroup(Alignment.BASELINE)
-		        .addComponent(lblNewLabel_1)
-		        .addComponent(upISBNSearch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		      .addGap(18)
-		      .addComponent(btnNewButton)
-		      .addGap(18)
+		      .addContainerGap()
+		      .addComponent(lblChangeTheValues)
+		      .addGap(34)
 		      .addGroup(gl_updateBook.createParallelGroup(Alignment.LEADING)
 		        .addGroup(gl_updateBook.createSequentialGroup()
 		          .addComponent(lblNewLabel_2)
@@ -1248,7 +1208,7 @@ public class MainFrame {
 		      .addComponent(upAuthorTx5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 		      .addPreferredGap(ComponentPlacement.RELATED)
 		      .addComponent(btnNewButton_3)
-		      .addContainerGap(80, Short.MAX_VALUE))
+		      .addContainerGap(128, Short.MAX_VALUE))
 		);
 		updateBook.setLayout(gl_updateBook);
 		
@@ -1499,38 +1459,47 @@ public class MainFrame {
 		
 		textField_31 = new JTextField();
 		textField_31.setColumns(10);
+		
+		JLabel lblChangeTheValues_1 = new JLabel("Change the values and click update to update the information of this movie");
+		lblChangeTheValues_1.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		GroupLayout gl_updateMovie = new GroupLayout(updateMovie);
 		gl_updateMovie.setHorizontalGroup(
-			gl_updateMovie.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 805, Short.MAX_VALUE)
-				.addGroup(gl_updateMovie.createSequentialGroup()
-					.addGap(107)
-					.addGroup(gl_updateMovie.createParallelGroup(Alignment.TRAILING)
-						.addComponent(btnSearchMovie)
-						.addGroup(gl_updateMovie.createSequentialGroup()
-							.addGroup(gl_updateMovie.createParallelGroup(Alignment.LEADING)
-								.addComponent(lblMovieName_2)
-								.addComponent(lblReleaseYear_2))
-							.addGap(18)
-							.addGroup(gl_updateMovie.createParallelGroup(Alignment.LEADING)
-								.addComponent(textField_30, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)
-								.addComponent(textField_31, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE))))
-					.addContainerGap(178, Short.MAX_VALUE))
+		  gl_updateMovie.createParallelGroup(Alignment.LEADING)
+		    .addGroup(gl_updateMovie.createSequentialGroup()
+		      .addGroup(gl_updateMovie.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_updateMovie.createSequentialGroup()
+		          .addGap(104)
+		          .addGroup(gl_updateMovie.createParallelGroup(Alignment.TRAILING)
+		            .addComponent(btnSearchMovie)
+		            .addGroup(gl_updateMovie.createSequentialGroup()
+		              .addGroup(gl_updateMovie.createParallelGroup(Alignment.LEADING)
+		                .addComponent(lblMovieName_2)
+		                .addComponent(lblReleaseYear_2))
+		              .addGap(18)
+		              .addGroup(gl_updateMovie.createParallelGroup(Alignment.LEADING)
+		                .addComponent(textField_30, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)
+		                .addComponent(textField_31, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)))))
+		        .addGroup(gl_updateMovie.createSequentialGroup()
+		          .addGap(26)
+		          .addComponent(lblChangeTheValues_1, GroupLayout.PREFERRED_SIZE, 553, GroupLayout.PREFERRED_SIZE)))
+		      .addContainerGap(212, Short.MAX_VALUE))
 		);
 		gl_updateMovie.setVerticalGroup(
-			gl_updateMovie.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_updateMovie.createSequentialGroup()
-					.addGap(32)
-					.addGroup(gl_updateMovie.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblMovieName_2)
-						.addComponent(textField_30, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addGroup(gl_updateMovie.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblReleaseYear_2)
-						.addComponent(textField_31, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addComponent(btnSearchMovie)
-					.addContainerGap(413, Short.MAX_VALUE))
+		  gl_updateMovie.createParallelGroup(Alignment.LEADING)
+		    .addGroup(gl_updateMovie.createSequentialGroup()
+		      .addGap(21)
+		      .addComponent(lblChangeTheValues_1, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
+		      .addGap(31)
+		      .addGroup(gl_updateMovie.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(lblMovieName_2)
+		        .addComponent(textField_30, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addGroup(gl_updateMovie.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(lblReleaseYear_2)
+		        .addComponent(textField_31, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addComponent(btnSearchMovie)
+		      .addContainerGap(439, Short.MAX_VALUE))
 		);
 		updateMovie.setLayout(gl_updateMovie);
 		
@@ -1874,6 +1843,386 @@ public class MainFrame {
 		);
 		view.setLayout(gl_view);
 		
+		JPanel updateAlbum2 = new JPanel();
+		frame.getContentPane().add(updateAlbum2, "updateAlbum2");
+		
+		JScrollPane scrollPane = new JScrollPane();
+		
+		JLabel label_28 = new JLabel("Album name:");
+		
+		JLabel label_29 = new JLabel("Producer:");
+		
+		textField_6 = new JTextField();
+		textField_6.setColumns(10);
+		
+		textField_7 = new JTextField();
+		textField_7.setColumns(10);
+		
+		JLabel label_30 = new JLabel("Year:");
+		
+		textField_8 = new JTextField();
+		textField_8.setColumns(10);
+		GroupLayout gl_updateAlbum2 = new GroupLayout(updateAlbum2);
+		gl_updateAlbum2.setHorizontalGroup(
+		  gl_updateAlbum2.createParallelGroup(Alignment.TRAILING)
+		    .addGroup(gl_updateAlbum2.createSequentialGroup()
+		      .addGroup(gl_updateAlbum2.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_updateAlbum2.createSequentialGroup()
+		          .addGap(79)
+		          .addGroup(gl_updateAlbum2.createParallelGroup(Alignment.LEADING)
+		            .addGroup(gl_updateAlbum2.createSequentialGroup()
+		              .addComponent(label_28)
+		              .addGap(18)
+		              .addComponent(textField_7, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
+		              .addGap(135)
+		              .addComponent(label_30)
+		              .addGap(12)
+		              .addComponent(textField_8, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+		            .addGroup(gl_updateAlbum2.createSequentialGroup()
+		              .addComponent(label_29)
+		              .addGap(39)
+		              .addComponent(textField_6, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))))
+		        .addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 1087, GroupLayout.PREFERRED_SIZE))
+		      .addContainerGap(45, Short.MAX_VALUE))
+		);
+		gl_updateAlbum2.setVerticalGroup(
+		  gl_updateAlbum2.createParallelGroup(Alignment.LEADING)
+		    .addGroup(gl_updateAlbum2.createSequentialGroup()
+		      .addGap(60)
+		      .addGroup(gl_updateAlbum2.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_updateAlbum2.createSequentialGroup()
+		          .addGap(3)
+		          .addComponent(label_28))
+		        .addComponent(textField_7, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		        .addGroup(gl_updateAlbum2.createSequentialGroup()
+		          .addGap(6)
+		          .addComponent(label_30))
+		        .addGroup(gl_updateAlbum2.createSequentialGroup()
+		          .addGap(3)
+		          .addComponent(textField_8, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+		      .addGap(10)
+		      .addGroup(gl_updateAlbum2.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_updateAlbum2.createSequentialGroup()
+		          .addGap(6)
+		          .addComponent(label_29))
+		        .addComponent(textField_6, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addPreferredGap(ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
+		      .addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 832, GroupLayout.PREFERRED_SIZE))
+		);
+		
+		JPanel panel_1 = new JPanel();
+		scrollPane.setViewportView(panel_1);
+		GridBagLayout gbl_panel_1 = new GridBagLayout();
+		gbl_panel_1.columnWidths = new int[]{72, 73, 75, 61, 73, 71, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_panel_1.rowHeights = new int[]{53, 22, 22, 25, 22, 22, 22, 22, 25, 0, 0, 0, 0};
+		gbl_panel_1.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, Double.MIN_VALUE};
+		gbl_panel_1.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		panel_1.setLayout(gbl_panel_1);
+		
+		JLabel label_3 = new JLabel("Music name:");
+		GridBagConstraints gbc_label_3 = new GridBagConstraints();
+		gbc_label_3.anchor = GridBagConstraints.WEST;
+		gbc_label_3.insets = new Insets(0, 0, 5, 5);
+		gbc_label_3.gridx = 1;
+		gbc_label_3.gridy = 1;
+		panel_1.add(label_3, gbc_label_3);
+		
+		textField = new JTextField();
+		textField.setColumns(10);
+		GridBagConstraints gbc_textField = new GridBagConstraints();
+		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField.anchor = GridBagConstraints.NORTH;
+		gbc_textField.gridwidth = 4;
+		gbc_textField.insets = new Insets(0, 0, 5, 5);
+		gbc_textField.gridx = 2;
+		gbc_textField.gridy = 1;
+		panel_1.add(textField, gbc_textField);
+		
+		JLabel label_22 = new JLabel("Music name:");
+		GridBagConstraints gbc_label_22 = new GridBagConstraints();
+		gbc_label_22.anchor = GridBagConstraints.WEST;
+		gbc_label_22.insets = new Insets(0, 0, 5, 5);
+		gbc_label_22.gridx = 10;
+		gbc_label_22.gridy = 1;
+		panel_1.add(label_22, gbc_label_22);
+		
+		textField_1 = new JTextField();
+		textField_1.setColumns(10);
+		GridBagConstraints gbc_textField_1 = new GridBagConstraints();
+		gbc_textField_1.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField_1.gridwidth = 5;
+		gbc_textField_1.insets = new Insets(0, 0, 5, 5);
+		gbc_textField_1.gridx = 11;
+		gbc_textField_1.gridy = 1;
+		panel_1.add(textField_1, gbc_textField_1);
+		
+		JLabel label_23 = new JLabel("language:");
+		GridBagConstraints gbc_label_23 = new GridBagConstraints();
+		gbc_label_23.anchor = GridBagConstraints.SOUTHWEST;
+		gbc_label_23.insets = new Insets(0, 0, 5, 5);
+		gbc_label_23.gridx = 1;
+		gbc_label_23.gridy = 2;
+		panel_1.add(label_23, gbc_label_23);
+		
+		textField_2 = new JTextField();
+		textField_2.setColumns(10);
+		GridBagConstraints gbc_textField_2 = new GridBagConstraints();
+		gbc_textField_2.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField_2.anchor = GridBagConstraints.NORTH;
+		gbc_textField_2.gridwidth = 4;
+		gbc_textField_2.insets = new Insets(0, 0, 5, 5);
+		gbc_textField_2.gridx = 2;
+		gbc_textField_2.gridy = 2;
+		panel_1.add(textField_2, gbc_textField_2);
+		
+		JLabel label_24 = new JLabel("language:");
+		GridBagConstraints gbc_label_24 = new GridBagConstraints();
+		gbc_label_24.anchor = GridBagConstraints.WEST;
+		gbc_label_24.insets = new Insets(0, 0, 5, 5);
+		gbc_label_24.gridx = 10;
+		gbc_label_24.gridy = 2;
+		panel_1.add(label_24, gbc_label_24);
+		
+		textField_3 = new JTextField();
+		textField_3.setColumns(10);
+		GridBagConstraints gbc_textField_3 = new GridBagConstraints();
+		gbc_textField_3.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField_3.gridwidth = 5;
+		gbc_textField_3.insets = new Insets(0, 0, 5, 5);
+		gbc_textField_3.gridx = 11;
+		gbc_textField_3.gridy = 2;
+		panel_1.add(textField_3, gbc_textField_3);
+		
+		JLabel label_25 = new JLabel("Disk type:");
+		GridBagConstraints gbc_label_25 = new GridBagConstraints();
+		gbc_label_25.anchor = GridBagConstraints.WEST;
+		gbc_label_25.insets = new Insets(0, 0, 5, 5);
+		gbc_label_25.gridx = 1;
+		gbc_label_25.gridy = 3;
+		panel_1.add(label_25, gbc_label_25);
+		
+		JRadioButton radioButton = new JRadioButton("audioCD");
+		radioButton.setSelected(true);
+		GridBagConstraints gbc_radioButton = new GridBagConstraints();
+		gbc_radioButton.anchor = GridBagConstraints.NORTHWEST;
+		gbc_radioButton.insets = new Insets(0, 0, 5, 5);
+		gbc_radioButton.gridx = 2;
+		gbc_radioButton.gridy = 3;
+		panel_1.add(radioButton, gbc_radioButton);
+		
+		JRadioButton radioButton_1 = new JRadioButton("vinyl");
+		GridBagConstraints gbc_radioButton_1 = new GridBagConstraints();
+		gbc_radioButton_1.anchor = GridBagConstraints.NORTHWEST;
+		gbc_radioButton_1.insets = new Insets(0, 0, 5, 5);
+		gbc_radioButton_1.gridx = 4;
+		gbc_radioButton_1.gridy = 3;
+		panel_1.add(radioButton_1, gbc_radioButton_1);
+		
+		JLabel label_26 = new JLabel("Disk type:");
+		GridBagConstraints gbc_label_26 = new GridBagConstraints();
+		gbc_label_26.anchor = GridBagConstraints.WEST;
+		gbc_label_26.insets = new Insets(0, 0, 5, 5);
+		gbc_label_26.gridx = 10;
+		gbc_label_26.gridy = 3;
+		panel_1.add(label_26, gbc_label_26);
+		
+		JRadioButton radioButton_2 = new JRadioButton("audioCD");
+		radioButton_2.setSelected(true);
+		GridBagConstraints gbc_radioButton_2 = new GridBagConstraints();
+		gbc_radioButton_2.anchor = GridBagConstraints.WEST;
+		gbc_radioButton_2.insets = new Insets(0, 0, 5, 5);
+		gbc_radioButton_2.gridx = 11;
+		gbc_radioButton_2.gridy = 3;
+		panel_1.add(radioButton_2, gbc_radioButton_2);
+		
+		JRadioButton radioButton_3 = new JRadioButton("vinyl");
+		GridBagConstraints gbc_radioButton_3 = new GridBagConstraints();
+		gbc_radioButton_3.anchor = GridBagConstraints.WEST;
+		gbc_radioButton_3.insets = new Insets(0, 0, 5, 5);
+		gbc_radioButton_3.gridx = 14;
+		gbc_radioButton_3.gridy = 3;
+		panel_1.add(radioButton_3, gbc_radioButton_3);
+		
+		JLabel label_27 = new JLabel("Song writer:");
+		GridBagConstraints gbc_label_27 = new GridBagConstraints();
+		gbc_label_27.anchor = GridBagConstraints.WEST;
+		gbc_label_27.insets = new Insets(0, 0, 5, 5);
+		gbc_label_27.gridx = 1;
+		gbc_label_27.gridy = 4;
+		panel_1.add(label_27, gbc_label_27);
+		
+		textField_4 = new JTextField();
+		textField_4.setColumns(10);
+		GridBagConstraints gbc_textField_4 = new GridBagConstraints();
+		gbc_textField_4.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField_4.anchor = GridBagConstraints.NORTH;
+		gbc_textField_4.gridwidth = 4;
+		gbc_textField_4.insets = new Insets(0, 0, 5, 5);
+		gbc_textField_4.gridx = 2;
+		gbc_textField_4.gridy = 4;
+		panel_1.add(textField_4, gbc_textField_4);
+		
+		JLabel label_31 = new JLabel("Song writer:");
+		GridBagConstraints gbc_label_31 = new GridBagConstraints();
+		gbc_label_31.anchor = GridBagConstraints.WEST;
+		gbc_label_31.insets = new Insets(0, 0, 5, 5);
+		gbc_label_31.gridx = 10;
+		gbc_label_31.gridy = 4;
+		panel_1.add(label_31, gbc_label_31);
+		
+		textField_5 = new JTextField();
+		textField_5.setColumns(10);
+		GridBagConstraints gbc_textField_5 = new GridBagConstraints();
+		gbc_textField_5.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField_5.gridwidth = 5;
+		gbc_textField_5.insets = new Insets(0, 0, 5, 5);
+		gbc_textField_5.gridx = 11;
+		gbc_textField_5.gridy = 4;
+		panel_1.add(textField_5, gbc_textField_5);
+		
+		JLabel label_32 = new JLabel("Composer:");
+		GridBagConstraints gbc_label_32 = new GridBagConstraints();
+		gbc_label_32.anchor = GridBagConstraints.WEST;
+		gbc_label_32.insets = new Insets(0, 0, 5, 5);
+		gbc_label_32.gridx = 1;
+		gbc_label_32.gridy = 5;
+		panel_1.add(label_32, gbc_label_32);
+		
+		textField_9 = new JTextField();
+		textField_9.setColumns(10);
+		GridBagConstraints gbc_textField_9 = new GridBagConstraints();
+		gbc_textField_9.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField_9.anchor = GridBagConstraints.NORTH;
+		gbc_textField_9.gridwidth = 4;
+		gbc_textField_9.insets = new Insets(0, 0, 5, 5);
+		gbc_textField_9.gridx = 2;
+		gbc_textField_9.gridy = 5;
+		panel_1.add(textField_9, gbc_textField_9);
+		
+		JLabel label_33 = new JLabel("Composer:");
+		GridBagConstraints gbc_label_33 = new GridBagConstraints();
+		gbc_label_33.anchor = GridBagConstraints.WEST;
+		gbc_label_33.insets = new Insets(0, 0, 5, 5);
+		gbc_label_33.gridx = 10;
+		gbc_label_33.gridy = 5;
+		panel_1.add(label_33, gbc_label_33);
+		
+		textField_10 = new JTextField();
+		textField_10.setColumns(10);
+		GridBagConstraints gbc_textField_10 = new GridBagConstraints();
+		gbc_textField_10.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField_10.gridwidth = 5;
+		gbc_textField_10.insets = new Insets(0, 0, 5, 5);
+		gbc_textField_10.gridx = 11;
+		gbc_textField_10.gridy = 5;
+		panel_1.add(textField_10, gbc_textField_10);
+		
+		JLabel label_34 = new JLabel("Arranger:");
+		GridBagConstraints gbc_label_34 = new GridBagConstraints();
+		gbc_label_34.anchor = GridBagConstraints.WEST;
+		gbc_label_34.insets = new Insets(0, 0, 5, 5);
+		gbc_label_34.gridx = 1;
+		gbc_label_34.gridy = 6;
+		panel_1.add(label_34, gbc_label_34);
+		
+		textField_11 = new JTextField();
+		textField_11.setColumns(10);
+		GridBagConstraints gbc_textField_11 = new GridBagConstraints();
+		gbc_textField_11.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField_11.anchor = GridBagConstraints.NORTH;
+		gbc_textField_11.gridwidth = 4;
+		gbc_textField_11.insets = new Insets(0, 0, 5, 5);
+		gbc_textField_11.gridx = 2;
+		gbc_textField_11.gridy = 6;
+		panel_1.add(textField_11, gbc_textField_11);
+		
+		JLabel label_35 = new JLabel("Arranger:");
+		GridBagConstraints gbc_label_35 = new GridBagConstraints();
+		gbc_label_35.anchor = GridBagConstraints.WEST;
+		gbc_label_35.insets = new Insets(0, 0, 5, 5);
+		gbc_label_35.gridx = 10;
+		gbc_label_35.gridy = 6;
+		panel_1.add(label_35, gbc_label_35);
+		
+		textField_12 = new JTextField();
+		textField_12.setColumns(10);
+		GridBagConstraints gbc_textField_12 = new GridBagConstraints();
+		gbc_textField_12.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField_12.gridwidth = 5;
+		gbc_textField_12.insets = new Insets(0, 0, 5, 5);
+		gbc_textField_12.gridx = 11;
+		gbc_textField_12.gridy = 6;
+		panel_1.add(textField_12, gbc_textField_12);
+		
+		JLabel label_36 = new JLabel("Singers:");
+		GridBagConstraints gbc_label_36 = new GridBagConstraints();
+		gbc_label_36.anchor = GridBagConstraints.WEST;
+		gbc_label_36.insets = new Insets(0, 0, 5, 5);
+		gbc_label_36.gridx = 1;
+		gbc_label_36.gridy = 7;
+		panel_1.add(label_36, gbc_label_36);
+		
+		textField_13 = new JTextField();
+		textField_13.setColumns(10);
+		GridBagConstraints gbc_textField_13 = new GridBagConstraints();
+		gbc_textField_13.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField_13.anchor = GridBagConstraints.NORTH;
+		gbc_textField_13.gridwidth = 4;
+		gbc_textField_13.insets = new Insets(0, 0, 5, 5);
+		gbc_textField_13.gridx = 2;
+		gbc_textField_13.gridy = 7;
+		panel_1.add(textField_13, gbc_textField_13);
+		
+		JLabel label_37 = new JLabel("Singers:");
+		GridBagConstraints gbc_label_37 = new GridBagConstraints();
+		gbc_label_37.anchor = GridBagConstraints.WEST;
+		gbc_label_37.insets = new Insets(0, 0, 5, 5);
+		gbc_label_37.gridx = 10;
+		gbc_label_37.gridy = 7;
+		panel_1.add(label_37, gbc_label_37);
+		
+		textField_14 = new JTextField();
+		textField_14.setColumns(10);
+		GridBagConstraints gbc_textField_14 = new GridBagConstraints();
+		gbc_textField_14.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField_14.gridwidth = 5;
+		gbc_textField_14.insets = new Insets(0, 0, 5, 5);
+		gbc_textField_14.gridx = 11;
+		gbc_textField_14.gridy = 7;
+		panel_1.add(textField_14, gbc_textField_14);
+		
+		JButton button = new JButton("Update");
+		GridBagConstraints gbc_button = new GridBagConstraints();
+		gbc_button.anchor = GridBagConstraints.NORTHWEST;
+		gbc_button.insets = new Insets(0, 0, 5, 5);
+		gbc_button.gridx = 4;
+		gbc_button.gridy = 8;
+		panel_1.add(button, gbc_button);
+		
+		JButton button_6 = new JButton("Cancel");
+		GridBagConstraints gbc_button_6 = new GridBagConstraints();
+		gbc_button_6.anchor = GridBagConstraints.NORTHWEST;
+		gbc_button_6.insets = new Insets(0, 0, 5, 5);
+		gbc_button_6.gridx = 5;
+		gbc_button_6.gridy = 8;
+		panel_1.add(button_6, gbc_button_6);
+		
+		JButton button_7 = new JButton("Update");
+		GridBagConstraints gbc_button_7 = new GridBagConstraints();
+		gbc_button_7.insets = new Insets(0, 0, 5, 5);
+		gbc_button_7.gridx = 14;
+		gbc_button_7.gridy = 8;
+		panel_1.add(button_7, gbc_button_7);
+		
+		JButton button_8 = new JButton("Cancel");
+		GridBagConstraints gbc_button_8 = new GridBagConstraints();
+		gbc_button_8.anchor = GridBagConstraints.EAST;
+		gbc_button_8.insets = new Insets(0, 0, 5, 5);
+		gbc_button_8.gridx = 15;
+		gbc_button_8.gridy = 8;
+		panel_1.add(button_8, gbc_button_8);
+		updateAlbum2.setLayout(gl_updateAlbum2);
+		
 		
 		
 		
@@ -1978,7 +2327,7 @@ public class MainFrame {
             }
           } else if(checkHelper.albumExist(name)) {
             CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
-            c.show(frame.getContentPane(), "updateAlbum");
+            c.show(frame.getContentPane(), "updateAlbum2"); 
           } else if (checkHelper.movieExist(name)) {
             CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
             c.show(frame.getContentPane(), "updateMovie");
