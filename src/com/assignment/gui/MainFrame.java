@@ -274,7 +274,11 @@ public class MainFrame {
 							bookabs = insertabstract.getText();
 						}
 						if (!insertkeyword.getText().equals("")) {
-							keywords = insertkeyword.getText().split("\\s*,\\s*");
+						  if (insertkeyword.getText().contains(",")) {
+						    keywords = insertkeyword.getText().split("\\s*,\\s*");
+						  } else {
+						    keywords = (insertkeyword.getText() + ",").split(",");
+						  }
 						}
 
 						List<String> authors = new ArrayList<String>();
@@ -1704,7 +1708,7 @@ public class MainFrame {
 			    int year = Integer.parseInt(delMovieYearTx.getText());
 			    // find if the movie exist
 			    if (SelectHelper.checkMovieExist(movieName, year)) {
-			      TransactionHelper.deleteMovieTransaction(movieName, year);
+			      TransactionHelper.deleteMovieTransaction(movieName);
 			      System.out.println("Movie is deleted");
 			    } else {
 			      System.out.println("Movie not exist");
@@ -1905,79 +1909,112 @@ public class MainFrame {
 		
 		JMenuItem mntmMovie = new JMenuItem("Movie");
 		mntmMovie.addActionListener(new ActionListener() {
-	          public void actionPerformed(ActionEvent event) {
-	        	// go to insert book page
-	        	  CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
-	        	  c.show(frame.getContentPane(), "insertMovie");
-	          }
-	        });
+        public void actionPerformed(ActionEvent event) {
+      	// go to insert book page
+      	  CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
+      	  c.show(frame.getContentPane(), "insertMovie");
+        }
+      });
 		mnInsert.add(mntmMovie);
 		
-		JMenu mnUpdate = new JMenu("Update");
-		mnData.add(mnUpdate);
+		JMenuItem menuUpdate = new JMenuItem("Update");
+		menuUpdate.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent e) {
+		    String name = JOptionPane.showInputDialog(null, "What do you want to update?", "Update dialog", JOptionPane.QUESTION_MESSAGE);
+        // validate input field
+        if (name == "") {
+          JOptionPane.showMessageDialog(null, "You have to input a name", "Update dialog - need name", JOptionPane.ERROR_MESSAGE);
+        } else {
+          // search the product and redirect them to corresponding panel
+          if(checkHelper.bookExist(name)) {
+            CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
+            c.show(frame.getContentPane(), "updateBook");
+            clearUpdateBook();
+            // get data set
+            ResultSet bookResult = null, bookKeyword = null, bookAuthors = null;
+            String keywords = "";
+            String isbn = SelectHelper.getBookIsbn(name);
+            bookResult = SelectHelper.getBookInfo(isbn);
+            bookKeyword = SelectHelper.getBookKeyword(isbn);
+            bookAuthors = SelectHelper.getBookAuthorName(isbn);
+            // show data textfield
+            try {
+              upBookTitleTx.setText(bookResult.getString("Title"));
+              upISBN.setText(bookResult.getString("ISBN"));
+              upPublisherTx.setText(bookResult.getString("Publisher"));
+              upPagesTx.setText(bookResult.getString("NumberOfPages"));
+              upBookYearTx.setText(String.valueOf(bookResult.getInt("YearOfPublication")));
+              upEditionTx.setText(String.valueOf(bookResult.getInt("EditionNumber")));
+              upAbstractTx.setText(bookResult.getString("Abstract"));
+              upKeywordsTx.setText(keywords);
+              try {
+                if (bookKeyword != null) {
+                  keywords = bookKeyword.getString("Tag");
+                  System.out.println(keywords);
+                  while (bookKeyword.next()) {
+                    keywords += "," + bookKeyword.getString("Tag");
+                  }
+                  upKeywordsTx.setText(keywords);
+                }
+              } catch (SQLException e1) {
+                // do nothing...
+              }
+
+              upAuthorTx1.setText(bookAuthors.getString("FullName"));
+              if (bookAuthors.next()) {
+                upAuthorTx2.setText(bookAuthors.getString("FullName"));
+              }
+              if (bookAuthors.next()) {
+                upAuthorTx3.setText(bookAuthors.getString("FullName"));
+              }
+              if (bookAuthors.next()) {
+                upAuthorTx4.setText(bookAuthors.getString("FullName"));
+              }
+              if (bookAuthors.next()) {
+                upAuthorTx5.setText(bookAuthors.getString("FullName"));
+              }
+            } catch (SQLException e1) {
+              e1.printStackTrace();
+            }
+          } else if(checkHelper.albumExist(name)) {
+            CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
+            c.show(frame.getContentPane(), "updateAlbum");
+          } else if (checkHelper.movieExist(name)) {
+            CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
+            c.show(frame.getContentPane(), "updateMovie");
+          } else {
+            JOptionPane.showMessageDialog(null, "Product not found", "Product not found", JOptionPane.INFORMATION_MESSAGE);
+          }
+        }
+		  }
+		});
+		mnData.add(menuUpdate);
 		
-		JMenuItem menuItem = new JMenuItem("Book");
-		menuItem.addActionListener(new ActionListener() {
-	          public void actionPerformed(ActionEvent event) {
-	        	// go to insert book page
-	        	  CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
-	        	  c.show(frame.getContentPane(), "updateBook");
-	          }
-	        });
-		mnUpdate.add(menuItem);
-		
-		JMenuItem menuItem_1 = new JMenuItem("Album");
-		menuItem_1.addActionListener(new ActionListener() {
-	          public void actionPerformed(ActionEvent event) {
-	        	// go to insert book page
-	        	  CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
-	        	  c.show(frame.getContentPane(), "updateAlbum");
-	          }
-	        });
-		mnUpdate.add(menuItem_1);
-		
-		JMenuItem menuItem_2 = new JMenuItem("Movie");
-		menuItem_2.addActionListener(new ActionListener() {
-	          public void actionPerformed(ActionEvent event) {
-	        	// go to insert book page
-	        	  CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
-	        	  c.show(frame.getContentPane(), "updateMovie");
-	          }
-	        });
-		mnUpdate.add(menuItem_2);
-		
-		JMenu mnDelete = new JMenu("Delete");
-		mnData.add(mnDelete);
-		
-		JMenuItem menuItem_3 = new JMenuItem("Book");
-		menuItem_3.addActionListener(new ActionListener() {
-	          public void actionPerformed(ActionEvent event) {
-	        	// go to insert book page
-	        	  CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
-	        	  c.show(frame.getContentPane(), "deleteBook");
-	          }
-	        });
-		mnDelete.add(menuItem_3);
-		
-		JMenuItem menuItem_4 = new JMenuItem("Album");
-		menuItem_4.addActionListener(new ActionListener() {
-	          public void actionPerformed(ActionEvent event) {
-	        	// go to insert book page
-	        	  CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
-	        	  c.show(frame.getContentPane(), "deleteAlbum");
-	          }
-	        });
-		mnDelete.add(menuItem_4);
-		
-		JMenuItem menuItem_5 = new JMenuItem("Movie");
-		menuItem_5.addActionListener(new ActionListener() {
-	          public void actionPerformed(ActionEvent event) {
-	        	// go to insert book page
-	        	  CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
-	        	  c.show(frame.getContentPane(), "deleteMovie");
-	          }
-	        });
-		mnDelete.add(menuItem_5);
+		JMenuItem mntmDelete = new JMenuItem("Remove");
+		mntmDelete.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent e) {
+		    String name = JOptionPane.showInputDialog(null, "What do you want to remove?", "Remove dialog", JOptionPane.QUESTION_MESSAGE);
+		    // validate input field
+		    if (name == "") {
+		      JOptionPane.showMessageDialog(null, "You have to input a name", "Remove dialog - need name", JOptionPane.ERROR_MESSAGE);
+		    } else {
+		      // search the name in each category, if found, delete it
+		      if(checkHelper.bookExist(name)) {
+		        TransactionHelper.deleteBookTransaction(name);
+		        JOptionPane.showMessageDialog(null, "Successfully deleted this book", "Remove successfully", JOptionPane.INFORMATION_MESSAGE);
+		      } else if(checkHelper.albumExist(name)) {
+		        TransactionHelper.deleteAlbumTransaction(name);
+		        JOptionPane.showMessageDialog(null, "Successfully deleted all music tracks in this album", "Remove successfully", JOptionPane.INFORMATION_MESSAGE);
+		      } else if (checkHelper.movieExist(name)) {
+		        TransactionHelper.deleteMovieTransaction(name);
+		        JOptionPane.showMessageDialog(null, "Successfully deleted this movie", "Remove successfully", JOptionPane.INFORMATION_MESSAGE);
+		      } else {
+		        JOptionPane.showMessageDialog(null, "Product not found", "Product not found", JOptionPane.INFORMATION_MESSAGE);
+		      }
+		    }
+		  }
+		});
+		mnData.add(mntmDelete);
 		
 		JMenu mnView = new JMenu("View");
 		menuBar.add(mnView);
@@ -2122,6 +2159,7 @@ public class MainFrame {
 	  
 	  public static void insertBookAuthor(String isbn, List<String> authors) throws SQLException {
 	    String sql = "insert into Bookauthor values (?,?);";
+	    int count = 0;
       PreparedStatement preparedStatement;
       int pplID = -1;
       for (String author : authors) {
@@ -2132,7 +2170,8 @@ public class MainFrame {
           // add new author
           pplID = InserterHelper.insertNewPeople(author);
           if (pplID == -1) {
-            System.out.println("The author name "+author+" is not in a correct format. will not add to database.");            break;
+            System.out.println("The author name "+author+" is not in a correct format. will not add to database.");
+            continue;
           }
         }
         // insert author after found/added
@@ -2140,7 +2179,11 @@ public class MainFrame {
         preparedStatement.setString(1, isbn);
         preparedStatement.setInt(2, pplID);
         preparedStatement.executeUpdate();
-        
+        count++;
+      }
+      if (count <= 0) {
+        System.out.println("Need to add at least one valid author");
+        throw new SQLException();
       }
 	  }
 	  
@@ -2157,21 +2200,23 @@ public class MainFrame {
 	    int keyID = -1, nextKeyID = -1;
 	    String sql = "insert into Keyword values (?,?);";
 	    PreparedStatement preparedStatement;
-      for (String keyword : keywords) {
-        nextKeyID = SelectHelper.getNextKeywordID();
-        keyID = SelectHelper.getKeywordID(keyword);
-        if (nextKeyID == -1) {
-          // sth wrong on getting next keyword id
-          System.out.println("sth wrong - keyword");
-        } else if (keyID < 0){
-          preparedStatement = con.prepareStatement(sql);
-          preparedStatement.setInt(1, nextKeyID);
-          preparedStatement.setString(2, keyword);
-          preparedStatement.executeUpdate();
-          keyID = nextKeyID;
+	    if (keywords != null) {
+        for (String keyword : keywords) {
+          nextKeyID = SelectHelper.getNextKeywordID();
+          keyID = SelectHelper.getKeywordID(keyword);
+          if (nextKeyID == -1) {
+            // sth wrong on getting next keyword id
+            System.out.println("sth wrong - keyword");
+          } else if (keyID < 0){
+            preparedStatement = con.prepareStatement(sql);
+            preparedStatement.setInt(1, nextKeyID);
+            preparedStatement.setString(2, keyword);
+            preparedStatement.executeUpdate();
+            keyID = nextKeyID;
+          }
           insertBookKeyword(isbn, keyID);
         }
-      }
+	    }
 	  }
 	  
 	  public static int insertNewPeople(String fullname) throws SQLException {
@@ -2297,8 +2342,22 @@ public class MainFrame {
 	
 	public static class checkHelper {
 	  
+	  public static boolean bookExist(String bookTitle) {
+	    if (SelectHelper.getBookCount(bookTitle) > 0) {
+	      return true;
+	    }
+	    return false;
+	  }
+	  
 	  public static boolean albumExist(String albumName) {
 	    if (SelectHelper.getAlbumMusicsCount(albumName) > 0) {
+	      return true;
+	    }
+	    return false;
+	  }
+	  
+	  public static boolean movieExist(String movieName) {
+	    if (SelectHelper.getMovieCount(movieName) > 0) {
 	      return true;
 	    }
 	    return false;
@@ -2413,50 +2472,65 @@ public class MainFrame {
         preparedStatement.executeUpdate();
 	    }
 	  
-	    public static void removeMovie(String movieName, int year) throws SQLException {
-	      String sql = "delete from Movie where movieName = ? and Year = ?;";
+	    public static void removeMovie(String movieName) throws SQLException {
+	      String sql = "delete from Movie where movieName = ?;";
         PreparedStatement preparedStatement;
         preparedStatement = con.prepareStatement(sql);
         preparedStatement.setString(1, movieName);
-        preparedStatement.setInt(2, year);
         preparedStatement.executeUpdate();
 	    }
 	    
-	    public static void removeMovieAward(String movieName, int year) throws SQLException {
-	      String sql = "delete from Award where movieName = ? and Year = ?;";
+	    public static void removeMovieAward(String movieName) throws SQLException {
+	      String sql = "delete from Award where movieName = ?;";
         PreparedStatement preparedStatement;
         preparedStatement = con.prepareStatement(sql);
         preparedStatement.setString(1, movieName);
-        preparedStatement.setInt(2, year);
         preparedStatement.executeUpdate();
 	    }
 	    
-	    public static void removeMovieCrew(String movieName, int year) throws SQLException {
-	      String sql = "delete from CrewMember where movieName = ? and ReleaseYear = ?;";
+	    public static void removeMovieCrew(String movieName) throws SQLException {
+	      String sql = "delete from CrewMember where movieName = ?;";
         PreparedStatement preparedStatement;
         preparedStatement = con.prepareStatement(sql);
         preparedStatement.setString(1, movieName);
-        preparedStatement.setInt(2, year);
         preparedStatement.executeUpdate();
 	    }
 	}
 		 
 	 
 	public static class SelectHelper {
+	  public static String getBookIsbn(String bookTitle) {
+	    String sql = "Select isbn from Book where Title = ?;";
+	    ResultSet rs = null;
+      PreparedStatement ps;
+      try {
+        ps = con.prepareStatement(sql);
+        ps.setString(1, bookTitle);
+        rs = ps.executeQuery();
+        rs.next();
+        return rs.getString("ISBN");
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return null;
+	  }
 	  
-	  public static ResultSet getAlbumMusics(String albumName) {
-	    String sql = "Select MusicName from music where AlbumName=?;";
+	  public static int getBookCount(String bookTitle) {
+	    String sql = "Select count(*) from Book where Title = ?;";
 	    ResultSet rs = null;
 	    PreparedStatement ps;
       try {
         ps = con.prepareStatement(sql);
-        ps.setString(1, albumName);
+        ps.setString(1, bookTitle);
         rs = ps.executeQuery();
+        rs.next();
+        return rs.getInt("count(*)");
       } catch (SQLException e) {
         e.printStackTrace();
       }
-      return rs;
+      return -1;
 	  }
+	  
 	  public static int getAlbumMusicsCount(String albumName) {
 	    String sql = "Select count(*) from music where albumName=?;";
 	    ResultSet rs = null;
@@ -2473,6 +2547,37 @@ public class MainFrame {
       }
       return count;
 	  }
+	  
+	  public static int getMovieCount(String movieName) {
+	    String sql = "Select count(*) from Movie where MovieName = ?;";
+      ResultSet rs = null;
+      PreparedStatement ps;
+      try {
+        ps = con.prepareStatement(sql);
+        ps.setString(1, movieName);
+        rs = ps.executeQuery();
+        rs.next();
+        return rs.getInt("count(*)");
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return -1;
+	  }
+
+    public static ResultSet getAlbumMusics(String albumName) {
+      String sql = "Select MusicName from music where AlbumName=?;";
+      ResultSet rs = null;
+      PreparedStatement ps;
+      try {
+        ps = con.prepareStatement(sql);
+        ps.setString(1, albumName);
+        rs = ps.executeQuery();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return rs;
+    }
+    
 	  public static ResultSet getBookInfo(String isbn) {
 	    String sql = "Select * from book where ISBN = ?;";
       ResultSet rs = null;
@@ -2809,7 +2914,6 @@ public class MainFrame {
         } catch (SQLException e1) {
           e1.printStackTrace();
         }
-        e.printStackTrace();
       } finally {
         try {
           con.setAutoCommit(true);
@@ -2974,9 +3078,10 @@ public class MainFrame {
        }
      }
 	  
-	  public static void deleteBookTransaction(String isbn) {
+	  public static void deleteBookTransaction(String bookTitle) {
 	    try {
 	      con.setAutoCommit(false);
+	      String isbn = SelectHelper.getBookIsbn(bookTitle);
         DeleteHelper.removeBookKeyword(isbn);
         DeleteHelper.removeBookAuthor(isbn);
         DeleteHelper.removeBook(isbn);
@@ -3054,12 +3159,12 @@ public class MainFrame {
       }
     }
 	  
-	  public static void deleteMovieTransaction(String movieName, int year) {
+	  public static void deleteMovieTransaction(String movieName) {
 	    try {
         con.setAutoCommit(false);
-        DeleteHelper.removeMovieAward(movieName, year);
-        DeleteHelper.removeMovieCrew(movieName, year);
-        DeleteHelper.removeMovie(movieName, year);
+        DeleteHelper.removeMovieAward(movieName);
+        DeleteHelper.removeMovieCrew(movieName);
+        DeleteHelper.removeMovie(movieName);
         con.commit();
       } catch (SQLException e) {
         e.printStackTrace();
