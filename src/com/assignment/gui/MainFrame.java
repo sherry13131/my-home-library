@@ -764,28 +764,38 @@ public class MainFrame {
 		      
 		      int counter = 0;
 		      String[] tempCrewName = null;
-//		      List<String> theirRoles = new ArrayList<String>();
-		      Map<String, String> allCrewNameRole = new HashMap<String, String>();  // key: crewname, value:role
+		      List<String> theirRoles = new ArrayList<String>();
+		      Map<String, List<String>> allCrewNameRole = new HashMap<String, List<String>>();  // key: crewname, value:array of roleName
+		      // --- for each role
 		      for (JTextField crewTx: MovieCrewJFields.keySet()) {		        
 		        // split by ','
 		        tempCrewName = crewTx.getText().toLowerCase().split("\\s*,\\s*");
-		        // try to put in a hashmap with name as key and role as value
-		        // the pair with the same key will replace the previous value
+		        
+		        // try to put in a hashmap with name as key and role[] as value
+		        // the pair with the same key will replace the previous value ... wrong... fixing now
+		        // create a hash map for each person with an empty list
 		        for (String name : tempCrewName) {
-		          if (MovieCrewJFields.get(crewTx).equals("cast")) {
-		            if (counter < 10) {
-		              allCrewNameRole.put(name, MovieCrewJFields.get(crewTx));
-	                counter++;
-		            }
-		          } else {
-		            if (counter < 3) {
-  		            allCrewNameRole.put(name, MovieCrewJFields.get(crewTx));
-  		            counter++;
-		            }
+		          // if the name not exist in the hash map, insert it into the hashmap
+		          if (allCrewNameRole.get(name) == null) {
+		            allCrewNameRole.put(name, new ArrayList<String>());
 		          }
+		          // add their corresponding roles for each person
+		          if (MovieCrewJFields.get(crewTx).equals("cast")) {
+                if (counter < 10) {
+//                  allCrewNameRole.put(name, MovieCrewJFields.get(crewTx));
+                  allCrewNameRole.get(name).add(MovieCrewJFields.get(crewTx));
+                  counter++;
+                }
+              } else {
+                if (counter < 3) {
+                  allCrewNameRole.get(name).add(MovieCrewJFields.get(crewTx));
+                  counter++;
+                }
+              }
 		        }
-		        counter = 0;
-		      }
+            counter = 0;
+          }
+		      
 		      // get casts name
 //		      tempCrewName = castsTx.getText().split("\\s*,\\s*");
 //		      List<String> castNameList = new LinkedList<String>(Arrays.asList(tempCrewName));
@@ -2435,7 +2445,7 @@ public class MainFrame {
 	   }
 	   
 //	   public static boolean insertAward(String movieName, int movieYear, Map<String, String> allCrewNameRole, List<String> castNameList) {
-	   public static void insertAward(String movieName, int movieYear, Map<String, String> allCrewNameRole) throws SQLException {
+	   public static void insertAward(String movieName, int movieYear, Map<String, List<String>> allCrewNameRole) throws SQLException {
 	     String sql = "insert ignore into award values (?,?,?,?);";
 	     PreparedStatement ps;
        ps = con.prepareStatement(sql);
@@ -2449,7 +2459,7 @@ public class MainFrame {
        }
 	   }
 	   
-	  public static void insertCrewMember(String movieName, int movieYear, Map<String, String> allCrewNameRole) throws SQLException {
+	  public static void insertCrewMember(String movieName, int movieYear, Map<String, List<String>> allCrewNameRole) throws SQLException {
 	    String sql = "insert into CrewMember values (?,?,?,?);";
 	    Map<String,String> flags = new HashMap<String,String>();  
 	    PreparedStatement ps;
@@ -2459,9 +2469,12 @@ public class MainFrame {
       for (String name : allCrewNameRole.keySet()) {
         // get peopleID for people
         ps.setInt(1, SelectHelper.getPeopleID(name));
-        ps.setInt(4, SelectHelper.getRoleID(allCrewNameRole.get(name)));
-        ps.executeUpdate();
-        flags.put(allCrewNameRole.get(name), name);
+        // for each role the person has
+        for (String role: allCrewNameRole.get(name)) {
+          ps.setInt(4, SelectHelper.getRoleID(role));
+          ps.executeUpdate();
+          flags.put(role, name);
+        }
 	    }
       // check if all the roles have at least 1 people
       if (flags.size() < 7) {
@@ -3062,7 +3075,7 @@ public class MainFrame {
       }
 	  }
 	  
-	  public static void insertMovieTransaction(String movieName, int movieYear, Map<String, String> allCrewNameRole) {
+	  public static void insertMovieTransaction(String movieName, int movieYear, Map<String, List<String>> allCrewNameRole) {
       try {
 	      con.setAutoCommit(false);
 	       // insert movie if not exist
