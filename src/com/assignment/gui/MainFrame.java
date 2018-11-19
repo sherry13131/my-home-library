@@ -91,12 +91,6 @@ public class MainFrame {
 	private JTextField upMusicNameSearch;
 	private JTextField textField_30;
 	private JTextField textField_31;
-	private JTextField delISBNTx;
-	private JTextField delAlbumTx;
-	private JTextField delAlbumTx2;
-	private JTextField delMusicTx;
-	private JTextField delMovieNameTx;
-	private JTextField delMovieYearTx;
 	private JTextField singersTx;
 	private JTextField composersTx;
 	private JTextField editorsTx;
@@ -189,21 +183,21 @@ public class MainFrame {
 		JPanel insertBook = new JPanel();
 		frame.getContentPane().add(insertBook, "insertBook");
 		
-				JLabel lblBookTitle = new JLabel("Book title:");
+				JLabel lblBookTitle = new JLabel("Book title* :");
 		
 		insertbooktitle = new JTextField();
 		insertbooktitle.setColumns(10);
 		
-		JLabel lblBookIsbn = new JLabel("Book ISBN:");
+		JLabel lblBookIsbn = new JLabel("Book ISBN* :");
 		
 		insertbookisbn = new JTextField();
 		insertbookisbn.setColumns(10);
 		
-		JLabel lblNewLabel = new JLabel("Publisher:");
+		JLabel lblNewLabel = new JLabel("Publisher* :");
 		
-		JLabel lblNumberofPages = new JLabel("Numberof pages:");
+		JLabel lblNumberofPages = new JLabel("Numberof pages* :");
 		
-		JLabel lblYearOfPublication = new JLabel("Year of publication:");
+		JLabel lblYearOfPublication = new JLabel("Year of publication* :");
 		
 		JLabel lblEditionNumber = new JLabel("Edition number:");
 		
@@ -211,7 +205,7 @@ public class MainFrame {
 		
 		JLabel lblKeywords = new JLabel("Keywords:");
 		
-		JLabel lblAuthors = new JLabel("Authors:");
+		JLabel lblAuthors = new JLabel("Authors* :");
 		
 		insertbookpub = new JTextField();
 		insertbookpub.setColumns(10);
@@ -287,9 +281,11 @@ public class MainFrame {
 						
 						// get optional field
 						if (!insertedition.getText().equals("")) {
-							if (checkHelper.checkIfNumerical(editorsTx) > 0) {
-								edition = Integer.parseInt(insertedition.getText());
-							}
+						  edition = checkHelper.checkIfNumerical(insertedition);
+						  if (edition < 0) {
+						    System.out.println("edition wrong range, set it as null");
+						    edition = -1;
+						  }
 						}
 						if (!insertabstract.getText().equals("")) {
 							bookabs = insertabstract.getText();
@@ -327,108 +323,132 @@ public class MainFrame {
 				}
 			}
 		});
+		
+		JLabel lblEachBookCan = new JLabel("Each book can store at most 5 authors, you can separate the names by comma ' , '.");
+		
+		JLabel lblNameOfPeople_1 = new JLabel("Name of people who involved should be in the format of 'first_name family_name' or 'first_name middle_name family_name'");
+		
+		JLabel lblIfTheNames = new JLabel("If the names are in the wrong format, it will not be stored in the database.");
+		
+		JLabel lblPleaseInsertAll_1 = new JLabel("Please insert all the mandatory fields. ISBN is a 13 digits string. You have to enter at least one author.");
 		GroupLayout gl_insertBook = new GroupLayout(insertBook);
 		gl_insertBook.setHorizontalGroup(
-			gl_insertBook.createParallelGroup(Alignment.TRAILING)
-				.addGroup(Alignment.LEADING, gl_insertBook.createSequentialGroup()
-					.addGap(173)
-					.addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_insertBook.createSequentialGroup()
-							.addComponent(lblNumberofPages)
-							.addGap(18)
-							.addComponent(insertpages, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_insertBook.createSequentialGroup()
-							.addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
-								.addComponent(lblBookTitle)
-								.addComponent(lblBookIsbn)
-								.addComponent(lblNewLabel))
-							.addGap(53)
-							.addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING, false)
-								.addComponent(insertbookpub)
-								.addComponent(insertbookisbn)
-								.addComponent(insertbooktitle, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))
-						.addGroup(gl_insertBook.createSequentialGroup()
-							.addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
-								.addComponent(lblYearOfPublication)
-								.addComponent(lblEditionNumber)
-								.addComponent(lblAbstract)
-								.addComponent(lblKeywords)
-								.addComponent(lblAuthors))
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
-								.addComponent(insertkeyword, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
-								.addComponent(insertedition, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
-								.addComponent(insertpubyear, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
-								.addComponent(insertabstract, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
-								.addGroup(gl_insertBook.createParallelGroup(Alignment.TRAILING)
-									.addGroup(gl_insertBook.createSequentialGroup()
-										.addComponent(insertauthor1, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
-										.addGap(23)
-										.addComponent(insertauthor2, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE))
-									.addGroup(gl_insertBook.createSequentialGroup()
-										.addComponent(insertauthor3, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
-										.addGap(23)
-										.addComponent(insertauthor4, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE))
-									.addComponent(insertauthor5, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
-									.addGroup(gl_insertBook.createSequentialGroup()
-										.addComponent(btnSubmitbookinsert, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
-										.addPreferredGap(ComponentPlacement.RELATED)
-										.addComponent(btnCancelbook))))))
-					.addContainerGap(217, Short.MAX_VALUE))
+		  gl_insertBook.createParallelGroup(Alignment.LEADING)
+		    .addGroup(gl_insertBook.createSequentialGroup()
+		      .addGap(52)
+		      .addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
+		          .addComponent(lblEachBookCan, GroupLayout.PREFERRED_SIZE, 901, GroupLayout.PREFERRED_SIZE)
+		          .addComponent(lblNameOfPeople_1, GroupLayout.PREFERRED_SIZE, 809, GroupLayout.PREFERRED_SIZE)
+		          .addComponent(lblPleaseInsertAll_1, GroupLayout.PREFERRED_SIZE, 672, GroupLayout.PREFERRED_SIZE)
+		          .addComponent(lblIfTheNames, GroupLayout.PREFERRED_SIZE, 469, GroupLayout.PREFERRED_SIZE))
+		        .addGroup(gl_insertBook.createSequentialGroup()
+		          .addGap(251)
+		          .addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
+		            .addGroup(gl_insertBook.createSequentialGroup()
+		              .addComponent(lblNumberofPages)
+		              .addGap(18)
+		              .addComponent(insertpages, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+		            .addGroup(gl_insertBook.createSequentialGroup()
+		              .addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
+		                .addComponent(lblBookTitle)
+		                .addComponent(lblBookIsbn)
+		                .addComponent(lblNewLabel))
+		              .addGap(53)
+		              .addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING, false)
+		                .addComponent(insertbookpub)
+		                .addComponent(insertbookisbn)
+		                .addComponent(insertbooktitle, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))
+		            .addGroup(gl_insertBook.createSequentialGroup()
+		              .addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
+		                .addComponent(lblYearOfPublication)
+		                .addComponent(lblEditionNumber)
+		                .addComponent(lblAbstract)
+		                .addComponent(lblKeywords)
+		                .addComponent(lblAuthors))
+		              .addPreferredGap(ComponentPlacement.RELATED)
+		              .addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
+		                .addComponent(insertkeyword, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
+		                .addComponent(insertedition, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
+		                .addComponent(insertpubyear, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
+		                .addComponent(insertabstract, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
+		                .addGroup(gl_insertBook.createParallelGroup(Alignment.TRAILING)
+		                  .addGroup(gl_insertBook.createSequentialGroup()
+		                    .addComponent(insertauthor1, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
+		                    .addGap(23)
+		                    .addComponent(insertauthor2, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE))
+		                  .addGroup(gl_insertBook.createSequentialGroup()
+		                    .addComponent(insertauthor3, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
+		                    .addGap(23)
+		                    .addComponent(insertauthor4, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE))
+		                  .addComponent(insertauthor5, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
+		                  .addGroup(gl_insertBook.createSequentialGroup()
+		                    .addComponent(btnSubmitbookinsert, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
+		                    .addPreferredGap(ComponentPlacement.RELATED)
+		                    .addComponent(btnCancelbook))))))))
+		      .addContainerGap(179, Short.MAX_VALUE))
 		);
 		gl_insertBook.setVerticalGroup(
-			gl_insertBook.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_insertBook.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_insertBook.createSequentialGroup()
-							.addGap(3)
-							.addComponent(lblBookTitle))
-						.addComponent(insertbooktitle, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
-						.addComponent(insertbookisbn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblBookIsbn))
-					.addGap(18)
-					.addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblNewLabel)
-						.addComponent(insertbookpub, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblNumberofPages)
-						.addComponent(insertpages, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblYearOfPublication)
-						.addComponent(insertpubyear, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblEditionNumber)
-						.addComponent(insertedition, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblAbstract)
-						.addComponent(insertabstract, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblKeywords)
-						.addComponent(insertkeyword, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
-						.addComponent(lblAuthors)
-						.addComponent(insertauthor1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(insertauthor2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
-						.addComponent(insertauthor3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(insertauthor4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(insertauthor5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
-						.addComponent(btnSubmitbookinsert)
-						.addComponent(btnCancelbook))
-					.addContainerGap(99, Short.MAX_VALUE))
+		  gl_insertBook.createParallelGroup(Alignment.LEADING)
+		    .addGroup(gl_insertBook.createSequentialGroup()
+		      .addGap(47)
+		      .addComponent(lblPleaseInsertAll_1)
+		      .addGap(11)
+		      .addComponent(lblEachBookCan)
+		      .addGap(13)
+		      .addComponent(lblNameOfPeople_1)
+		      .addGap(13)
+		      .addComponent(lblIfTheNames)
+		      .addGap(37)
+		      .addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_insertBook.createSequentialGroup()
+		          .addGap(3)
+		          .addComponent(lblBookTitle))
+		        .addComponent(insertbooktitle, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(insertbookisbn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		        .addComponent(lblBookIsbn))
+		      .addGap(18)
+		      .addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(lblNewLabel)
+		        .addComponent(insertbookpub, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(lblNumberofPages)
+		        .addComponent(insertpages, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(lblYearOfPublication)
+		        .addComponent(insertpubyear, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(lblEditionNumber)
+		        .addComponent(insertedition, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(lblAbstract)
+		        .addComponent(insertabstract, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(lblKeywords)
+		        .addComponent(insertkeyword, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
+		      .addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
+		        .addComponent(lblAuthors)
+		        .addComponent(insertauthor1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		        .addComponent(insertauthor2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addPreferredGap(ComponentPlacement.RELATED)
+		      .addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
+		        .addComponent(insertauthor3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		        .addComponent(insertauthor4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addPreferredGap(ComponentPlacement.RELATED)
+		      .addComponent(insertauthor5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		      .addPreferredGap(ComponentPlacement.UNRELATED)
+		      .addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(btnSubmitbookinsert)
+		        .addComponent(btnCancelbook))
+		      .addContainerGap(343, Short.MAX_VALUE))
 		);
 		insertBook.setLayout(gl_insertBook);
 		
@@ -559,114 +579,137 @@ public class MainFrame {
     
     JRadioButton vinylType = new JRadioButton("Vinyl");
     vinylType.setText("vinyl");
+    
+    JLabel lblPleaseInsertAll = new JLabel("Please insert all the fields.");
+    
+    JLabel lblProducerSongWriter = new JLabel("Producer, song writer, composer and arranger can only have one name. Each music can store at most 2 singers, you can separate the names by comma ' , '.");
+    
+    JLabel lblNameOfPeople = new JLabel("Name of people who involved should be in the format of 'first_name family_name' or 'first_name middle_name family_name'");
+    
+    JLabel lblIfTheName = new JLabel("If the names are in the wrong format, it will not be stored in the database.");
     GroupLayout gl_insertAlbum = new GroupLayout(insertAlbum);
+    gl_insertAlbum.setHorizontalGroup(
+      gl_insertAlbum.createParallelGroup(Alignment.TRAILING)
+        .addGroup(gl_insertAlbum.createSequentialGroup()
+          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.LEADING)
+            .addGroup(gl_insertAlbum.createSequentialGroup()
+              .addGap(52)
+              .addComponent(lblPleaseInsertAll))
+            .addGroup(gl_insertAlbum.createSequentialGroup()
+              .addGap(279)
+              .addGroup(gl_insertAlbum.createParallelGroup(Alignment.TRAILING)
+                .addGroup(gl_insertAlbum.createSequentialGroup()
+                  .addGroup(gl_insertAlbum.createParallelGroup(Alignment.TRAILING)
+                    .addGroup(gl_insertAlbum.createSequentialGroup()
+                      .addGroup(gl_insertAlbum.createParallelGroup(Alignment.LEADING)
+                        .addComponent(lblYear)
+                        .addComponent(lblMusicName)
+                        .addComponent(lblLanguage)
+                        .addComponent(lblDiskType)
+                        .addComponent(lblProducer)
+                        .addComponent(lblSongWriter)
+                        .addComponent(lblComposer)
+                        .addComponent(lblArranger)
+                        .addComponent(lblSingers))
+                      .addGap(22))
+                    .addGroup(gl_insertAlbum.createSequentialGroup()
+                      .addComponent(lblAlbumName)
+                      .addGap(18)))
+                  .addGroup(gl_insertAlbum.createParallelGroup(Alignment.LEADING)
+                    .addGroup(gl_insertAlbum.createParallelGroup(Alignment.LEADING, false)
+                      .addComponent(albumNameTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+                      .addComponent(ComposerTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+                      .addComponent(producerTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+                      .addComponent(songWriterTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+                      .addComponent(langTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+                      .addComponent(arrangerTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+                      .addComponent(yearTx)
+                      .addComponent(musicNameTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addComponent(singersTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
+                    .addGroup(gl_insertAlbum.createSequentialGroup()
+                      .addComponent(audioCDtype)
+                      .addGap(64)
+                      .addComponent(vinylType))))
+                .addGroup(gl_insertAlbum.createSequentialGroup()
+                  .addPreferredGap(ComponentPlacement.RELATED, 555, GroupLayout.PREFERRED_SIZE)
+                  .addComponent(submitBtn, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
+                  .addGap(18)
+                  .addComponent(button_1))))
+            .addGroup(gl_insertAlbum.createSequentialGroup()
+              .addGap(52)
+              .addGroup(gl_insertAlbum.createParallelGroup(Alignment.LEADING)
+                .addComponent(lblNameOfPeople)
+                .addComponent(lblProducerSongWriter)
+                .addComponent(lblIfTheName))))
+          .addContainerGap(179, Short.MAX_VALUE))
+    );
+    gl_insertAlbum.setVerticalGroup(
+      gl_insertAlbum.createParallelGroup(Alignment.LEADING)
+        .addGroup(gl_insertAlbum.createSequentialGroup()
+          .addGap(38)
+          .addComponent(lblPleaseInsertAll)
+          .addGap(11)
+          .addComponent(lblProducerSongWriter)
+          .addPreferredGap(ComponentPlacement.UNRELATED)
+          .addComponent(lblNameOfPeople)
+          .addPreferredGap(ComponentPlacement.UNRELATED)
+          .addComponent(lblIfTheName)
+          .addGap(22)
+          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.TRAILING)
+            .addGroup(gl_insertAlbum.createSequentialGroup()
+              .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
+                .addComponent(albumNameTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblAlbumName))
+              .addPreferredGap(ComponentPlacement.UNRELATED)
+              .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
+                .addComponent(yearTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblYear))
+              .addGap(18)
+              .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
+                .addComponent(musicNameTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblMusicName))
+              .addGap(18)
+              .addComponent(langTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            .addComponent(lblLanguage))
+          .addGap(18)
+          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
+            .addComponent(lblDiskType)
+            .addComponent(audioCDtype)
+            .addComponent(vinylType))
+          .addGap(18)
+          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
+            .addComponent(producerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+            .addComponent(lblProducer))
+          .addGap(18)
+          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
+            .addComponent(songWriterTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+            .addComponent(lblSongWriter))
+          .addGap(18)
+          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
+            .addComponent(ComposerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+            .addComponent(lblComposer))
+          .addGap(18)
+          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
+            .addComponent(arrangerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+            .addComponent(lblArranger))
+          .addGap(18)
+          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
+            .addComponent(lblSingers)
+            .addComponent(singersTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+          .addGap(52)
+          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
+            .addComponent(submitBtn)
+            .addComponent(button_1))
+          .addContainerGap(348, Short.MAX_VALUE))
+    );
     
 		diskTypeTx = new ButtonGroup();
 		diskTypeTx.add(audioCDtype);
 		diskTypeTx.add(vinylType);
-		
-		gl_insertAlbum.setHorizontalGroup(
-		  gl_insertAlbum.createParallelGroup(Alignment.TRAILING)
-		    .addGroup(gl_insertAlbum.createSequentialGroup()
-		      .addGap(173)
-		      .addGroup(gl_insertAlbum.createParallelGroup(Alignment.TRAILING)
-		        .addGroup(gl_insertAlbum.createSequentialGroup()
-		          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.LEADING)
-		            .addComponent(lblYear)
-		            .addComponent(lblMusicName)
-		            .addComponent(lblLanguage)
-		            .addComponent(lblDiskType)
-		            .addComponent(lblProducer)
-		            .addComponent(lblSongWriter)
-		            .addComponent(lblComposer)
-		            .addComponent(lblArranger)
-		            .addComponent(lblSingers))
-		          .addGap(22))
-		        .addGroup(gl_insertAlbum.createSequentialGroup()
-		          .addComponent(lblAlbumName)
-		          .addGap(18)))
-		      .addGroup(gl_insertAlbum.createParallelGroup(Alignment.LEADING)
-		        .addGroup(gl_insertAlbum.createParallelGroup(Alignment.LEADING, false)
-		          .addComponent(albumNameTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
-		          .addComponent(ComposerTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
-		          .addComponent(producerTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
-		          .addComponent(songWriterTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
-		          .addComponent(langTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
-		          .addComponent(arrangerTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
-		          .addComponent(yearTx)
-		          .addComponent(musicNameTx))
-		        .addComponent(singersTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
-		        .addGroup(gl_insertAlbum.createSequentialGroup()
-		          .addComponent(audioCDtype)
-		          .addGap(64)
-		          .addComponent(vinylType)))
-		      .addContainerGap(239, Short.MAX_VALUE))
-		    .addGroup(gl_insertAlbum.createSequentialGroup()
-		      .addContainerGap(401, Short.MAX_VALUE)
-		      .addComponent(submitBtn, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
-		      .addGap(18)
-		      .addComponent(button_1)
-		      .addGap(233))
-		);
-		gl_insertAlbum.setVerticalGroup(
-		  gl_insertAlbum.createParallelGroup(Alignment.LEADING)
-		    .addGroup(gl_insertAlbum.createSequentialGroup()
-		      .addContainerGap(15, Short.MAX_VALUE)
-		      .addGroup(gl_insertAlbum.createParallelGroup(Alignment.TRAILING)
-		        .addGroup(gl_insertAlbum.createSequentialGroup()
-		          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-		            .addComponent(albumNameTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-		            .addComponent(lblAlbumName))
-		          .addPreferredGap(ComponentPlacement.UNRELATED)
-		          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-		            .addComponent(yearTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-		            .addComponent(lblYear))
-		          .addGap(18)
-		          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-		            .addComponent(musicNameTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-		            .addComponent(lblMusicName))
-		          .addGap(18)
-		          .addComponent(langTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		        .addComponent(lblLanguage))
-		      .addGap(18)
-		      .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-		        .addComponent(lblDiskType)
-		        .addComponent(audioCDtype)
-		        .addComponent(vinylType))
-		      .addGap(18)
-		      .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-		        .addComponent(producerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-		        .addComponent(lblProducer))
-		      .addGap(18)
-		      .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-		        .addComponent(songWriterTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-		        .addComponent(lblSongWriter))
-		      .addGap(18)
-		      .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-		        .addComponent(ComposerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-		        .addComponent(lblComposer))
-		      .addGap(18)
-		      .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-		        .addComponent(arrangerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-		        .addComponent(lblArranger))
-		      .addGap(18)
-		      .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-		        .addComponent(lblSingers)
-		        .addComponent(singersTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		      .addGap(52)
-		      .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-		        .addComponent(submitBtn)
-		        .addComponent(button_1))
-		      .addGap(81))
-		);
 		insertAlbum.setLayout(gl_insertAlbum);
 		
 		JPanel insertMovie = new JPanel();
 		frame.getContentPane().add(insertMovie, "insertMovie");
-		
-		JButton button_2 = new JButton("Submit");
-		
-		JButton button_3 = new JButton("Cancel");
 		
 		JLabel lblReleaseYear = new JLabel("Release year:");
 		
@@ -721,7 +764,8 @@ public class MainFrame {
 		      
 		      int counter = 0;
 		      String[] tempCrewName = null;
-		      Map<String, String> allCrewNameRole = new HashMap<String, String>();  // key: name, value:role
+//		      List<String> theirRoles = new ArrayList<String>();
+		      Map<String, String> allCrewNameRole = new HashMap<String, String>();  // key: crewname, value:role
 		      for (JTextField crewTx: MovieCrewJFields.keySet()) {		        
 		        // split by ','
 		        tempCrewName = crewTx.getText().toLowerCase().split("\\s*,\\s*");
@@ -855,17 +899,11 @@ public class MainFrame {
 		
 		JLabel lblGender = new JLabel("Editor (1 to 3):");
 		
-		JRadioButton rdbtnFemale = new JRadioButton("female");
-		
 		JLabel lblGotAward = new JLabel("Costume designer (1 to 3):");
 		
-		JRadioButton rdbtnYes = new JRadioButton("Yes");
-		
 		ButtonGroup castGenderGroup = new ButtonGroup();
-		castGenderGroup.add(rdbtnFemale);
 		
 		ButtonGroup castRewardGroup = new ButtonGroup();
-		castRewardGroup.add(rdbtnYes);
 		
 		JLabel lblCrewsAndCasts = new JLabel("Crews and casts");
 		
@@ -890,62 +928,48 @@ public class MainFrame {
 		      .addGroup(gl_insertMovie.createParallelGroup(Alignment.TRAILING)
 		        .addGroup(gl_insertMovie.createSequentialGroup()
 		          .addComponent(button_4, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
-		          .addContainerGap(604, Short.MAX_VALUE))
+		          .addContainerGap(1006, Short.MAX_VALUE))
 		        .addGroup(gl_insertMovie.createSequentialGroup()
 		          .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
-		            .addGroup(gl_insertMovie.createParallelGroup(Alignment.TRAILING)
-		              .addGroup(gl_insertMovie.createSequentialGroup()
-		                .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
-		                  .addComponent(lblCrewsAndCasts)
-		                  .addGroup(gl_insertMovie.createSequentialGroup()
-		                    .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
-		                      .addComponent(lblMovieName)
-		                      .addComponent(lblMovieName_1)
-		                      .addComponent(lblReleaseYear_1)
-		                      .addComponent(lblCrewName)
-		                      .addComponent(lblRole)
-		                      .addComponent(lblGender))
-		                    .addPreferredGap(ComponentPlacement.RELATED, 5, Short.MAX_VALUE)
-		                    .addGroup(gl_insertMovie.createParallelGroup(Alignment.TRAILING, false)
-		                      .addGroup(gl_insertMovie.createSequentialGroup()
-		                        .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING, false)
-		                          .addComponent(scriptWritersTx, Alignment.TRAILING)
-		                          .addComponent(directorsTx, Alignment.TRAILING)
-		                          .addComponent(composersTx, GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE)
-		                          .addComponent(producersTx, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
-		                          .addComponent(editorsTx, GroupLayout.PREFERRED_SIZE, 224, GroupLayout.PREFERRED_SIZE)
-		                          .addComponent(movieNameTx))
-		                        .addPreferredGap(ComponentPlacement.UNRELATED)
-		                        .addComponent(lblReleaseYear)
-		                        .addGap(18)
-		                        .addComponent(movieYearTx, GroupLayout.PREFERRED_SIZE, 169, GroupLayout.PREFERRED_SIZE))
-		                      .addGroup(gl_insertMovie.createSequentialGroup()
-		                        .addComponent(button_2, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
-		                        .addGap(64)
-		                        .addComponent(rdbtnFemale)
-		                        .addGap(39)))))
-		                .addPreferredGap(ComponentPlacement.RELATED))
-		              .addGroup(gl_insertMovie.createSequentialGroup()
-		                .addComponent(rdbtnYes)
-		                .addGap(74)))
 		            .addGroup(gl_insertMovie.createSequentialGroup()
-		              .addGroup(gl_insertMovie.createParallelGroup(Alignment.TRAILING)
+		              .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
+		                .addComponent(lblCrewsAndCasts)
+		                .addGroup(gl_insertMovie.createSequentialGroup()
+		                  .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
+		                    .addComponent(lblMovieName)
+		                    .addComponent(lblMovieName_1)
+		                    .addComponent(lblReleaseYear_1)
+		                    .addComponent(lblCrewName)
+		                    .addComponent(lblRole)
+		                    .addComponent(lblGender))
+		                  .addPreferredGap(ComponentPlacement.RELATED, 199, Short.MAX_VALUE)
+		                  .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING, false)
+		                    .addComponent(scriptWritersTx, Alignment.TRAILING)
+		                    .addComponent(directorsTx, Alignment.TRAILING)
+		                    .addComponent(composersTx, GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE)
+		                    .addComponent(producersTx, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
+		                    .addComponent(editorsTx, GroupLayout.PREFERRED_SIZE, 224, GroupLayout.PREFERRED_SIZE)
+		                    .addComponent(movieNameTx))
+		                  .addPreferredGap(ComponentPlacement.UNRELATED)
+		                  .addComponent(lblReleaseYear)
+		                  .addGap(18)
+		                  .addComponent(movieYearTx, GroupLayout.PREFERRED_SIZE, 169, GroupLayout.PREFERRED_SIZE)))
+		              .addPreferredGap(ComponentPlacement.RELATED))
+		            .addGroup(gl_insertMovie.createSequentialGroup()
+		              .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
 		                .addGroup(gl_insertMovie.createSequentialGroup()
 		                  .addComponent(lblGotAward)
 		                  .addGap(37)
 		                  .addComponent(costumeDesignersTx, GroupLayout.PREFERRED_SIZE, 228, GroupLayout.PREFERRED_SIZE))
-		                .addGroup(Alignment.LEADING, gl_insertMovie.createSequentialGroup()
+		                .addGroup(gl_insertMovie.createSequentialGroup()
 		                  .addComponent(lblCast)
 		                  .addGap(46)
 		                  .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
 		                    .addComponent(button_5, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
 		                    .addComponent(castsTx, GroupLayout.PREFERRED_SIZE, 230, GroupLayout.PREFERRED_SIZE))))
 		              .addPreferredGap(ComponentPlacement.RELATED)))
-		          .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
-		            .addComponent(button_3, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
-		            .addGroup(gl_insertMovie.createSequentialGroup()
-		              .addPreferredGap(ComponentPlacement.RELATED)
-		              .addComponent(movieRolesTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+		          .addPreferredGap(ComponentPlacement.RELATED)
+		          .addComponent(movieRolesTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 		          .addGap(127))))
 		);
 		gl_insertMovie.setVerticalGroup(
@@ -995,24 +1019,11 @@ public class MainFrame {
 		              .addGap(60)
 		              .addGroup(gl_insertMovie.createParallelGroup(Alignment.BASELINE)
 		                .addComponent(button_4)
-		                .addComponent(button_5))
-		              .addGap(74)
-		              .addComponent(button_2))
+		                .addComponent(button_5)))
 		            .addGroup(gl_insertMovie.createSequentialGroup()
 		              .addPreferredGap(ComponentPlacement.UNRELATED, 263, Short.MAX_VALUE)
-		              .addGroup(gl_insertMovie.createParallelGroup(Alignment.TRAILING)
-		                .addComponent(rdbtnFemale)
-		                .addGroup(gl_insertMovie.createSequentialGroup()
-		                  .addComponent(movieRolesTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-		                  .addGap(70)))
-		              .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
-		                .addGroup(gl_insertMovie.createSequentialGroup()
-		                  .addGap(19)
-		                  .addComponent(button_3))
-		                .addGroup(gl_insertMovie.createSequentialGroup()
-		                  .addGap(28)
-		                  .addComponent(rdbtnYes)))
-		              .addGap(126)))))
+		              .addComponent(movieRolesTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		              .addGap(240)))))
 		      .addGap(32))
 		);
 		insertMovie.setLayout(gl_insertMovie);
@@ -1502,235 +1513,6 @@ public class MainFrame {
 		      .addContainerGap(439, Short.MAX_VALUE))
 		);
 		updateMovie.setLayout(gl_updateMovie);
-		
-		JPanel deleteBook = new JPanel();
-		frame.getContentPane().add(deleteBook, "deleteBook");
-		
-		JButton btnDeleteBook = new JButton("Delete Book");
-		btnDeleteBook.addActionListener(new ActionListener() {
-		  public void actionPerformed(ActionEvent e) {
-		    String isbn = delISBNTx.getText();
-		    // check isbn regex
-        if (checkHelper.checkIsbnFormat(isbn)) {
-          // check if book exist in db
-          boolean found = SelectHelper.bookexist(isbn);
-          // delete if found
-          if (found) {
-            TransactionHelper.deleteBookTransaction(isbn);
-            System.out.println("book deleted");
-          } else {
-            System.out.println("No such book");  
-          }
-        } else {
-          System.out.println("please enter ISBN with 13 digits");
-        }
-        delISBNTx.setText("");
-		  }
-		});
-		
-		JLabel label = new JLabel("Book ISBN:");
-		
-		delISBNTx = new JTextField();
-		delISBNTx.setColumns(10);
-		GroupLayout gl_deleteBook = new GroupLayout(deleteBook);
-		gl_deleteBook.setHorizontalGroup(
-			gl_deleteBook.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 805, Short.MAX_VALUE)
-				.addGroup(gl_deleteBook.createSequentialGroup()
-					.addGap(107)
-					.addGroup(gl_deleteBook.createParallelGroup(Alignment.TRAILING)
-						.addComponent(btnDeleteBook)
-						.addGroup(gl_deleteBook.createSequentialGroup()
-							.addComponent(label)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(delISBNTx, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(198, Short.MAX_VALUE))
-		);
-		gl_deleteBook.setVerticalGroup(
-			gl_deleteBook.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_deleteBook.createSequentialGroup()
-					.addGap(32)
-					.addGroup(gl_deleteBook.createParallelGroup(Alignment.BASELINE)
-						.addComponent(label)
-						.addComponent(delISBNTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addComponent(btnDeleteBook)
-					.addContainerGap(453, Short.MAX_VALUE))
-		);
-		deleteBook.setLayout(gl_deleteBook);
-		
-		JPanel deleteAlbum = new JPanel();
-		frame.getContentPane().add(deleteAlbum, "deleteAlbum");
-		
-		JButton btnDeleteMusic = new JButton("Delete Music");
-		btnDeleteMusic.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			  if (delAlbumTx.getText().equals("") || delMusicTx.getText().equals("")) {
-			    System.out.println("Please enter valid information for all fields");
-			  } else {
-			    String albumName = delAlbumTx.getText();
-			    String musicName = delMusicTx.getText();
-			    // find if the music exist
-			    if (checkHelper.musicExistNoYear(albumName, musicName)) {
-  			    TransactionHelper.deleteMusicTransaction(albumName, musicName);
-  			    System.out.println("music is deleted");
-			    } else {
-			      System.out.println("music not exist");
-			    }
-			  }
-			}
-		});
-		
-		JLabel label_1 = new JLabel("Music name:");
-		
-		JLabel label_2 = new JLabel("Album name:");
-		
-		JLabel lblAlbumName_2 = new JLabel("Album name:");
-		
-		delAlbumTx = new JTextField();
-		delAlbumTx.setColumns(10);
-		
-		delAlbumTx2 = new JTextField();
-		delAlbumTx2.setColumns(10);
-		
-		delMusicTx = new JTextField();
-		delMusicTx.setColumns(10);
-		
-		JButton btnDeleteAlbum = new JButton("Delete Album");
-		btnDeleteAlbum.addActionListener(new ActionListener() {
-		  public void actionPerformed(ActionEvent e) {
-		    // validate input
-		    if (delAlbumTx2.getText().equals("")) {
-		      System.out.println("Please enter the album name");
-		    } else {
-		      String albumName = delAlbumTx2.getText();
-		      // if exist delete album
-		      if (checkHelper.albumExist(albumName)) {
-		        TransactionHelper.deleteAlbumTransaction(albumName);
-		        System.out.println("album " + albumName+ " deleted");
-		      } else {
-		        System.out.println("album not exist");
-		      }
-		    }
-		  }
-		});
-		GroupLayout gl_deleteAlbum = new GroupLayout(deleteAlbum);
-		gl_deleteAlbum.setHorizontalGroup(
-		  gl_deleteAlbum.createParallelGroup(Alignment.TRAILING)
-		    .addGroup(gl_deleteAlbum.createSequentialGroup()
-		      .addGap(107)
-		      .addGroup(gl_deleteAlbum.createParallelGroup(Alignment.LEADING, false)
-		        .addGroup(Alignment.TRAILING, gl_deleteAlbum.createSequentialGroup()
-		          .addComponent(lblAlbumName_2)
-		          .addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-		          .addComponent(delAlbumTx2, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE))
-		        .addGroup(gl_deleteAlbum.createSequentialGroup()
-		          .addComponent(label_1)
-		          .addGap(18)
-		          .addComponent(delMusicTx))
-		        .addGroup(gl_deleteAlbum.createSequentialGroup()
-		          .addComponent(label_2)
-		          .addPreferredGap(ComponentPlacement.UNRELATED)
-		          .addComponent(delAlbumTx, GroupLayout.PREFERRED_SIZE, 431, GroupLayout.PREFERRED_SIZE)))
-		      .addContainerGap(211, Short.MAX_VALUE))
-		    .addGroup(gl_deleteAlbum.createSequentialGroup()
-		      .addContainerGap(575, Short.MAX_VALUE)
-		      .addGroup(gl_deleteAlbum.createParallelGroup(Alignment.TRAILING)
-		        .addComponent(btnDeleteAlbum, GroupLayout.PREFERRED_SIZE, 122, GroupLayout.PREFERRED_SIZE)
-		        .addComponent(btnDeleteMusic))
-		      .addGap(141))
-		);
-		gl_deleteAlbum.setVerticalGroup(
-		  gl_deleteAlbum.createParallelGroup(Alignment.LEADING)
-		    .addGroup(gl_deleteAlbum.createSequentialGroup()
-		      .addGap(32)
-		      .addGroup(gl_deleteAlbum.createParallelGroup(Alignment.BASELINE)
-		        .addComponent(label_2)
-		        .addComponent(delAlbumTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		      .addGap(18)
-		      .addGroup(gl_deleteAlbum.createParallelGroup(Alignment.LEADING)
-		        .addComponent(label_1)
-		        .addComponent(delMusicTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		      .addGap(27)
-		      .addComponent(btnDeleteMusic)
-		      .addGap(38)
-		      .addGroup(gl_deleteAlbum.createParallelGroup(Alignment.BASELINE)
-		        .addComponent(delAlbumTx2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-		        .addComponent(lblAlbumName_2))
-		      .addGap(18)
-		      .addComponent(btnDeleteAlbum)
-		      .addContainerGap(367, Short.MAX_VALUE))
-		);
-		deleteAlbum.setLayout(gl_deleteAlbum);
-		
-		JPanel deleteMovie = new JPanel();
-		frame.getContentPane().add(deleteMovie, "deleteMovie");
-		
-		JButton btnDeleteMovie = new JButton("Delete Movie");
-		btnDeleteMovie.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			  // validate all fields
-			  if (delMovieNameTx.getText().equals("") || checkHelper.checkIfNumerical(delMovieYearTx) < 0) {
-			    System.out.println("Please enter valid information");
-			  } else {
-			    String movieName = delMovieNameTx.getText();
-			    int year = Integer.parseInt(delMovieYearTx.getText());
-			    // find if the movie exist
-			    if (SelectHelper.checkMovieExist(movieName, year)) {
-			      TransactionHelper.deleteMovieTransaction(movieName);
-			      System.out.println("Movie is deleted");
-			    } else {
-			      System.out.println("Movie not exist");
-			    }
-			  }
-			  
-			}
-		});
-		
-		JLabel label_4 = new JLabel("Movie name:");
-		
-		JLabel label_5 = new JLabel("Release year:");
-		
-		delMovieNameTx = new JTextField();
-		delMovieNameTx.setColumns(10);
-		
-		delMovieYearTx = new JTextField();
-		delMovieYearTx.setColumns(10);
-		GroupLayout gl_deleteMovie = new GroupLayout(deleteMovie);
-		gl_deleteMovie.setHorizontalGroup(
-			gl_deleteMovie.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 805, Short.MAX_VALUE)
-				.addGroup(gl_deleteMovie.createSequentialGroup()
-					.addGap(107)
-					.addGroup(gl_deleteMovie.createParallelGroup(Alignment.TRAILING)
-						.addComponent(btnDeleteMovie)
-						.addGroup(gl_deleteMovie.createSequentialGroup()
-							.addGroup(gl_deleteMovie.createParallelGroup(Alignment.LEADING)
-								.addComponent(label_4)
-								.addComponent(label_5))
-							.addGap(18)
-							.addGroup(gl_deleteMovie.createParallelGroup(Alignment.LEADING)
-								.addComponent(delMovieNameTx, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)
-								.addComponent(delMovieYearTx, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE))))
-					.addContainerGap(176, Short.MAX_VALUE))
-		);
-		gl_deleteMovie.setVerticalGroup(
-			gl_deleteMovie.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 550, Short.MAX_VALUE)
-				.addGroup(gl_deleteMovie.createSequentialGroup()
-					.addGap(32)
-					.addGroup(gl_deleteMovie.createParallelGroup(Alignment.BASELINE)
-						.addComponent(label_4)
-						.addComponent(delMovieNameTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addGroup(gl_deleteMovie.createParallelGroup(Alignment.BASELINE)
-						.addComponent(label_5)
-						.addComponent(delMovieYearTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addComponent(btnDeleteMovie)
-					.addContainerGap(413, Short.MAX_VALUE))
-		);
-		deleteMovie.setLayout(gl_deleteMovie);
 		
 		JPanel view = new JPanel();
 		frame.getContentPane().add(view, "viewPanel");
@@ -2669,7 +2451,7 @@ public class MainFrame {
 	   
 	  public static void insertCrewMember(String movieName, int movieYear, Map<String, String> allCrewNameRole) throws SQLException {
 	    String sql = "insert into CrewMember values (?,?,?,?);";
-	    Set<String> flags = new HashSet<String>();  
+	    Map<String,String> flags = new HashMap<String,String>();  
 	    PreparedStatement ps;
       ps = con.prepareStatement(sql);
       ps.setString(2, movieName);
@@ -2679,10 +2461,10 @@ public class MainFrame {
         ps.setInt(1, SelectHelper.getPeopleID(name));
         ps.setInt(4, SelectHelper.getRoleID(allCrewNameRole.get(name)));
         ps.executeUpdate();
-        flags.add(allCrewNameRole.get(name));
+        flags.put(allCrewNameRole.get(name), name);
 	    }
       // check if all the roles have at least 1 people
-      if (flags.size() != 7) {
+      if (flags.size() < 7) {
         throw new SQLException();
       }
 	  }
@@ -2975,16 +2757,24 @@ public class MainFrame {
       return rs;
 	  }
 	  
-	   public static int getPeopleID(String name) {
+	   public static int getPeopleID(String fullname) {
 	     String sql = "Select ID from PeopleInvolved where concat(FirstName,' ',FamilyName) = ?;";
-	     PreparedStatement preparedStatement;
+	     String sql2 = "Select ID from PeopleInvolved where concat(FirstName,' ', MiddleName, ' ', FamilyName) = ?;";
+       String[] name = fullname.split(" ");
+	     PreparedStatement preparedStatement = null;
 	     try {
-	       preparedStatement = con.prepareStatement(sql);
-	       preparedStatement.setString(1, name);
-	       ResultSet rs = preparedStatement.executeQuery();
-	       if (rs.next()) {
-	         return (rs.getInt("ID"));
+	       if (name.length == 2) {
+  	       preparedStatement = con.prepareStatement(sql);
+	       } else if (name.length > 2) {
+	         preparedStatement = con.prepareStatement(sql2);
+	       } else {
+	         return -1;
 	       }
+	       preparedStatement.setString(1, fullname);
+         ResultSet rs = preparedStatement.executeQuery();
+         if (rs.next()) {
+           return (rs.getInt("ID"));
+         }
 	     } catch (Exception e){
 	       e.printStackTrace();
 	     }
@@ -3398,7 +3188,7 @@ public class MainFrame {
                  }
                  // insert 
                  InserterHelper.insertMusicPeopleInvolved(albumName, year, musicName, ppl, sw, c, a);
-                 System.out.println("inserted music people involved");
+                 System.out.println("inserted music people involved " + ppl);
                  // reset the hashmap
                  temprole.clear();
                  sw = 0; c = 0; a= 0;
@@ -3413,6 +3203,7 @@ public class MainFrame {
        } catch (SQLException e) {
          System.out.println("something wrong when inserting.");
          System.out.println("Rolling back here...");
+         e.printStackTrace();
          try {
           con.rollback();
         } catch (SQLException e1) {
