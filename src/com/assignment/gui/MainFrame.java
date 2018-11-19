@@ -256,9 +256,9 @@ public class MainFrame {
 				// validate entry
 				if (insertbooktitle.getText().equals("")||insertbookisbn.getText().equals("")||insertbookpub.getText().equals("")||
 						insertpages.getText().equals("")||insertpubyear.getText().equals("") || insertauthor1.getText().equals("")||
-						insertbookisbn.getText().length() != 13) {
+						insertbookisbn.getText().length() != 13 || insertabstract.getText().length() > 5000) {
 					// show error - mandatory fields
-					System.out.println("fill in all mandatory fields and in correct format");
+					JOptionPane.showMessageDialog(null, "fill in all mandatory fields and in correct format", "Insert book - wrong format", JOptionPane.ERROR_MESSAGE);
 				} else {
 					// get input
 					title = insertbooktitle.getText();
@@ -273,17 +273,18 @@ public class MainFrame {
 					
 					if (pages <= 0 || year <= 0) {
 						// show error - wrong range
-						System.out.println("range wrong");	
+					  JOptionPane.showMessageDialog(null, "Please fill in with correct range", "Insert book - wrong format on range", JOptionPane.ERROR_MESSAGE);
 					} else if (bookExist) {
 						// error - book isbn duplicated
 						System.out.println("ISBN already exist in the database");
+						JOptionPane.showMessageDialog(null, "This book has already exist in the database", "Insert book - book existed", JOptionPane.ERROR_MESSAGE);
 					} else {
 						
 						// get optional field
 						if (!insertedition.getText().equals("")) {
 						  edition = checkHelper.checkIfNumerical(insertedition);
 						  if (edition < 0) {
-						    System.out.println("edition wrong range, set it as null");
+						    JOptionPane.showMessageDialog(null, "Since edition in wrong format, default set it as no edition info", "Insert book - wrong format on range", JOptionPane.ERROR_MESSAGE);
 						    edition = -1;
 						  }
 						}
@@ -314,8 +315,13 @@ public class MainFrame {
 						}
 						
 					  // insert book
-						TransactionHelper.insertBookTransaction(isbn, title, pub, pages, year, edition, bookabs, authors, keywords);
+						boolean success = TransactionHelper.insertBookTransaction(isbn, title, pub, pages, year, edition, bookabs, authors, keywords);
 
+						if (success) {
+						  JOptionPane.showMessageDialog(null, "Book inserted.", "Insert book - success", JOptionPane.INFORMATION_MESSAGE);
+						} else {
+						  JOptionPane.showMessageDialog(null, "Book insertion fail due to unexpected error", "Insert book - error", JOptionPane.ERROR_MESSAGE);
+						}
 						// clear all fields if successfully insert all data
 						clearInsertbook();
 						
@@ -469,8 +475,10 @@ public class MainFrame {
 		        yearTx.getText().equals("") || singersTx.getText().equals("")) {
 		      // show error - mandatory fields
           System.out.println("fill in all mandatory fields and in correct format");
+          JOptionPane.showMessageDialog(null, "fill in all mandatory fields and in correct format", "Insert music - wrong format", JOptionPane.ERROR_MESSAGE);
 		    } else if (checkHelper.checkIfNumerical(yearTx) <= 0) {
 		      System.out.println("fill in the year in correct format (year > 0)");
+		      JOptionPane.showMessageDialog(null, "fill in the year in correct range", "Insert music - wrong range", JOptionPane.ERROR_MESSAGE);
 		    } else {
 		      // get the string values
 		      albumName = albumNameTx.getText();
@@ -511,9 +519,19 @@ public class MainFrame {
               type = d.getEnum();
             }
           }
-          
-          // insert music
-          TransactionHelper.insertMusicTransaction(albumName, musicName, lang, producer, musicpeoples, year, singers, type);
+       // check if the music album exist in Music, insert if not
+          if (!checkHelper.musicExist(albumName, year, musicName)) {
+            // insert music
+            boolean success = TransactionHelper.insertMusicTransaction(albumName, musicName, lang, producer, musicpeoples, year, singers, type);
+            if (success) {
+              JOptionPane.showMessageDialog(null, "Music inserted.", "Insert music - success", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+              JOptionPane.showMessageDialog(null, "Music insertion fail due to unexpected error", "Insert music - error", JOptionPane.ERROR_MESSAGE);
+            }
+          } else {
+//            System.out.println("music track of that album already existed.");
+            JOptionPane.showMessageDialog(null, "This music track of that album already existed", "Insert music - already existed", JOptionPane.ERROR_MESSAGE);
+          }
 		    }
 		  }
 		});
@@ -869,12 +887,16 @@ public class MainFrame {
 //		      }
 		      
 		      
-		      
 		      // check if it's a number
 		      if (movieYear >= 0) {
   		      // check if movie exist
   		      if (!SelectHelper.checkMovieExist(movieName, movieYear)) {
-  		          TransactionHelper.insertMovieTransaction(movieName, movieYear, allCrewNameRole);
+  		          boolean success = TransactionHelper.insertMovieTransaction(movieName, movieYear, allCrewNameRole);
+  		          if (success) {
+  		            JOptionPane.showMessageDialog(null, "Movie inserted.", "Insert movie - success", JOptionPane.INFORMATION_MESSAGE);
+  		          } else {
+  		            JOptionPane.showMessageDialog(null, "Movie insertion fail due to unexpected error", "Insert movie - error", JOptionPane.ERROR_MESSAGE);
+  		          }
 //  		        // insert movie if not exist
 //  		        InserterHelper.insertMovie(movieName, movieYear);
 //  		        System.out.println("movie inserted");
@@ -887,6 +909,7 @@ public class MainFrame {
 //  		        System.out.println("crewMember inserted");
   		      } else {
   		        System.out.println("movie already exist");
+  		        JOptionPane.showMessageDialog(null, "This music track of that album already existed", "Insert music - already existed", JOptionPane.ERROR_MESSAGE);
   		        // clear textfields
   		        clearInsertMovie();
   		      }
@@ -3044,7 +3067,7 @@ public class MainFrame {
 	 
 	public static class TransactionHelper {
 	  
-	  public static void insertBookTransaction(String isbn, String title, String pub, int pages, int year, int edition,
+	  public static boolean insertBookTransaction(String isbn, String title, String pub, int pages, int year, int edition,
 	      String bookabs, List<String> authors, String[] keywords) {
       try {
         con.setAutoCommit(false);
@@ -3058,6 +3081,7 @@ public class MainFrame {
         InserterHelper.insertKeyword(isbn, keywords);
         System.out.println("book keywords inserted");
         con.commit();
+        return true;
       } catch (SQLException e) {
         try {
           con.rollback();
@@ -3073,9 +3097,10 @@ public class MainFrame {
           e.printStackTrace();
         }
       }
+      return false;
 	  }
 	  
-	  public static void insertMovieTransaction(String movieName, int movieYear, Map<String, List<String>> allCrewNameRole) {
+	  public static boolean insertMovieTransaction(String movieName, int movieYear, Map<String, List<String>> allCrewNameRole) {
       try {
 	      con.setAutoCommit(false);
 	       // insert movie if not exist
@@ -3088,6 +3113,7 @@ public class MainFrame {
         InserterHelper.insertAward(movieName, movieYear, allCrewNameRole);
         System.out.println("award inserted - default all no award");
 	      con.commit();
+	      return true;
 	    } catch (SQLException e) {
 	      try {
 	        con.rollback();
@@ -3104,9 +3130,10 @@ public class MainFrame {
 	        e.printStackTrace();
 	      }
 	    }
+      return false;
 	   }	    
 	   
-	  public static void insertMusicTransaction(String albumName, String musicName, String lang, String producer,
+	  public static boolean insertMusicTransaction(String albumName, String musicName, String lang, String producer,
        Map<String, String> musicpeoples, int year, List<String> singers, diskType type) {
        int pplID = -1;
        try {
@@ -3161,58 +3188,52 @@ public class MainFrame {
          musicpeopleid.put("composer", SelectHelper.getPeopleID(musicpeoples.get("composer")));
          musicpeopleid.put("arranger", SelectHelper.getPeopleID(musicpeoples.get("arranger")));
          
-         // check if the music album exist in Music, insert if not
-         if (!checkHelper.musicExist(albumName, year, musicName)) {
-             System.out.println("here");
-             // insert only if that piece of soundtrack is not in db
-             // insert into Music table
-             InserterHelper.insertAlbum(albumName, year, musicName, lang, type, producer);
-             // insert into MusicSinger
-             // only add at most 2 singers for each song
-             for (int i=0; i<singers.size() ;i++) {
-               // add the people is exist in peopleInvolved
-               id = SelectHelper.getPeopleID(singers.get(i));
-               InserterHelper.insertMusicSinger(albumName, year, musicName, id);
-               System.out.println("inserted music singer");
-             }
-             // insert into PeopleInvolvedMusic
-             // check the role for each people
-    
-             Map<String, Integer> temprole = new HashMap<String, Integer>();
-             // for each people, serach their roles in music
-             for (int ppl : musicpeopleid.values()) {
-               // check if this people is inserted already
-               if (!SelectHelper.checkMusicCastExist(albumName, year, musicName, ppl)) {
-                 for (String role : musicpeopleid.keySet()) {
-                   if (musicpeopleid.get(role).equals(ppl)) {
-                     temprole.put(role, ppl);
-                   }
+           System.out.println("here");
+           // insert only if that piece of soundtrack is not in db
+           // insert into Music table
+           InserterHelper.insertAlbum(albumName, year, musicName, lang, type, producer);
+           // insert into MusicSinger
+           // only add at most 2 singers for each song
+           for (int i=0; i<singers.size() ;i++) {
+             // add the people is exist in peopleInvolved
+             id = SelectHelper.getPeopleID(singers.get(i));
+             InserterHelper.insertMusicSinger(albumName, year, musicName, id);
+             System.out.println("inserted music singer");
+           }
+           // insert into PeopleInvolvedMusic
+           // check the role for each people
+  
+           Map<String, Integer> temprole = new HashMap<String, Integer>();
+           // for each people, serach their roles in music
+           for (int ppl : musicpeopleid.values()) {
+             // check if this people is inserted already
+             if (!SelectHelper.checkMusicCastExist(albumName, year, musicName, ppl)) {
+               for (String role : musicpeopleid.keySet()) {
+                 if (musicpeopleid.get(role).equals(ppl)) {
+                   temprole.put(role, ppl);
                  }
-                 // insert
-                 int sw = 0, c=0, a=0;
-                 if (temprole.containsKey("songWriter")) {
-                   sw = 1;
-                 }
-                 if (temprole.containsKey("composer")) {
-                   c = 1;
-                 }
-                 if (temprole.containsKey("arranger")) {
-                   a = 1;
-                 }
-                 // insert 
-                 InserterHelper.insertMusicPeopleInvolved(albumName, year, musicName, ppl, sw, c, a);
-                 System.out.println("inserted music people involved " + ppl);
-                 // reset the hashmap
-                 temprole.clear();
-                 sw = 0; c = 0; a= 0;
                }
+               // insert
+               int sw = 0, c=0, a=0;
+               if (temprole.containsKey("songWriter")) {
+                 sw = 1;
+               }
+               if (temprole.containsKey("composer")) {
+                 c = 1;
+               }
+               if (temprole.containsKey("arranger")) {
+                 a = 1;
+               }
+               // insert 
+               InserterHelper.insertMusicPeopleInvolved(albumName, year, musicName, ppl, sw, c, a);
+               System.out.println("inserted music people involved " + ppl);
+               // reset the hashmap
+               temprole.clear();
+               sw = 0; c = 0; a= 0;
              }
-             con.commit();
-             System.out.println("Successfully insert all data");
-         } else {
-           System.out.println("music track of that album already existed.");
-         }
-
+           }
+           con.commit();
+           return true;
        } catch (SQLException e) {
          System.out.println("something wrong when inserting.");
          System.out.println("Rolling back here...");
@@ -3229,6 +3250,7 @@ public class MainFrame {
            e.printStackTrace();
          }
        }
+       return false;
      }
 	  
 	  public static void deleteBookTransaction(String bookTitle) {
