@@ -12,6 +12,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
+import javax.swing.JList;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -63,6 +65,7 @@ import java.awt.FlowLayout;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
 import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
 
 public class MainFrame {
 
@@ -764,6 +767,8 @@ public class MainFrame {
 		JButton btnAddNewCrew = new JButton("Add new crew or cast");
 		btnAddNewCrew.addActionListener(new ActionListener() {
 		  public void actionPerformed(ActionEvent arg0) {
+//		    CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
+//        c.show(frame.getContentPane(), "AddMovieCrewPanel2");
 		    CreateFrameMovieCrew createFrameMovieCrew = new CreateFrameMovieCrew(crews);
 		  }
 		});
@@ -1625,6 +1630,10 @@ public class MainFrame {
 		frame.getContentPane().add(AddMusicTrackPanel, "AddMusicTrackPanel");
 		
 		JButton button_3 = new JButton("Submit");
+		button_3.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent e) {
+		  }
+		});
 		
 		JButton button_9 = new JButton("Cancel");
 		
@@ -1777,6 +1786,106 @@ public class MainFrame {
 		
 		
 		
+    JPanel AddMovieCrewPanel = new JPanel();
+    AddMovieCrewPanel.setOpaque(true);
+    frame.getContentPane().add(AddMovieCrewPanel, "AddMovieCrewPanel");
+    
+    JButton button = new JButton("Submit");
+    
+    JLabel label_3 = new JLabel("Crews and casts");
+    
+    textField_1 = new JTextField();
+    textField_1.setColumns(10);
+    
+    JButton button_4 = new JButton("Cancel");
+    button_4.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent arg0) {
+      }
+    });
+    
+    String[] movieCastRoles = {"director", "script writer", "cast", "producer",
+        "composer", "editor", "costume designer"};
+    
+    
+    ButtonGroup castRewardGroup = new ButtonGroup();
+    
+    JLabel lblName = new JLabel("Name:");
+    
+    JLabel lblRole = new JLabel("Role:");
+    
+    JLabel lblGender = new JLabel("Gender:");
+    
+    JRadioButton rdbtnMale = new JRadioButton("male");
+    JRadioButton rdbtnFemale = new JRadioButton("female");
+    
+    ButtonGroup castGenderGroup = new ButtonGroup();
+    castGenderGroup.add(rdbtnMale);
+    castGenderGroup.add(rdbtnFemale);
+    
+    JLabel lblGotAward = new JLabel("got award:");
+    JCheckBox chckbxTickIfYes = new JCheckBox("Tick if yes");
+    
+    JList list = new JList(movieCastRoles);
+    list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    
+    GroupLayout gl_AddMovieCrewPanel = new GroupLayout(AddMovieCrewPanel);
+    gl_AddMovieCrewPanel.setHorizontalGroup(
+      gl_AddMovieCrewPanel.createParallelGroup(Alignment.LEADING)
+        .addGroup(gl_AddMovieCrewPanel.createSequentialGroup()
+          .addGap(54)
+          .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.LEADING)
+            .addComponent(lblRole)
+            .addComponent(lblName)
+            .addComponent(lblGender)
+            .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.TRAILING, false)
+              .addComponent(lblGotAward, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+              .addComponent(label_3, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)))
+          .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.LEADING)
+            .addGroup(gl_AddMovieCrewPanel.createSequentialGroup()
+              .addComponent(rdbtnMale)
+              .addGap(18)
+              .addComponent(rdbtnFemale))
+            .addComponent(textField_1, GroupLayout.PREFERRED_SIZE, 224, GroupLayout.PREFERRED_SIZE)
+            .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.TRAILING)
+              .addGroup(gl_AddMovieCrewPanel.createSequentialGroup()
+                .addComponent(button, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
+                .addGap(48)
+                .addComponent(button_4, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE))
+              .addComponent(list, GroupLayout.PREFERRED_SIZE, 226, GroupLayout.PREFERRED_SIZE))
+            .addGroup(gl_AddMovieCrewPanel.createSequentialGroup()
+              .addPreferredGap(ComponentPlacement.RELATED)
+              .addComponent(chckbxTickIfYes)))
+          .addContainerGap(734, Short.MAX_VALUE))
+    );
+    gl_AddMovieCrewPanel.setVerticalGroup(
+      gl_AddMovieCrewPanel.createParallelGroup(Alignment.LEADING)
+        .addGroup(gl_AddMovieCrewPanel.createSequentialGroup()
+          .addGap(64)
+          .addComponent(label_3)
+          .addGap(16)
+          .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.BASELINE)
+            .addComponent(lblName)
+            .addComponent(textField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+          .addGap(18)
+          .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.BASELINE)
+            .addComponent(lblRole)
+            .addComponent(list, GroupLayout.PREFERRED_SIZE, 184, GroupLayout.PREFERRED_SIZE))
+          .addGap(18)
+          .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.BASELINE)
+            .addComponent(lblGender)
+            .addComponent(rdbtnMale)
+            .addComponent(rdbtnFemale))
+          .addGap(22)
+          .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.BASELINE)
+            .addComponent(lblGotAward)
+            .addComponent(chckbxTickIfYes))
+          .addGap(18)
+          .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.LEADING)
+            .addComponent(button)
+            .addComponent(button_4))
+          .addContainerGap(469, Short.MAX_VALUE))
+    );
+    AddMovieCrewPanel.setLayout(gl_AddMovieCrewPanel);
 		
 		
 		
@@ -3869,7 +3978,7 @@ public class MainFrame {
 	 public class CreateFrameMovieCrew {
 	   public CreateFrameMovieCrew(HashMap<String, List<MovieCrew>> crews)
      {
-	     JFrame frame = new JFrame("Test");
+       JFrame frame = new JFrame("Test2");
 	     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
        try 
        {
@@ -3879,100 +3988,104 @@ public class MainFrame {
        }
        JPanel AddMovieCrewPanel = new JPanel();
        AddMovieCrewPanel.setOpaque(true);
-//	     frame.getContentPane().add(AddMovieCrewPanel, "AddMovieCrewPanel");
-	     
-	     JButton button = new JButton("Submit");
-	     
-	     JLabel label_3 = new JLabel("Crews and casts");
-	     
-	     textField_1 = new JTextField();
-	     textField_1.setColumns(10);
-	     
-	     JButton button_4 = new JButton("Cancel");
-	     button_4.addActionListener(new ActionListener() {
-	       public void actionPerformed(ActionEvent arg0) {
-	       }
-	     });
-	     
-	     String[] movieCastRoles = {"director", "script writer", "cast", "producer",
-	         "composer", "editor", "costume designer"};
-	     
-	     
-	     ButtonGroup castRewardGroup = new ButtonGroup();
-	     
-	     JLabel lblName = new JLabel("Name:");
-	     
-	     JLabel lblRole = new JLabel("Role:");
-	     
-	     JLabel lblGender = new JLabel("Gender:");
-	     
-	     JRadioButton rdbtnMale = new JRadioButton("male");
-	     JRadioButton rdbtnFemale = new JRadioButton("female");
-	     
+//       frame.getContentPane().add(AddMovieCrewPanel, "AddMovieCrewPanel2");
+       
+       JButton button = new JButton("Submit");
+       
+       JLabel label_3 = new JLabel("Crews and casts");
+       
+       textField_1 = new JTextField();
+       textField_1.setColumns(10);
+       
+       JButton button_4 = new JButton("Cancel");
+       button_4.addActionListener(new ActionListener() {
+         public void actionPerformed(ActionEvent arg0) {
+         }
+       });
+       
+       String[] movieCastRoles = {"director", "script writer", "cast", "producer",
+           "composer", "editor", "costume designer"};
+       
+       
+//       ButtonGroup castRewardGroup = new ButtonGroup();
+       
+       JLabel lblName = new JLabel("Name:");
+       
+       JLabel lblRole = new JLabel("Role:");
+       
+       JLabel lblGender = new JLabel("Gender:");
+       
+       JRadioButton rdbtnMale = new JRadioButton("male");
+       JRadioButton rdbtnFemale = new JRadioButton("female");
+       
        ButtonGroup castGenderGroup = new ButtonGroup();
        castGenderGroup.add(rdbtnMale);
        castGenderGroup.add(rdbtnFemale);
-	     
-	     JLabel lblGotAward = new JLabel("got award:");
-	     JCheckBox chckbxTickIfYes = new JCheckBox("Tick if yes");
-	     
-	     GroupLayout gl_AddMovieCrewPanel = new GroupLayout(AddMovieCrewPanel);
-	     Component comboBox = null;
-      gl_AddMovieCrewPanel.setHorizontalGroup(
-	       gl_AddMovieCrewPanel.createParallelGroup(Alignment.LEADING)
-	         .addGroup(gl_AddMovieCrewPanel.createSequentialGroup()
-	           .addGap(54)
-	           .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.LEADING)
-	             .addComponent(lblRole)
-	             .addComponent(lblName)
-	             .addComponent(lblGender)
-	             .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.TRAILING, false)
-	               .addComponent(lblGotAward, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-	               .addComponent(label_3, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)))
-	           .addGap(36)
-	           .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.LEADING)
-	             .addComponent(chckbxTickIfYes)
-	             .addGroup(gl_AddMovieCrewPanel.createSequentialGroup()
-	               .addComponent(rdbtnMale)
-	               .addGap(18)
-	               .addComponent(rdbtnFemale))
-	             .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.TRAILING)
-	               .addGroup(gl_AddMovieCrewPanel.createSequentialGroup()
-	                 .addComponent(button, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
-	                 .addGap(48)
-	                 .addComponent(button_4, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE))
-	               .addComponent(textField_1, GroupLayout.PREFERRED_SIZE, 224, GroupLayout.PREFERRED_SIZE)))
-	           .addContainerGap(700, Short.MAX_VALUE))
-	     );
-	     gl_AddMovieCrewPanel.setVerticalGroup(
-	       gl_AddMovieCrewPanel.createParallelGroup(Alignment.LEADING)
-	         .addGroup(gl_AddMovieCrewPanel.createSequentialGroup()
-	           .addGap(64)
-	           .addComponent(label_3)
-	           .addGap(16)
-	           .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.BASELINE)
-	             .addComponent(lblName)
-	             .addComponent(textField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-	           .addGap(18)
-	           .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.BASELINE)
-	             .addComponent(lblRole))
-	           .addGap(18)
-	           .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.BASELINE)
-	             .addComponent(lblGender)
-	             .addComponent(rdbtnMale)
-	             .addComponent(rdbtnFemale))
-	           .addGap(18)
-	           .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.BASELINE)
-	             .addComponent(lblGotAward)
-	             .addComponent(chckbxTickIfYes))
-	           .addGap(33)
-	           .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.LEADING)
-	             .addComponent(button)
-	             .addComponent(button_4))
-	           .addContainerGap(469, Short.MAX_VALUE)
-	           )
-	     );
-	     AddMovieCrewPanel.setLayout(gl_AddMovieCrewPanel);
+       
+       JLabel lblGotAward = new JLabel("got award:");
+       JCheckBox chckbxTickIfYes = new JCheckBox("Tick if yes");
+       
+       JList list = new JList(movieCastRoles);
+       list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+       
+       GroupLayout gl_AddMovieCrewPanel = new GroupLayout(AddMovieCrewPanel);
+       gl_AddMovieCrewPanel.setHorizontalGroup(
+         gl_AddMovieCrewPanel.createParallelGroup(Alignment.LEADING)
+           .addGroup(gl_AddMovieCrewPanel.createSequentialGroup()
+             .addGap(54)
+             .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.LEADING)
+               .addComponent(lblRole)
+               .addComponent(lblName)
+               .addComponent(lblGender)
+               .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.TRAILING, false)
+                 .addComponent(lblGotAward, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                 .addComponent(label_3, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)))
+             .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.LEADING)
+               .addGroup(gl_AddMovieCrewPanel.createSequentialGroup()
+                 .addComponent(rdbtnMale)
+                 .addGap(18)
+                 .addComponent(rdbtnFemale))
+               .addComponent(textField_1, GroupLayout.PREFERRED_SIZE, 224, GroupLayout.PREFERRED_SIZE)
+               .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.TRAILING)
+                 .addGroup(gl_AddMovieCrewPanel.createSequentialGroup()
+                   .addComponent(button, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
+                   .addGap(48)
+                   .addComponent(button_4, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE))
+                 .addComponent(list, GroupLayout.PREFERRED_SIZE, 226, GroupLayout.PREFERRED_SIZE))
+               .addGroup(gl_AddMovieCrewPanel.createSequentialGroup()
+                 .addPreferredGap(ComponentPlacement.RELATED)
+                 .addComponent(chckbxTickIfYes)))
+             .addContainerGap(734, Short.MAX_VALUE))
+       );
+       gl_AddMovieCrewPanel.setVerticalGroup(
+         gl_AddMovieCrewPanel.createParallelGroup(Alignment.LEADING)
+           .addGroup(gl_AddMovieCrewPanel.createSequentialGroup()
+             .addGap(64)
+             .addComponent(label_3)
+             .addGap(16)
+             .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.BASELINE)
+               .addComponent(lblName)
+               .addComponent(textField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+             .addGap(18)
+             .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.BASELINE)
+               .addComponent(lblRole)
+               .addComponent(list, GroupLayout.PREFERRED_SIZE, 184, GroupLayout.PREFERRED_SIZE))
+             .addGap(18)
+             .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.BASELINE)
+               .addComponent(lblGender)
+               .addComponent(rdbtnMale)
+               .addComponent(rdbtnFemale))
+             .addGap(22)
+             .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.BASELINE)
+               .addComponent(lblGotAward)
+               .addComponent(chckbxTickIfYes))
+             .addGap(18)
+             .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.LEADING)
+               .addComponent(button)
+               .addComponent(button_4))
+             .addContainerGap(469, Short.MAX_VALUE))
+       );
+       AddMovieCrewPanel.setLayout(gl_AddMovieCrewPanel);
 	     
 	     frame.getContentPane().add(BorderLayout.CENTER, AddMovieCrewPanel);
        frame.pack();
@@ -3984,6 +4097,12 @@ public class MainFrame {
 	
 	public class CreateFrame {
 
+        private JTextField textField_12;
+        private JTextField textField_13;
+        private JTextField textField_14;
+        private JTextField textField_15;
+        private JTextField insYearTx;
+        private JTextField textField_17;
         private JTextField insSingerTx2;
         private JTextField insMusicTx;
         private JTextField insLangTx;
