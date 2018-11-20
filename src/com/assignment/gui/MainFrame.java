@@ -13,6 +13,7 @@ import javax.swing.JLabel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -2196,6 +2197,191 @@ public class MainFrame {
 		JMenu mnReport = new JMenu("Report");
 		menuBar.add(mnReport);
 		
+		JMenuItem mntmRAuthors = new JMenuItem("R1 - Author's publication");
+		mntmRAuthors.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent arg0) {
+		    String name = JOptionPane.showInputDialog(null, "Which author are you searching for?", "R1 - Get author's name", JOptionPane.QUESTION_MESSAGE);
+		    if (name.equals("")) {
+		      JOptionPane.showMessageDialog(null, "Please enter a name", "No name is inserted", JOptionPane.ERROR_MESSAGE);
+		    } else {
+  		    ResultSet rs = null;
+  		    rs = ReportHelper.createR1Report(name);
+  		    try {
+            if (rs != null) {
+              JTable table;
+              table = new JTable(buildTableModel(rs));
+              // show views
+              JOptionPane.showMessageDialog(null, new JScrollPane(table), "Data Table Preview", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+              JOptionPane.showMessageDialog(null, "Please enter correct information", "something wrong", JOptionPane.ERROR_MESSAGE);
+            }
+  		    } catch (SQLException e) {
+            e.printStackTrace();
+          }
+		    }
+		  }
+		});
+		mnReport.add(mntmRAuthors);
+		
+		JMenuItem mntmRPublication = new JMenuItem("R2 - Publication in one year");
+		mntmRPublication.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent e) {
+		    String str = JOptionPane.showInputDialog(null, "Which year are you searching for?", "R2 - Get publication year", JOptionPane.QUESTION_MESSAGE);
+		    int year = checkHelper.checkIfNumerical(str);
+        if (year < 0) {
+          JOptionPane.showMessageDialog(null, "Please enter a positive number", "No number is inserted", JOptionPane.ERROR_MESSAGE);
+        }
+        if (str.equals("") || year < 0) {
+          JOptionPane.showMessageDialog(null, "Please enter a positive number", "Need positive number", JOptionPane.ERROR_MESSAGE);
+        } else {
+          ResultSet rs = null;
+          rs = ReportHelper.createR2Report(year);
+          try {
+            if (rs != null) {
+              JTable table;
+              table = new JTable(buildTableModel(rs));
+              // show views
+              JOptionPane.showMessageDialog(null, new JScrollPane(table), "Data Table Preview", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+              JOptionPane.showMessageDialog(null, "Please enter correct information", "something wrong", JOptionPane.ERROR_MESSAGE);
+            }
+          } catch (SQLException e1) {
+            e1.printStackTrace();
+          }
+        }
+		  }
+		});
+		mnReport.add(mntmRPublication);
+		
+		JMenuItem mntmRBooks = new JMenuItem("R3 - Books with similar topic");
+		mntmRBooks.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent e) {
+		    String keyword = JOptionPane.showInputDialog(null, "What keyword are you searching for?", "R3 - Get a keyword", JOptionPane.QUESTION_MESSAGE);
+        if (keyword.equals("")) {
+          JOptionPane.showMessageDialog(null, "Please enter a string", "No string is inserted", JOptionPane.ERROR_MESSAGE);
+        } else {
+          ResultSet rs = null;
+          rs = ReportHelper.createR3Report(keyword);
+          try {
+            if (rs != null) {
+              JTable table;
+              table = new JTable(buildTableModel(rs));
+              // show views
+              JOptionPane.showMessageDialog(null, new JScrollPane(table), "Data Table Preview", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+              JOptionPane.showMessageDialog(null, "Please enter correct information", "something wrong", JOptionPane.ERROR_MESSAGE);
+            }
+          } catch (SQLException e1) {
+            e1.printStackTrace();
+          }
+        }
+		  }
+		});
+		mnReport.add(mntmRBooks);
+		
+		JMenuItem mntmRFrequent = new JMenuItem("R4 - Frequent publishers");
+		mnReport.add(mntmRFrequent);
+		
+		JMenuItem mntmRMost = new JMenuItem("R5 - Most popular subjects");
+		mntmRMost.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent e) {
+		    
+        ResultSet rs = null;
+        rs = ReportHelper.createR5Report();
+        try {
+          if (rs != null) {
+            JTable table;
+            table = new JTable(buildTableModel(rs));
+            // show views
+            JOptionPane.showMessageDialog(null, new JScrollPane(table), "Data Table Preview", JOptionPane.INFORMATION_MESSAGE);
+          }
+        } catch (SQLException e1) {
+          e1.printStackTrace();
+        }
+
+		  }
+		});
+		mnReport.add(mntmRMost);
+		
+		JMenuItem mntmRMulti = new JMenuItem("R6 - Multi skills movie crew");
+		mntmRMulti.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent e) {
+		    ResultSet rs = null;
+        rs = ReportHelper.createR6Report();
+        try {
+          if (rs != null) {
+            JTable table;
+            table = new JTable(buildTableModel(rs));
+            // show views
+            JOptionPane.showMessageDialog(null, new JScrollPane(table), "Data Table Preview", JOptionPane.INFORMATION_MESSAGE);
+          }
+        } catch (SQLException e1) {
+          e1.printStackTrace();
+        }
+		  }
+		});
+		mnReport.add(mntmRMulti);
+		
+		JMenuItem mntmRAward = new JMenuItem("R7 - Award winning movies");
+		mnReport.add(mntmRAward);
+		
+		JMenuItem mntmRMusic = new JMenuItem("R8 - Music with similar name");
+		mntmRMusic.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent e) {
+		    ResultSet rs = null;
+        rs = ReportHelper.createR8Report();
+        try {
+          if (rs != null) {
+            JTable table;
+            table = new JTable(buildTableModel(rs));
+            // show views
+            JOptionPane.showMessageDialog(null, new JScrollPane(table), "Data Table Preview", JOptionPane.INFORMATION_MESSAGE);
+          }
+        } catch (SQLException e1) {
+          e1.printStackTrace();
+        }
+		  }
+		});
+		mnReport.add(mntmRMusic);
+		
+		JMenuItem mntmRMulti_1 = new JMenuItem("R9 - Multi skills music crew");
+		mntmRMulti_1.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent e) {
+		    ResultSet rs = null;
+        rs = ReportHelper.createR9Report();
+        try {
+          if (rs != null) {
+            JTable table;
+            table = new JTable(buildTableModel(rs));
+            // show views
+            JOptionPane.showMessageDialog(null, new JScrollPane(table), "Data Table Preview", JOptionPane.INFORMATION_MESSAGE);
+          }
+        } catch (SQLException e1) {
+          e1.printStackTrace();
+        }
+		  }
+		});
+		mnReport.add(mntmRMulti_1);
+		
+		JMenuItem mntmRSimilar = new JMenuItem("R10 - Similar Names");
+		mntmRSimilar.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent e) {
+		    ResultSet rs = null;
+        rs = ReportHelper.createR10Report();
+        try {
+          if (rs != null) {
+            JTable table;
+            table = new JTable(buildTableModel(rs));
+            // show views
+            JOptionPane.showMessageDialog(null, new JScrollPane(table), "Data Table Preview", JOptionPane.INFORMATION_MESSAGE);
+          }
+        } catch (SQLException e1) {
+          e1.printStackTrace();
+        }
+		  }
+		});
+		mnReport.add(mntmRSimilar);
+		
 		
 
 	}
@@ -2583,6 +2769,17 @@ public class MainFrame {
 	       result = -1;
 	     }
 	     return result;
+	   }
+	   
+	   public static int checkIfNumerical(String str) {
+	     int result = -1;
+       try {
+         result = Integer.parseInt(str);
+       } catch (NumberFormatException nfe) {
+         // Not a number
+         result = -1;
+       }
+       return result;
 	   }
 	}
 	
@@ -2981,8 +3178,9 @@ public class MainFrame {
        ResultSet rs = null;
        try {
         ps = con.prepareStatement(sql);
-        for (int i = 1; i <= count; i++) {
+        for (int i = 1; i <= count*2; i=i+2) {
           ps.setString(i, "%" + name + "%");
+          ps.setInt(i+1, year);
         }
         if (count > 0) {
           rs = ps.executeQuery();
@@ -3012,54 +3210,61 @@ public class MainFrame {
 	public static class BuildQueryHelper {
 	  
 	  public static String bulidForView(Map<String, Boolean> types) {
+	    boolean exist = true, success = true;
 	    String sql = "";
-	    int count = 0;
-	    for (String b: types.keySet()) {	      
-	      // if it's checked
-	      if (types.get(b)) {
-	        // if there's sql in sql string
-	        if (!sql.equals("")) {
-	          sql += ") union (";
+	    Map<String, String> viewNames = new HashMap<String, String>();
+	    viewNames.put("authorView", "a");
+	    viewNames.put("SingerView", "s");
+	    viewNames.put("crewView", "c");
+	    for (String viewname : viewNames.keySet()) {
+	      exist = checkIfTableExist(viewname);
+	      if (!exist) {
+	        switch (viewNames.get(viewname)) {
+	          case "a":
+	            CreateViewHelper.createViewForViewPartAuthor();
+	          case "s":
+              CreateViewHelper.createViewForViewPartSinger();
+	          case "c":
+              CreateViewHelper.createViewForViewPartCrew();
+	          default:
+	            success = false;
 	        }
-  	      if (b.equals("book")) {
-  	        sql += "select b.title ProductName, b.YearOfPublication Year, 'B' Type, min(CASE WHEN ISNULL(p.MiddleName) " + 
-  	            "THEN concat(p.firstName, ' ', p.familyname) " + 
-  	            "ELSE concat(p.firstName, ' ',p.middlename, ' ', p.familyname) " + 
-  	            "END) 'Author/singer/director' " + 
-  	            "from book b, bookauthor ba, peopleInvolved p " + 
-  	            "where b.isbn = ba.isbn and ba.author_id = p.id and b.title like ? " + 
-  	            "group by ProductName " + 
-  	            "order by p.familyname";
-  	      } else if (b.equals("album")) {
-  	        sql += "select mu.albumName ProductName, mu.Year Year, 'M' Type, min(CASE WHEN ISNULL(p.MiddleName) " + 
-  	            "THEN concat(p.firstName, ' ', p.familyname) " + 
-  	            "ELSE concat(p.firstName, ' ',p.middlename, ' ', p.familyname) " + 
-  	            "END) 'Author/singer/director' " + 
-  	            "from music mu, musicsinger mus, peopleinvolved p " + 
-  	            "where (mu.albumName,mu.year,mu.musicName) = (mus.albumName,mus.year,mus.musicName) and mus.peopleInvolved_id = p.id and mu.albumName like ? " + 
-  	            "group by ProductName " + 
-  	            "order by p.familyname";
-  	      } else if (b.equals("movie")) {
-  	        sql += "select mv.MovieName ProductName, mv.year Year, 'F' Type, min(CASE WHEN ISNULL(p.MiddleName) " + 
-  	            "THEN concat(p.firstName, ' ', p.familyname) " + 
-  	            "ELSE concat(p.firstName, ' ',p.middlename, ' ', p.familyname) " + 
-  	            "END) 'Author/singer/director' " + 
-  	            "from movie mv, crewmember cm, peopleinvolved p, role r " + 
-  	            "where (mv.MovieName, mv.year) = (cm.MovieName, cm.ReleaseYear) and cm.PeopleInvolved_id = p.id and cm.role_id = r.id and mv.MovieName like ? " + 
-  	            "group by ProductName " + 
-  	            "order by p.familyname";
-  	      }
-          count++;
 	      }
-        if (count == 2) {
-          sql = "(" + sql;
-        }
- 	    }
-	    // end query
-	    if (count > 1) {
-	      sql += ");";
+	    }
+	    if (success) {
+	      // build query
+	      sql = "select ProductName, Year, Type, Author_singer_director from (";
+	      int count = 0;
+	      for (String b: types.keySet()) {        
+	        // if it's checked
+	        if (types.get(b)) {
+	          // if there's sql in sql string
+	          count ++;
+	          if (count > 1) {
+	            sql += " union ";
+	          }
+	          if (b.equals("book")) {
+	            sql += "select ProductName, Year, Type, Author_singer_director " + 
+	                "from authorView " + 
+	                "where title like ? and year = ?";
+	          } else if (b.equals("album")) {
+	            sql += "select ProductName, Year, Type, Author_singer_director " + 
+	                "from singerView " + 
+	                "where albumName like ? and year = ?";
+	          } else if (b.equals("movie")) {
+	            sql += "select ProductName, Year, Type, Author_singer_director " + 
+	                "from crewView " + 
+	                "where moviename like ? and year = ?";
+	          }
+	          
+	        }
+	      }
+	      // end query
+	      if (count > 0) {
+	        sql += ") t order by Author_singer_director;";
+	      }
 	    } else {
-	      sql += ";";
+	      JOptionPane.showMessageDialog(null, "Something wrong when building query", "View - unexpected error", JOptionPane.ERROR_MESSAGE);
 	    }
 	    return sql;
 	  }
@@ -3358,6 +3563,460 @@ public class MainFrame {
         }
       }
 	  }
+	}
+	
+	private static class ReportHelper {
+	  public static ResultSet createR1Report(String fullname) {
+	    String[] name = fullname.split(" ");
+      ResultSet rs = null;
+	    String sql = "select b.ISBN, b.Title, b.YearOfPublication " + 
+	        "from Book b, bookauthor ba, peopleinvolved p " + 
+	        "where b.ISBN = ba.ISBN and ba.author_id = p.id and concat(p.firstname,' ',p.familyname) = ? " + 
+	        "order by ISBN;";
+	    if (name.length >= 3) {
+	      sql = "select b.ISBN, b.Title, b.YearOfPublication " + 
+	          "from Book b, bookauthor ba, peopleinvolved p " + 
+	          "where b.ISBN = ba.ISBN and ba.author_id = p.id and concat(p.firstname,' ',p.middlename,' ',p.familyname) = ? " + 
+	          "order by ISBN;";
+	    }
+	    try {
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setString(1, fullname);
+        rs = ps.executeQuery();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+	    return rs;
+	  }
+	  
+	  public static ResultSet createR2Report(int year) {
+	    String sql = "select b.ISBN, b.title, b.YearOfPublication, p.familyname, upper(SUBSTRING(p.firstname,1,1)) initials " + 
+	        "from book b, bookauthor ba, peopleinvolved p " + 
+	        "where b.isbn = ba.isbn and ba.author_id = p.id and yearOfPublication = ? " + 
+	        "order by b.title;";
+	    ResultSet rs = null;
+	    try {
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setInt(1, year);
+        rs = ps.executeQuery();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return rs;
+	  }
+	  
+	  public static ResultSet createR3Report(String keyword) {
+	    String sql = "select isbn, title, yearofpublication " + 
+	        "from " + 
+	        "(select b.isbn, b.title, b.yearofpublication " + 
+	        "from book b " + 
+	        "inner join bookkeyword bk " + 
+	        "on b.isbn = bk.isbn " + 
+	        "inner join keyword k " + 
+	        "on k.id = bk.keyword_id " + 
+	        "where k.tag like ?  " + 
+	        "union " + 
+	        "select ISBN, title, yearOfPublication  " + 
+	        "from book  " + 
+	        "where abstract like ? or title like ?) a " + 
+	        "order by isbn;";
+	    ResultSet rs = null;
+	    try {
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setString(1, "%" + keyword + "%");
+        ps.setString(2, "%" + keyword + "%");
+        ps.setString(3, "%" + keyword + "%");
+        rs = ps.executeQuery();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return rs;
+	  }
+	  
+	  public static ResultSet createR5Report() {
+	    // create a view if not exist yet
+	    boolean exist = checkIfTableExist("keywordFrequency");
+	    boolean success = true;
+	    ResultSet rs = null;
+	    if(!exist) {
+	      success = CreateViewHelper.createViewForR5();
+	    }
+	    // execute query if view exist
+	    if (success) {
+	      String sql = "select k.tag, kf.frequency " + 
+	          "from bookkeyword bk, keyword k, keywordFrequency kf " + 
+	          "where bk.keyword_id = k.id and kf.tag = k.tag and kf.frequency in (select max(frequency) from keywordFrequency) " + 
+	          "group by k.tag " + 
+	          "order by k.tag;";
+	      Statement statement;
+	      try {
+	        statement = con.createStatement();
+	        rs = statement.executeQuery(sql);
+	      } catch (SQLException e) {
+	        e.printStackTrace();
+	      }
+	    }
+      return rs;
+	  }
+	  
+	  public static ResultSet createR6Report() {
+      // create a view if not exist yet
+      boolean exist = checkIfTableExist("multiSkillsMovieCrew");
+      boolean success = true;
+      ResultSet rs = null;
+      if(!exist) {
+        success = CreateViewHelper.createViewForR6();
+      }
+      // execute query if view exist
+      if (success) {
+        String sql = "select p.familyname, r.description, cm.moviename " + 
+            "from peopleinvolved p " + 
+            "inner join crewmember cm " + 
+            "on cm.peopleinvolved_id = p.id " + 
+            "inner join multiSkillsMovieCrew t " + 
+            "on t.peopleinvolved_id = p.id " + 
+            "inner join role r " + 
+            "on r.id = cm.role_id " + 
+            "where t.numroles >= (select max(numroles) from multiSkillsMovieCrew) and t.moviename = cm.moviename " + 
+            "order by p.familyname;";
+        Statement statement;
+        try {
+          statement = con.createStatement();
+          rs = statement.executeQuery(sql);
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
+      }
+      return rs;
+    }
+	  
+	  public static ResultSet createR8Report() {
+      // create a view if not exist yet
+      boolean exist = checkIfTableExist("musicNameDupNum");
+      boolean success = true;
+      ResultSet rs = null;
+      if(!exist) {
+        success = CreateViewHelper.createViewForR8();
+      }
+      // execute query if view exist
+      if (success) {
+        String sql = "select ms.albumname, ms.musicname, ms.year, CASE WHEN ISNULL(p.MiddleName) " + 
+            "THEN concat(p.firstName, ' ', p.familyname) " + 
+            "ELSE concat(p.firstName, ' ',p.middlename, ' ', p.familyname) " + 
+            "END 'Singer name' " + 
+            "from musicsinger ms, musicNameDupNum d, peopleinvolved p " + 
+            "where ms.musicname = d.musicname and ms.peopleinvolved_id = p.id " + 
+            "order by ms.musicname, ms.year;";
+        Statement statement;
+        try {
+          statement = con.createStatement();
+          rs = statement.executeQuery(sql);
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
+      }
+      return rs;
+    }
+	  
+	  public static ResultSet createR9Report() {
+      // create a view if not exist yet
+      boolean exist = checkIfTableExist("peopleOnlyNotArrangerMusic");
+      boolean success = true;
+      ResultSet rs = null;
+      if(!exist) {
+        success = CreateViewHelper.createViewForR9();
+      }
+      // execute query if view exist
+      if (success) {
+        String sql = "select p.familyname, upper(SUBSTRING(p.firstname,1,1)) 'First_name_initials', pa.musicname, pa.albumname, pa.year " + 
+            "from peopleinvolved p, peopleOnlyNotArrangerMusic pa " + 
+            "where p.id = pa.peopleinvolved_id " + 
+            "order by pa.year, pa.musicname desc;";
+        Statement statement;
+        try {
+          statement = con.createStatement();
+          rs = statement.executeQuery(sql);
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
+      }
+      return rs;
+    }
+	  
+	  public static ResultSet createR10Report() {
+      // create a view if not exist yet
+      boolean exist = checkIfTableExist("lnameofbook");
+      boolean success = true;
+      Map<String, String> viewNames = new HashMap<String, String>();//{"lnameofbook","lnameofmusic","lnameofmovie","distinctFamilyname"};
+      viewNames.put("lnameofbook", "b");
+      viewNames.put("lnameofmusic", "mu");
+      viewNames.put("lnameofmovie", "mv");
+      viewNames.put("distinctFamilyname", "d");
+      ResultSet rs = null;
+      for (String viewname : viewNames.keySet()) {
+        exist = checkIfTableExist(viewname);
+        if (!exist) {
+          switch (viewNames.get(viewname)) {
+            case "b":
+              success = CreateViewHelper.createViewForR10Book();
+            case "mu":
+              success = CreateViewHelper.createViewForR10Music();
+            case "mv":
+              success = CreateViewHelper.createViewForR10Movie();
+            case "d":
+              success = CreateViewHelper.createViewForR10DistinctLname();
+          }
+          if (!success) {
+            break;
+          }
+        }
+      }
+      // execute query if view exist
+      if (success) {
+        String sql = "select familyname, role " + 
+            "from " + 
+            "(select d.familyname, 'author' role " + 
+            "from distinctFamilyname d, bookauthor b, peopleinvolved p " + 
+            "where b.author_id = p.id and d.familyname = p.familyname " + 
+            "group by d.familyname " + 
+            "union " + 
+            "select d.familyname, 'singer' role " + 
+            "from distinctFamilyname d, musicsinger s, peopleinvolved p " + 
+            "where s.peopleinvolved_id = p.id and d.familyname = p.familyname " + 
+            "group by d.familyname " + 
+            "union " + 
+            "select d.familyname, r.description role " + 
+            "from distinctFamilyname d, crewmember c, peopleinvolved p, role r " + 
+            "where c.peopleinvolved_id = p.id and d.familyname = p.familyname and r.id = c.role_id " + 
+            "group by d.familyname) result " + 
+            "order by familyname;";
+        Statement statement;
+        try {
+          statement = con.createStatement();
+          rs = statement.executeQuery(sql);
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
+      } else {
+        JOptionPane.showMessageDialog(null, "Something wrong when creating views", "create view - unexpected error", JOptionPane.ERROR_MESSAGE);
+      }
+      return rs;
+    }
+	}
+	
+	public static class CreateViewHelper {
+	  
+	  public static boolean createViewForViewPartAuthor() {
+	    String sql = "create view authorView as " + 
+	        "select b.title ProductName, b.YearOfPublication Year, 'B' Type, min(CASE WHEN ISNULL(p.MiddleName) " + 
+	        "THEN concat(p.firstName, ' ', p.familyname) " + 
+	        "ELSE concat(p.firstName, ' ',p.middlename, ' ', p.familyname) " + 
+	        "END) 'Author_singer_director', b.title " + 
+	        "from book b, bookauthor ba, peopleInvolved p " + 
+	        "where b.isbn = ba.isbn and ba.author_id = p.id " + 
+	        "group by ProductName;";
+      Statement statement;
+      try {
+        statement = con.createStatement();
+        statement.executeUpdate(sql);
+        return true;
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return false;
+	  }
+	  
+	  public static boolean createViewForViewPartSinger() {
+      String sql = "create view SingerView as " + 
+          "select mu.albumName ProductName, mu.Year Year, 'M' Type, min(CASE WHEN ISNULL(p.MiddleName) " + 
+          "THEN concat(p.firstName, ' ', p.familyname) " + 
+          "ELSE concat(p.firstName, ' ',p.middlename, ' ', p.familyname) " + 
+          "END) 'Author_singer_director', mu.albumName " + 
+          "from music mu, musicsinger mus, peopleinvolved p " + 
+          "where (mu.albumName,mu.year,mu.musicName) = (mus.albumName,mus.year,mus.musicName) and mus.peopleInvolved_id = p.id " + 
+          "group by ProductName;";
+      Statement statement;
+      try {
+        statement = con.createStatement();
+        statement.executeUpdate(sql);
+        return true;
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return false;
+    }
+	  
+	  public static boolean createViewForViewPartCrew() {
+      String sql = "create view crewView as " + 
+          "select mv.MovieName ProductName, mv.year Year, 'F' Type, min(CASE WHEN ISNULL(p.MiddleName) " + 
+          "THEN concat(p.firstName, ' ', p.familyname) " + 
+          "ELSE concat(p.firstName, ' ',p.middlename, ' ', p.familyname) " + 
+          "END) 'Author_singer_director', mv.MovieName " + 
+          "from movie mv, crewmember cm, peopleinvolved p, role r " + 
+          "where (mv.MovieName, mv.year) = (cm.MovieName, cm.ReleaseYear) and cm.PeopleInvolved_id = p.id and cm.role_id = r.id " + 
+          "group by ProductName;";
+      Statement statement;
+      try {
+        statement = con.createStatement();
+        statement.executeUpdate(sql);
+        return true;
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return false;
+    }
+	  
+	  public static boolean createViewForR5() {
+	    String sql = "create view keywordFrequency as " + 
+	        "select k.tag, count(*) frequency from bookkeyword bk, keyword k " + 
+	        "where bk.keyword_id = k.id " + 
+	        "group by k.tag;";
+	    Statement statement;
+      try {
+        statement = con.createStatement();
+        statement.executeUpdate(sql);
+        return true;
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return false;
+	  }
+	  
+	  public static boolean createViewForR6() {
+      String sql = "create view multiSkillsMovieCrew as " + 
+          "select cm.peopleinvolved_id, cm.moviename, count(*) numroles " + 
+          "from crewmember cm " + 
+          "group by peopleinvolved_id, moviename;";
+      Statement statement;
+      try {
+        statement = con.createStatement();
+        statement.executeUpdate(sql);
+        return true;
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return false;
+    }
+	  
+	  public static boolean createViewForR8() {
+      String sql = "create view musicNameDupNum as " + 
+          "select musicname, count(*) numberDup " + 
+          "from music " + 
+          "group by musicname " + 
+          "having numberDup > 1;";
+      Statement statement;
+      try {
+        statement = con.createStatement();
+        statement.executeUpdate(sql);
+        return true;
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return false;
+    }
+	  
+	  public static boolean createViewForR9() {
+      String sql = "create view peopleOnlyNotArrangerMusic as " + 
+          "select albumname, year, musicname, peopleinvolved_id " + 
+          "from peopleinvolvedmusic " + 
+          "where isSongwriter = 1 and iscomposer = 1 and isarranger = 0;";
+      Statement statement;
+      try {
+        statement = con.createStatement();
+        statement.executeUpdate(sql);
+        return true;
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return false;
+    }
+	  
+	  public static boolean createViewForR10Book() {
+	    String sql = "create view lnameofbook as " + 
+	        "select p.familyname, count(*) " + 
+	        "from peopleinvolved p, bookauthor b " + 
+	        "where p.id = b.author_id " + 
+	        "group by p.familyname;";
+      Statement statement;
+      try {
+        statement = con.createStatement();
+        statement.executeUpdate(sql);
+        return true;
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return false;
+	  }
+	  
+	  public static boolean createViewForR10Music() {
+      String sql = "create view lnameofmusic as " + 
+          "select p.familyname, count(*) " + 
+          "from peopleinvolved p, musicsinger m " + 
+          "where p.id = m.peopleinvolved_id " + 
+          "group by p.familyname;";
+      Statement statement;
+      try {
+        statement = con.createStatement();
+        statement.executeUpdate(sql);
+        return true;
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return false;
+    }
+	  
+	  public static boolean createViewForR10Movie() {
+      String sql = "create view lnameofmovie as " + 
+          "select p.familyname, count(*) " + 
+          "from peopleinvolved p, crewmember c " + 
+          "where p.id = c.peopleinvolved_id " + 
+          "group by p.familyname;";
+      Statement statement;
+      try {
+        statement = con.createStatement();
+        statement.executeUpdate(sql);
+        return true;
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return false;
+    }
+	  
+	  public static boolean createViewForR10DistinctLname() {
+      String sql = "create view distinctFamilyname as " + 
+          "select distinct p.familyname " + 
+          "from peopleinvolved p " + 
+          "where (p.familyname in (select familyname from lnameofbook) and p.familyname in (select familyname from lnameofmusic)) " + 
+          "or (p.familyname in (select familyname from lnameofbook) and p.familyname in (select familyname from lnameofmovie)) " + 
+          "or (p.familyname in (select familyname from lnameofmusic) and p.familyname in (select familyname from lnameofmovie));";
+      Statement statement;
+      try {
+        statement = con.createStatement();
+        statement.executeUpdate(sql);
+        return true;
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return false;
+    }
+	}
+	
+	public static boolean checkIfTableExist(String tableName) {
+	  DatabaseMetaData meta;
+    try {
+      meta = con.getMetaData();
+      ResultSet res = meta.getTables(null, null, null, 
+          new String[] {"TABLE","VIEW"});
+       while (res.next()) {
+          if (res.getString("TABLE_NAME").equalsIgnoreCase(tableName)) {
+            return true;
+          }
+       }
+       res.close();
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return false;
 	}
 	
 	public static DefaultTableModel buildTableModel(ResultSet rs)
