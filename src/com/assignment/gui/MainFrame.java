@@ -118,6 +118,9 @@ public class MainFrame {
 	private JTextField upSingersTx;
 	private JTextField searchNameTx;
 	private JTextField searchYearTx;
+	private JCheckBox chckbxBook;
+  private JCheckBox chckbxAlbum;
+  private JCheckBox chckbxMovie;
 	private JTextField insYearTx;
 	private JTextField textField_17;
 	private JTextField insSingerTx2;
@@ -173,7 +176,7 @@ public class MainFrame {
 	 */
 	private void initialize(Connection con) {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 1126, 844);
+		frame.setBounds(100, 100, 885, 702);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		frame.getContentPane().setLayout(new CardLayout(0, 0));
@@ -345,15 +348,16 @@ public class MainFrame {
 		gl_insertBook.setHorizontalGroup(
 		  gl_insertBook.createParallelGroup(Alignment.LEADING)
 		    .addGroup(gl_insertBook.createSequentialGroup()
-		      .addGap(52)
 		      .addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
-		        .addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
-		          .addComponent(lblEachBookCan, GroupLayout.PREFERRED_SIZE, 901, GroupLayout.PREFERRED_SIZE)
-		          .addComponent(lblNameOfPeople_1, GroupLayout.PREFERRED_SIZE, 809, GroupLayout.PREFERRED_SIZE)
-		          .addComponent(lblPleaseInsertAll_1, GroupLayout.PREFERRED_SIZE, 672, GroupLayout.PREFERRED_SIZE)
-		          .addComponent(lblIfTheNames, GroupLayout.PREFERRED_SIZE, 469, GroupLayout.PREFERRED_SIZE))
 		        .addGroup(gl_insertBook.createSequentialGroup()
-		          .addGap(251)
+		          .addGap(22)
+		          .addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
+		            .addComponent(lblNameOfPeople_1, GroupLayout.PREFERRED_SIZE, 809, GroupLayout.PREFERRED_SIZE)
+		            .addComponent(lblPleaseInsertAll_1, GroupLayout.PREFERRED_SIZE, 672, GroupLayout.PREFERRED_SIZE)
+		            .addComponent(lblIfTheNames, GroupLayout.PREFERRED_SIZE, 469, GroupLayout.PREFERRED_SIZE)
+		            .addComponent(lblEachBookCan, GroupLayout.PREFERRED_SIZE, 597, GroupLayout.PREFERRED_SIZE)))
+		        .addGroup(gl_insertBook.createSequentialGroup()
+		          .addGap(184)
 		          .addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
 		            .addGroup(gl_insertBook.createSequentialGroup()
 		              .addComponent(lblNumberofPages)
@@ -396,12 +400,12 @@ public class MainFrame {
 		                    .addComponent(btnSubmitbookinsert, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
 		                    .addPreferredGap(ComponentPlacement.RELATED)
 		                    .addComponent(btnCancelbook))))))))
-		      .addContainerGap(179, Short.MAX_VALUE))
+		      .addContainerGap(36, Short.MAX_VALUE))
 		);
 		gl_insertBook.setVerticalGroup(
 		  gl_insertBook.createParallelGroup(Alignment.LEADING)
 		    .addGroup(gl_insertBook.createSequentialGroup()
-		      .addGap(47)
+		      .addContainerGap()
 		      .addComponent(lblPleaseInsertAll_1)
 		      .addGap(11)
 		      .addComponent(lblEachBookCan)
@@ -409,7 +413,7 @@ public class MainFrame {
 		      .addComponent(lblNameOfPeople_1)
 		      .addGap(13)
 		      .addComponent(lblIfTheNames)
-		      .addGap(37)
+		      .addPreferredGap(ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
 		      .addGroup(gl_insertBook.createParallelGroup(Alignment.LEADING)
 		        .addGroup(gl_insertBook.createSequentialGroup()
 		          .addGap(3)
@@ -458,7 +462,7 @@ public class MainFrame {
 		      .addGroup(gl_insertBook.createParallelGroup(Alignment.BASELINE)
 		        .addComponent(btnSubmitbookinsert)
 		        .addComponent(btnCancelbook))
-		      .addContainerGap(343, Short.MAX_VALUE))
+		      .addGap(38))
 		);
 		insertBook.setLayout(gl_insertBook);
     
@@ -586,34 +590,35 @@ public class MainFrame {
 		          .addGap(289)
 		          .addComponent(label_38)
 		          .addGap(39)
-		          .addComponent(textField_17, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
-		        .addGroup(gl_insertAlbum2.createSequentialGroup()
-		          .addGap(279)
-		          .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.TRAILING, false)
-		            .addGroup(gl_insertAlbum2.createSequentialGroup()
-		              .addComponent(lblMusicTracks)
-		              .addGap(314))
-		            .addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 397, GroupLayout.PREFERRED_SIZE)
-		            .addGroup(gl_insertAlbum2.createSequentialGroup()
-		              .addComponent(button_2)
-		              .addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-		              .addComponent(btnTry))
-		            .addGroup(gl_insertAlbum2.createSequentialGroup()
-		              .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.LEADING, false)
-		                .addComponent(label_43, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-		                .addComponent(label_1)
-		                .addComponent(lblProducer_1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-		              .addPreferredGap(ComponentPlacement.UNRELATED)
-		              .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.LEADING)
-		                .addComponent(insAlbumTx, GroupLayout.PREFERRED_SIZE, 308, GroupLayout.PREFERRED_SIZE)
-		                .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.LEADING)
-		                  .addComponent(insProducerTx, GroupLayout.PREFERRED_SIZE, 308, GroupLayout.PREFERRED_SIZE)
-		                  .addComponent(insYearTx, GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE))))
-		            .addGroup(gl_insertAlbum2.createSequentialGroup()
-		              .addComponent(btnCancel_2)
-		              .addGap(18)
-		              .addComponent(btnSubmit)))))
+		          .addComponent(textField_17, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))
 		      .addGap(155))
+		    .addGroup(Alignment.LEADING, gl_insertAlbum2.createSequentialGroup()
+		      .addGap(195)
+		      .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.TRAILING, false)
+		        .addGroup(gl_insertAlbum2.createSequentialGroup()
+		          .addComponent(lblMusicTracks)
+		          .addGap(314))
+		        .addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 397, GroupLayout.PREFERRED_SIZE)
+		        .addGroup(gl_insertAlbum2.createSequentialGroup()
+		          .addComponent(button_2)
+		          .addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+		          .addComponent(btnTry))
+		        .addGroup(gl_insertAlbum2.createSequentialGroup()
+		          .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.LEADING, false)
+		            .addComponent(label_43, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+		            .addComponent(label_1)
+		            .addComponent(lblProducer_1))
+		          .addPreferredGap(ComponentPlacement.UNRELATED)
+		          .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.LEADING)
+		            .addComponent(insAlbumTx, GroupLayout.PREFERRED_SIZE, 308, GroupLayout.PREFERRED_SIZE)
+		            .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.LEADING)
+		              .addComponent(insProducerTx, GroupLayout.PREFERRED_SIZE, 308, GroupLayout.PREFERRED_SIZE)
+		              .addComponent(insYearTx, GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE))))
+		        .addGroup(gl_insertAlbum2.createSequentialGroup()
+		          .addComponent(btnCancel_2)
+		          .addGap(18)
+		          .addComponent(btnSubmit)))
+		      .addContainerGap(328, Short.MAX_VALUE))
 		);
 		gl_insertAlbum2.setVerticalGroup(
 		  gl_insertAlbum2.createParallelGroup(Alignment.LEADING)
@@ -624,7 +629,7 @@ public class MainFrame {
 		      .addComponent(lblYouShouldInsert)
 		      .addPreferredGap(ComponentPlacement.UNRELATED)
 		      .addComponent(label_44)
-		      .addGap(51)
+		      .addGap(47)
 		      .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.BASELINE)
 		        .addComponent(label_43)
 		        .addComponent(insAlbumTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
@@ -648,7 +653,7 @@ public class MainFrame {
 		      .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.BASELINE)
 		        .addComponent(btnSubmit)
 		        .addComponent(btnCancel_2))
-		      .addGap(51)
+		      .addGap(55)
 		      .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.LEADING)
 		        .addGroup(gl_insertAlbum2.createSequentialGroup()
 		          .addGap(376)
@@ -744,39 +749,56 @@ public class MainFrame {
 		    textArea.setText(str);
 		  }
 		});
+		
+		JLabel lblPleaseFillIn = new JLabel("Please fill in all the madatory fields.");
+		
+		JLabel lblThereShouldBe = new JLabel("There should be at least one people for each role. At most 10 for cast, at most 3 otherwise.");
 		GroupLayout gl_insertMovie = new GroupLayout(insertMovie);
 		gl_insertMovie.setHorizontalGroup(
 		  gl_insertMovie.createParallelGroup(Alignment.LEADING)
 		    .addGroup(gl_insertMovie.createSequentialGroup()
-		      .addGap(259)
 		      .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
-		        .addComponent(textArea, GroupLayout.PREFERRED_SIZE, 206, GroupLayout.PREFERRED_SIZE)
-		        .addComponent(lblCrewAndCast)
 		        .addGroup(gl_insertMovie.createSequentialGroup()
+		          .addGap(45)
 		          .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
-		            .addComponent(lblReleaseYear)
-		            .addComponent(lblMovieName))
-		          .addGap(18)
-		          .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING, false)
-		            .addComponent(movieNameTx)
-		            .addComponent(movieYearTx, GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)))
-		        .addComponent(btnAddNewCrew)
-		        .addComponent(btnRefreshList_1))
-		      .addGap(33)
-		      .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
-		        .addComponent(lblCast, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)
-		        .addGroup(gl_insertMovie.createParallelGroup(Alignment.TRAILING)
-		          .addGroup(gl_insertMovie.createSequentialGroup()
-		            .addComponent(btnSubmit_1)
-		            .addPreferredGap(ComponentPlacement.UNRELATED)
-		            .addComponent(btnCancel_1))
-		          .addComponent(textArea_1, GroupLayout.PREFERRED_SIZE, 206, GroupLayout.PREFERRED_SIZE)))
-		      .addContainerGap(344, Short.MAX_VALUE))
+		            .addComponent(lblThereShouldBe)
+		            .addComponent(lblPleaseFillIn)))
+		        .addGroup(gl_insertMovie.createSequentialGroup()
+		          .addGap(176)
+		          .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
+		            .addGroup(gl_insertMovie.createSequentialGroup()
+		              .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
+		                .addComponent(textArea, GroupLayout.PREFERRED_SIZE, 206, GroupLayout.PREFERRED_SIZE)
+		                .addComponent(lblCrewAndCast)
+		                .addComponent(btnRefreshList_1))
+		              .addGap(93)
+		              .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
+		                .addComponent(lblCast, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)
+		                .addGroup(gl_insertMovie.createParallelGroup(Alignment.TRAILING)
+		                  .addGroup(gl_insertMovie.createSequentialGroup()
+		                    .addComponent(btnSubmit_1)
+		                    .addPreferredGap(ComponentPlacement.UNRELATED)
+		                    .addComponent(btnCancel_1))
+		                  .addComponent(textArea_1, GroupLayout.PREFERRED_SIZE, 206, GroupLayout.PREFERRED_SIZE))))
+		            .addGroup(gl_insertMovie.createSequentialGroup()
+		              .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
+		                .addComponent(lblReleaseYear)
+		                .addComponent(lblMovieName))
+		              .addGap(18)
+		              .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING, false)
+		                .addComponent(movieNameTx)
+		                .addComponent(movieYearTx, GroupLayout.PREFERRED_SIZE, 169, GroupLayout.PREFERRED_SIZE)))
+		            .addComponent(btnAddNewCrew))))
+		      .addContainerGap(103, Short.MAX_VALUE))
 		);
 		gl_insertMovie.setVerticalGroup(
 		  gl_insertMovie.createParallelGroup(Alignment.LEADING)
 		    .addGroup(gl_insertMovie.createSequentialGroup()
-		      .addGap(104)
+		      .addGap(31)
+		      .addComponent(lblPleaseFillIn)
+		      .addGap(18)
+		      .addComponent(lblThereShouldBe)
+		      .addGap(18)
 		      .addGroup(gl_insertMovie.createParallelGroup(Alignment.TRAILING)
 		        .addGroup(gl_insertMovie.createSequentialGroup()
 		          .addComponent(lblCast)
@@ -801,7 +823,7 @@ public class MainFrame {
 		        .addComponent(btnCancel_1)
 		        .addComponent(btnSubmit_1)
 		        .addComponent(btnRefreshList_1))
-		      .addContainerGap(196, Short.MAX_VALUE))
+		      .addContainerGap(59, Short.MAX_VALUE))
 		);
 		insertMovie.setLayout(gl_insertMovie);
 		
@@ -1304,11 +1326,11 @@ public class MainFrame {
 		searchYearTx = new JTextField();
 		searchYearTx.setColumns(10);		
 
-    JCheckBox chckbxBook = new JCheckBox("Book");
+    chckbxBook = new JCheckBox("Book");
     
-    JCheckBox chckbxAlbum = new JCheckBox("Album");
+    chckbxAlbum = new JCheckBox("Album");
     
-    JCheckBox chckbxMovie = new JCheckBox("Movie");
+    chckbxMovie = new JCheckBox("Movie");
 		
 		JButton btnNewButton_4 = new JButton("Search");
 		btnNewButton_4.addActionListener(new ActionListener() {
@@ -1356,6 +1378,11 @@ public class MainFrame {
 		});
 		
 		JButton btnCancel = new JButton("Cancel");
+		btnCancel.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent e) {
+		    clearViewFields();
+		  }
+		});
 		GroupLayout gl_view = new GroupLayout(view);
 		gl_view.setHorizontalGroup(
 		  gl_view.createParallelGroup(Alignment.LEADING)
@@ -2083,8 +2110,12 @@ public class MainFrame {
     }
 	}
 	
-	private void clearInsertMovieCrews() {
-	  
+	private void clearViewFields() {
+	  searchNameTx.setText("");
+    searchYearTx.setText("");
+    chckbxBook.setSelected(false);
+    chckbxAlbum.setSelected(false);
+    chckbxMovie.setSelected(false);
 	}
 	
 	
@@ -2913,13 +2944,11 @@ public class MainFrame {
 	      if (!exist) {
 	        switch (viewNames.get(viewname)) {
 	          case "a":
-	            CreateViewHelper.createViewForViewPartAuthor();
+	            success = CreateViewHelper.createViewForViewPartAuthor();
 	          case "s":
-              CreateViewHelper.createViewForViewPartSinger();
+              success = CreateViewHelper.createViewForViewPartSinger();
 	          case "c":
-              CreateViewHelper.createViewForViewPartCrew();
-	          default:
-	            success = false;
+              success = CreateViewHelper.createViewForViewPartCrew();
 	        }
 	      }
 	    }
@@ -4099,12 +4128,6 @@ public class MainFrame {
 	
 	public class CreateFrame {
 
-        private JTextField textField_12;
-        private JTextField textField_13;
-        private JTextField textField_14;
-        private JTextField textField_15;
-        private JTextField insYearTx;
-        private JTextField textField_17;
         private JTextField insSingerTx2;
         private JTextField insMusicTx;
         private JTextField insLangTx;
@@ -4139,7 +4162,6 @@ public class MainFrame {
                   insArrangerTx.getText().equals("") || insComposerTx.getText().equals("") || insSongWriterTx.getText().equals("") ||
                   insSingerTx1.getText().equals("")) {
                 // show error - mandatory fields
-                System.out.println("fill in all mandatory fields and in correct format");
                 JOptionPane.showMessageDialog(null, "fill in all mandatory fields and in correct format", "Insert music - wrong format", JOptionPane.ERROR_MESSAGE);
               } else {
                 // get the string values
@@ -4158,9 +4180,7 @@ public class MainFrame {
                 } else {
                   valid = checkHelper.checkNameFormat(singer1);
                 }
-
-                
-                
+               
                 // musicpeoples: key - roleTitle, value - peopleName
                 Map<String, String> musicpeoples = new HashMap<String,String>();
                 musicpeoples.put("songWriter", songWriter);
@@ -4206,7 +4226,7 @@ public class MainFrame {
                   JOptionPane.showMessageDialog(null, "submitted", "Insert music - submitted", JOptionPane.INFORMATION_MESSAGE);
                   
                   // TODO: clear fields
-                  
+                  clearInsertMusicTrack();
                 } else {
                   JOptionPane.showMessageDialog(null, "Some input are invalid", "Insert music - invalid name input", JOptionPane.ERROR_MESSAGE);
                 }
