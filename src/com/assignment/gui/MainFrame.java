@@ -86,14 +86,6 @@ public class MainFrame {
 	private JTextField insertauthor4;
 	private JTextField insertauthor3;
 	private JTextField insertauthor5;
-	private JTextField langTx;
-	private JTextField musicNameTx;
-	private JTextField yearTx;
-	private JTextField albumNameTx;
-	private JTextField ComposerTx;
-	private JTextField producerTx;
-	private JTextField songWriterTx;
-	private JTextField arrangerTx;
 	private ButtonGroup diskTypeTx;
 	private JTextField movieYearTx;
 	private JTextField movieNameTx;
@@ -102,7 +94,6 @@ public class MainFrame {
 	private JTextField upMusicNameSearch;
 	private JTextField textField_30;
 	private JTextField textField_31;
-	private JTextField singersTx;
 	private JTextField upBookYearTx;
 	private JTextField upEditionTx;
 	private JTextField upAbstractTx;
@@ -139,8 +130,13 @@ public class MainFrame {
 	private List<MusicTrack> musicTracks;
 	private JTextField insProducerTx;
 	private JTextField insAlbumTx;
-	private JTextField textField_1;
-	private HashMap<String, List<MovieCrew>> crews;
+	private JTextField insCastNameTx;
+	private JTextArea textAreaMusicTrack;
+	private JTextArea textArea;
+  private JTextArea textArea_1;
+	private Map<String, List<MovieCrew>> crews = new HashMap<String, List<MovieCrew>>();
+	private String[] movieCastRoles = {"director", "script writer", "cast", "producer",
+      "composer", "editor", "costume designer"};
 
 	/**
 	 * Launch the application.
@@ -338,13 +334,13 @@ public class MainFrame {
 			}
 		});
 		
-		JLabel lblEachBookCan = new JLabel("Each book can store at most 5 authors, you can separate the names by comma ' , '.");
+		JLabel lblEachBookCan = new JLabel("Each book can store at most 5 authors and at least one author, and, at most 20 keywords.");
 		
 		JLabel lblNameOfPeople_1 = new JLabel("Name of people who involved should be in the format of 'first_name family_name' or 'first_name middle_name family_name'");
 		
 		JLabel lblIfTheNames = new JLabel("If the names are in the wrong format, it will not be stored in the database.");
 		
-		JLabel lblPleaseInsertAll_1 = new JLabel("Please insert all the mandatory fields. ISBN is a 13 digits string. You have to enter at least one author.");
+		JLabel lblPleaseInsertAll_1 = new JLabel("Please insert all the mandatory fields. ISBN is a 13 digits string.");
 		GroupLayout gl_insertBook = new GroupLayout(insertBook);
 		gl_insertBook.setHorizontalGroup(
 		  gl_insertBook.createParallelGroup(Alignment.LEADING)
@@ -465,283 +461,205 @@ public class MainFrame {
 		      .addContainerGap(343, Short.MAX_VALUE))
 		);
 		insertBook.setLayout(gl_insertBook);
+    
+		diskTypeTx = new ButtonGroup();
 		
-		JPanel insertAlbum = new JPanel();
-		frame.getContentPane().add(insertAlbum, "insertAlbum");
+		JPanel insertAlbum2 = new JPanel();
+		frame.getContentPane().add(insertAlbum2, "insertAlbum2");
 		
-		JButton submitBtn = new JButton("Submit");
-		submitBtn.addActionListener(new ActionListener() {
-		  public void actionPerformed(ActionEvent arg0) {
-		    String albumName = null, musicName = null, lang = null, producer = null, arranger = null, composer = null, songWriter = null;
-		    String[] singersSplit = null; // at most 2 singer for each song
-		    int year = -1;
-		    diskType type = diskType.AUDIOCD;
+		JButton button_2 = new JButton("Add a music track");
+		button_2.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent e) {
+		    CreateFrame createFrame = new CreateFrame(musicTracks);
 		    
-		    // check all fields are filled in or not
-		    if (albumNameTx.getText().equals("")|| musicNameTx.getText().equals("") || langTx.getText().equals("") || producerTx.getText().equals("") ||
-		        arrangerTx.getText().equals("") || ComposerTx.getText().equals("") || songWriterTx.getText().equals("") ||
-		        yearTx.getText().equals("") || singersTx.getText().equals("")) {
-		      // show error - mandatory fields
-          System.out.println("fill in all mandatory fields and in correct format");
-          JOptionPane.showMessageDialog(null, "fill in all mandatory fields and in correct format", "Insert music - wrong format", JOptionPane.ERROR_MESSAGE);
-		    } else if (checkHelper.checkIfNumerical(yearTx) <= 0) {
-		      System.out.println("fill in the year in correct format (year > 0)");
-		      JOptionPane.showMessageDialog(null, "fill in the year in correct range", "Insert music - wrong range", JOptionPane.ERROR_MESSAGE);
-		    } else {
-		      // get the string values
-		      albumName = albumNameTx.getText();
-		      musicName = musicNameTx.getText();
-		      lang = langTx.getText();
-		      producer = producerTx.getText();
-		      arranger = arrangerTx.getText();
-		      composer = ComposerTx.getText();
-		      songWriter = songWriterTx.getText();
-		      year = Integer.parseInt(yearTx.getText());
-		      
-		      // musicpeoples: key - roleTitle, value - peopleName
-		      Map<String, String> musicpeoples = new HashMap<String,String>();
-		      musicpeoples.put("songWriter", songWriter);
-		      musicpeoples.put("composer", composer);
-		      musicpeoples.put("arranger", arranger);
-		      
-		      // split singers by ','
-          singersSplit = singersTx.getText().split("\\s*,\\s*");
-          List<String> singers = new ArrayList<String>();
-          if (singersSplit.length >= 2) {
-            singers.add(singersSplit[0]);
-            singers.add(singersSplit[1]);
-          } else {
-            singers.add(singersSplit[0]);
-          }
-          
-          // get diskType
-          String typeString = null;
-          for (Enumeration<AbstractButton> buttons = diskTypeTx.getElements(); buttons.hasMoreElements();) {
-            AbstractButton button = buttons.nextElement();
-            if (button.isSelected()) {
-              typeString = button.getText();
-            }
-          }
-          for (diskType d : type.getIteration()) {
-            if (d.getString().equalsIgnoreCase(typeString)) {
-              type = d.getEnum();
-            }
-          }
-       // check if the music album exist in Music, insert if not
-          if (!checkHelper.musicExist(albumName, year, musicName)) {
-            // insert music
-//            boolean success = TransactionHelper.insertMusicTransaction(albumName, musicName, lang, producer, musicpeoples, year, singers, type);
-            boolean success = false;
-            if (success) {
-              JOptionPane.showMessageDialog(null, "Music inserted.", "Insert music - success", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-              JOptionPane.showMessageDialog(null, "Music insertion fail due to unexpected error", "Insert music - error", JOptionPane.ERROR_MESSAGE);
-            }
-          } else {
-//            System.out.println("music track of that album already existed.");
-            JOptionPane.showMessageDialog(null, "This music track of that album already existed", "Insert music - already existed", JOptionPane.ERROR_MESSAGE);
-          }
-		    }
 		  }
 		});
 		
-		JButton button_1 = new JButton("Cancel");
-		button_1.addActionListener(new ActionListener(){
-      public void actionPerformed(ActionEvent arg0) {
-        clearInsertAlbum();
-      }
+		JLabel label = new JLabel("Please insert all the fields.");
+		
+		JLabel label_1 = new JLabel("Year:");
+		
+		JLabel label_43 = new JLabel("Album name:");
+		
+		insYearTx = new JTextField();
+		insYearTx.setColumns(10);
+		
+		JLabel label_44 = new JLabel("Name of people who involved should be in the format of 'first_name family_name' or 'first_name middle_name family_name'");
+		
+		JLabel lblYouShouldInsert = new JLabel("You should insert at least one music track for an album.");
+		
+		JLabel label_38 = new JLabel("Producer:");
+		
+		textField_17 = new JTextField();
+		textField_17.setColumns(10);
+		
+		JLabel lblMusicTracks = new JLabel("Music Tracks:");
+		
+		JScrollPane scrollPane_1 = new JScrollPane();
+		
+		    textAreaMusicTrack = new JTextArea();
+		    scrollPane_1.setViewportView(textAreaMusicTrack);
+		    
+		JButton btnTry = new JButton("Refresh list");
+		btnTry.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent e) {
+		    // set music track name on main panel
+		    String str = "";
+		    for(MusicTrack mt: musicTracks) {
+          str += mt.toString();
+        }
+		    textAreaMusicTrack.setText(str);
+		  }
 		});
-      
 		
-		JLabel lblLanguage = new JLabel("language:");
+		JButton btnSubmit = new JButton("Submit");
+		btnSubmit.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent e) {
+		    String albumName = null, producer = null;
+        int year = -1;
+        
+        // check all fields are filled in or not
+        if (insAlbumTx.getText().equals("") || insYearTx.getText().equals("") || insProducerTx.getText().equals("")) {
+          // show error - mandatory fields
+          System.out.println("fill in all mandatory fields and in correct format");
+          JOptionPane.showMessageDialog(null, "fill in all mandatory fields and in correct format", "Insert music - wrong format", JOptionPane.ERROR_MESSAGE);
+        } else if (checkHelper.checkIfNumerical(insYearTx) <= 0) {
+          System.out.println("fill in the year in correct format (year > 0)");
+          JOptionPane.showMessageDialog(null, "fill in the year in correct range", "Insert music - wrong range", JOptionPane.ERROR_MESSAGE);
+        } else if (musicTracks.isEmpty()) {
+          JOptionPane.showMessageDialog(null, "You should have at least one music track", "Insert music - no music track", JOptionPane.ERROR_MESSAGE);
+        } else {
+          // get the string values
+          albumName = insAlbumTx.getText();
+          year = Integer.parseInt(insYearTx.getText());
+          producer = insProducerTx.getText();
+          if (!checkHelper.checkNameFormat(producer)) {
+            JOptionPane.showMessageDialog(null, "fill in the producer name in correct format", "Insert music - wrong name format", JOptionPane.ERROR_MESSAGE);
+          } else {
+          
+            // check if the music album exist in Music, insert if not
+            if (!checkHelper.albumExist(albumName)) {
+              // insert music
+              boolean success = TransactionHelper.insertMusicTransaction(albumName, year, producer, musicTracks);
+              if (success) {
+                JOptionPane.showMessageDialog(null, "Music inserted.", "Insert music - success", JOptionPane.INFORMATION_MESSAGE);
+              } else {
+                JOptionPane.showMessageDialog(null, "Music insertion fail due to unexpected error", "Insert music - error", JOptionPane.ERROR_MESSAGE);
+              }
+            } else {
+  //            System.out.println("music track of that album already existed.");
+              JOptionPane.showMessageDialog(null, "This music track of that album already existed", "Insert music - already existed", JOptionPane.ERROR_MESSAGE);
+            }
+          }
+        }
+		  }
+		});
 		
-		langTx = new JTextField();
-		langTx.setColumns(10);
+		JLabel lblProducer_1 = new JLabel("Producer:");
 		
-		JLabel lblAlbumName = new JLabel("Album name:");
+		insProducerTx = new JTextField();
+		insProducerTx.setColumns(10);
 		
-		JLabel lblYear = new JLabel("Year:");
+		insAlbumTx = new JTextField();
+		insAlbumTx.setColumns(10);
 		
-		JLabel lblMusicName = new JLabel("Music name:");
+		JButton btnCancel_2 = new JButton("Cancel");
+		btnCancel_2.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent arg0) {
+		    clearInsertMusic();
+		  }
+		});
+		GroupLayout gl_insertAlbum2 = new GroupLayout(insertAlbum2);
+		gl_insertAlbum2.setHorizontalGroup(
+		  gl_insertAlbum2.createParallelGroup(Alignment.TRAILING)
+		    .addGroup(gl_insertAlbum2.createSequentialGroup()
+		      .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_insertAlbum2.createSequentialGroup()
+		          .addGap(52)
+		          .addComponent(label))
+		        .addGroup(gl_insertAlbum2.createSequentialGroup()
+		          .addGap(52)
+		          .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.LEADING)
+		            .addComponent(label_44)
+		            .addComponent(lblYouShouldInsert)))
+		        .addGroup(gl_insertAlbum2.createSequentialGroup()
+		          .addGap(289)
+		          .addComponent(label_38)
+		          .addGap(39)
+		          .addComponent(textField_17, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+		        .addGroup(gl_insertAlbum2.createSequentialGroup()
+		          .addGap(279)
+		          .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.TRAILING, false)
+		            .addGroup(gl_insertAlbum2.createSequentialGroup()
+		              .addComponent(lblMusicTracks)
+		              .addGap(314))
+		            .addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 397, GroupLayout.PREFERRED_SIZE)
+		            .addGroup(gl_insertAlbum2.createSequentialGroup()
+		              .addComponent(button_2)
+		              .addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+		              .addComponent(btnTry))
+		            .addGroup(gl_insertAlbum2.createSequentialGroup()
+		              .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.LEADING, false)
+		                .addComponent(label_43, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+		                .addComponent(label_1)
+		                .addComponent(lblProducer_1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		              .addPreferredGap(ComponentPlacement.UNRELATED)
+		              .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.LEADING)
+		                .addComponent(insAlbumTx, GroupLayout.PREFERRED_SIZE, 308, GroupLayout.PREFERRED_SIZE)
+		                .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.LEADING)
+		                  .addComponent(insProducerTx, GroupLayout.PREFERRED_SIZE, 308, GroupLayout.PREFERRED_SIZE)
+		                  .addComponent(insYearTx, GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE))))
+		            .addGroup(gl_insertAlbum2.createSequentialGroup()
+		              .addComponent(btnCancel_2)
+		              .addGap(18)
+		              .addComponent(btnSubmit)))))
+		      .addGap(155))
+		);
+		gl_insertAlbum2.setVerticalGroup(
+		  gl_insertAlbum2.createParallelGroup(Alignment.LEADING)
+		    .addGroup(gl_insertAlbum2.createSequentialGroup()
+		      .addGap(38)
+		      .addComponent(label)
+		      .addGap(11)
+		      .addComponent(lblYouShouldInsert)
+		      .addPreferredGap(ComponentPlacement.UNRELATED)
+		      .addComponent(label_44)
+		      .addGap(51)
+		      .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(label_43)
+		        .addComponent(insAlbumTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addPreferredGap(ComponentPlacement.UNRELATED)
+		      .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(label_1)
+		        .addComponent(insYearTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addPreferredGap(ComponentPlacement.UNRELATED)
+		      .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(lblProducer_1)
+		        .addComponent(insProducerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(30)
+		      .addComponent(lblMusicTracks)
+		      .addGap(18)
+		      .addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 98, GroupLayout.PREFERRED_SIZE)
+		      .addGap(35)
+		      .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(button_2)
+		        .addComponent(btnTry))
+		      .addGap(84)
+		      .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(btnSubmit)
+		        .addComponent(btnCancel_2))
+		      .addGap(51)
+		      .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.LEADING)
+		        .addGroup(gl_insertAlbum2.createSequentialGroup()
+		          .addGap(376)
+		          .addComponent(label_38))
+		        .addGroup(gl_insertAlbum2.createSequentialGroup()
+		          .addGap(373)
+		          .addComponent(textField_17, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+		      .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		);
 		
-		musicNameTx = new JTextField();
-		musicNameTx.setColumns(10);
-		
-		yearTx = new JTextField();
-		yearTx.setColumns(10);
-		
-		albumNameTx = new JTextField();
-		albumNameTx.setColumns(10);
-		
-		JLabel lblDiskType = new JLabel("Disk type:");
-		
-		JLabel lblProducer = new JLabel("Producer:");
-		
-		JLabel lblSongWriter = new JLabel("Song writer:");
-		
-		JLabel lblComposer = new JLabel("Composer:");
-		
-		JLabel lblArranger = new JLabel("Arranger:");
-		
-		ComposerTx = new JTextField();
-		ComposerTx.setColumns(10);
-		
-		producerTx = new JTextField();
-		producerTx.setColumns(10);
-		
-		songWriterTx = new JTextField();
-		songWriterTx.setColumns(10);
-		
-		arrangerTx = new JTextField();
-		arrangerTx.setColumns(10);
-		
-		JLabel lblSingers = new JLabel("Singers:");
-		
-		singersTx = new JTextField();
-		singersTx.setColumns(10);
-
-    JRadioButton audioCDtype = new JRadioButton("AudioCD");
-    audioCDtype.setText("audioCD");
-    audioCDtype.setSelected(true);
-    
-    JRadioButton vinylType = new JRadioButton("Vinyl");
-    vinylType.setText("vinyl");
-    
-    JLabel lblPleaseInsertAll = new JLabel("Please insert all the fields.");
-    
-    JLabel lblProducerSongWriter = new JLabel("Producer, song writer, composer and arranger can only have one name. Each music can store at most 2 singers, you can separate the names by comma ' , '.");
-    
-    JLabel lblNameOfPeople = new JLabel("Name of people who involved should be in the format of 'first_name family_name' or 'first_name middle_name family_name'");
-    
-    JLabel lblIfTheName = new JLabel("If the names are in the wrong format, it will not be stored in the database.");
-    
-    JButton btnAddAMusic = new JButton("Add a music track");
-    btnAddAMusic.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-      }
-    });
-    GroupLayout gl_insertAlbum = new GroupLayout(insertAlbum);
-    gl_insertAlbum.setHorizontalGroup(
-      gl_insertAlbum.createParallelGroup(Alignment.TRAILING)
-        .addGroup(gl_insertAlbum.createSequentialGroup()
-          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.LEADING)
-            .addGroup(gl_insertAlbum.createSequentialGroup()
-              .addGap(52)
-              .addComponent(lblPleaseInsertAll))
-            .addGroup(gl_insertAlbum.createSequentialGroup()
-              .addGap(279)
-              .addGroup(gl_insertAlbum.createParallelGroup(Alignment.TRAILING, false)
-                .addGroup(gl_insertAlbum.createSequentialGroup()
-                  .addGroup(gl_insertAlbum.createParallelGroup(Alignment.TRAILING)
-                    .addGroup(gl_insertAlbum.createSequentialGroup()
-                      .addGroup(gl_insertAlbum.createParallelGroup(Alignment.LEADING)
-                        .addComponent(lblYear)
-                        .addComponent(lblMusicName)
-                        .addComponent(lblLanguage)
-                        .addComponent(lblDiskType)
-                        .addComponent(lblProducer)
-                        .addComponent(lblSongWriter)
-                        .addComponent(lblComposer)
-                        .addComponent(lblArranger)
-                        .addComponent(lblSingers))
-                      .addGap(22))
-                    .addGroup(gl_insertAlbum.createSequentialGroup()
-                      .addComponent(lblAlbumName)
-                      .addGap(18)))
-                  .addGroup(gl_insertAlbum.createParallelGroup(Alignment.LEADING)
-                    .addGroup(gl_insertAlbum.createParallelGroup(Alignment.LEADING, false)
-                      .addComponent(albumNameTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
-                      .addComponent(ComposerTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
-                      .addComponent(producerTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
-                      .addComponent(songWriterTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
-                      .addComponent(langTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
-                      .addComponent(arrangerTx, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
-                      .addComponent(yearTx)
-                      .addComponent(musicNameTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                    .addComponent(singersTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
-                    .addGroup(gl_insertAlbum.createSequentialGroup()
-                      .addComponent(audioCDtype)
-                      .addGap(64)
-                      .addComponent(vinylType))))
-                .addGroup(gl_insertAlbum.createSequentialGroup()
-                  .addComponent(btnAddAMusic)
-                  .addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                  .addComponent(submitBtn, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
-                  .addGap(18)
-                  .addComponent(button_1))))
-            .addGroup(gl_insertAlbum.createSequentialGroup()
-              .addGap(52)
-              .addGroup(gl_insertAlbum.createParallelGroup(Alignment.LEADING)
-                .addComponent(lblNameOfPeople)
-                .addComponent(lblProducerSongWriter)
-                .addComponent(lblIfTheName))))
-          .addContainerGap(179, Short.MAX_VALUE))
-    );
-    gl_insertAlbum.setVerticalGroup(
-      gl_insertAlbum.createParallelGroup(Alignment.LEADING)
-        .addGroup(gl_insertAlbum.createSequentialGroup()
-          .addGap(38)
-          .addComponent(lblPleaseInsertAll)
-          .addGap(11)
-          .addComponent(lblProducerSongWriter)
-          .addPreferredGap(ComponentPlacement.UNRELATED)
-          .addComponent(lblNameOfPeople)
-          .addPreferredGap(ComponentPlacement.UNRELATED)
-          .addComponent(lblIfTheName)
-          .addGap(22)
-          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.TRAILING)
-            .addGroup(gl_insertAlbum.createSequentialGroup()
-              .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-                .addComponent(albumNameTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addComponent(lblAlbumName))
-              .addPreferredGap(ComponentPlacement.UNRELATED)
-              .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-                .addComponent(yearTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addComponent(lblYear))
-              .addGap(18)
-              .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-                .addComponent(musicNameTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addComponent(lblMusicName))
-              .addGap(18)
-              .addComponent(langTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addComponent(lblLanguage))
-          .addGap(18)
-          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-            .addComponent(lblDiskType)
-            .addComponent(audioCDtype)
-            .addComponent(vinylType))
-          .addGap(18)
-          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-            .addComponent(producerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-            .addComponent(lblProducer))
-          .addGap(18)
-          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-            .addComponent(songWriterTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-            .addComponent(lblSongWriter))
-          .addGap(18)
-          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-            .addComponent(ComposerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-            .addComponent(lblComposer))
-          .addGap(18)
-          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-            .addComponent(arrangerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-            .addComponent(lblArranger))
-          .addGap(18)
-          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-            .addComponent(lblSingers)
-            .addComponent(singersTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-          .addGap(52)
-          .addGroup(gl_insertAlbum.createParallelGroup(Alignment.BASELINE)
-            .addComponent(submitBtn)
-            .addComponent(button_1)
-            .addComponent(btnAddAMusic))
-          .addContainerGap(348, Short.MAX_VALUE))
-    );
-    
-		diskTypeTx = new ButtonGroup();
-		diskTypeTx.add(audioCDtype);
-		diskTypeTx.add(vinylType);
-		insertAlbum.setLayout(gl_insertAlbum);
+		insertAlbum2.setLayout(gl_insertAlbum2);
 		
 		JPanel insertMovie = new JPanel();
 		frame.getContentPane().add(insertMovie, "insertMovie");
@@ -758,11 +676,11 @@ public class MainFrame {
 		
 		JLabel lblCrewAndCast = new JLabel("Crew:");
 		
-		JTextArea textArea = new JTextArea();
+		textArea = new JTextArea();
 		
 		JLabel lblCast = new JLabel("Cast:");
 		
-		JTextArea textArea_1 = new JTextArea();
+		textArea_1 = new JTextArea();
 		
 		JButton btnAddNewCrew = new JButton("Add new crew or cast");
 		btnAddNewCrew.addActionListener(new ActionListener() {
@@ -774,8 +692,58 @@ public class MainFrame {
 		});
 		
 		JButton btnCancel_1 = new JButton("Cancel");
+		btnCancel_1.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent arg0) {
+		    // clear fields
+		    clearInsertMovies();
+		  }
+		});
 		
 		JButton btnSubmit_1 = new JButton("Submit");
+		btnSubmit_1.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent arg0) {
+        String movieName = null;
+        int year = checkHelper.checkIfNumerical(movieYearTx);
+        // validate input fields
+        if (movieNameTx.getText().equals("") || movieYearTx.getText().equals("") || checkHelper.checkIfEmptyCrew(crews)) {
+          JOptionPane.showMessageDialog(null, "Please fill in all the fields with at least one people in each role", "Insert movie - incomplete input", JOptionPane.ERROR_MESSAGE);
+        } else if (year < 0) {
+          JOptionPane.showMessageDialog(null, "Year in wrong range", "Insert movie - wrong range", JOptionPane.ERROR_MESSAGE);
+        } else {
+          // get all the input
+          movieName = movieNameTx.getText();
+          
+          // check if movie exist
+          if (!checkHelper.movieExist(movieName)) {
+            // inserting start
+            TransactionHelper.insertMovieTransaction(movieName, year, crews);
+            JOptionPane.showMessageDialog(null, "Movie inserted", "Insert movie - movie inserted", JOptionPane.INFORMATION_MESSAGE);
+          } else {
+            JOptionPane.showMessageDialog(null, "Movie already exist", "Insert movie - movie existed", JOptionPane.ERROR_MESSAGE);
+          }
+        }
+      }
+    });
+		
+		JButton btnRefreshList_1 = new JButton("Refresh list");
+		btnRefreshList_1.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent arg0) {
+		    String str = "";
+		    for (MovieCrew cast:crews.get("cast")) {
+		      str += cast.getCrewName() + "\n";
+		    }
+		    textArea_1.setText(str);
+		    str = "";
+		    for (String role: crews.keySet()) {
+		      if (!role.equalsIgnoreCase("cast")) {
+		        for (MovieCrew crew: crews.get(role)) {
+		          str += crew.getCrewName() + "\n"; 
+		        }
+		      }
+		    }
+		    textArea.setText(str);
+		  }
+		});
 		GroupLayout gl_insertMovie = new GroupLayout(insertMovie);
 		gl_insertMovie.setHorizontalGroup(
 		  gl_insertMovie.createParallelGroup(Alignment.LEADING)
@@ -792,7 +760,8 @@ public class MainFrame {
 		          .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING, false)
 		            .addComponent(movieNameTx)
 		            .addComponent(movieYearTx, GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)))
-		        .addComponent(btnAddNewCrew))
+		        .addComponent(btnAddNewCrew)
+		        .addComponent(btnRefreshList_1))
 		      .addGap(33)
 		      .addGroup(gl_insertMovie.createParallelGroup(Alignment.LEADING)
 		        .addComponent(lblCast, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)
@@ -830,7 +799,8 @@ public class MainFrame {
 		      .addGap(42)
 		      .addGroup(gl_insertMovie.createParallelGroup(Alignment.BASELINE)
 		        .addComponent(btnCancel_1)
-		        .addComponent(btnSubmit_1))
+		        .addComponent(btnSubmit_1)
+		        .addComponent(btnRefreshList_1))
 		      .addContainerGap(196, Short.MAX_VALUE))
 		);
 		insertMovie.setLayout(gl_insertMovie);
@@ -1432,199 +1402,7 @@ public class MainFrame {
 		);
 		view.setLayout(gl_view);
 		
-		JPanel insertAlbum2 = new JPanel();
-		frame.getContentPane().add(insertAlbum2, "insertAlbum2");
-		
-		JButton button_2 = new JButton("Add a music track");
-		button_2.addActionListener(new ActionListener() {
-		  public void actionPerformed(ActionEvent e) {
-		    CreateFrame createFrame = new CreateFrame(musicTracks);
-		    
-		  }
-		});
-		
-		JLabel label = new JLabel("Please insert all the fields.");
-		
-		JLabel label_1 = new JLabel("Year:");
-		
-		JLabel label_43 = new JLabel("Album name:");
-		
-		insYearTx = new JTextField();
-		insYearTx.setColumns(10);
-		
-		JLabel label_44 = new JLabel("Name of people who involved should be in the format of 'first_name family_name' or 'first_name middle_name family_name'");
-		
-		JLabel label_45 = new JLabel("Producer, song writer, composer and arranger can only have one name. Each music can store at most 2 singers, you can separate the names by comma ' , '.");
-		
-		JLabel label_46 = new JLabel("If the names are in the wrong format, it will not be stored in the database.");
-		
-		JLabel label_38 = new JLabel("Producer:");
-		
-		textField_17 = new JTextField();
-		textField_17.setColumns(10);
-		
-		JLabel lblMusicTracks = new JLabel("Music Tracks:");
-		
-		JScrollPane scrollPane_1 = new JScrollPane();
-
-    JTextArea textAreaMusicTrack = new JTextArea();
-    scrollPane_1.setViewportView(textAreaMusicTrack);
-    
-		JButton btnTry = new JButton("Refresh list");
-		btnTry.addActionListener(new ActionListener() {
-		  public void actionPerformed(ActionEvent e) {
-		    // set music track name on main panel
-		    String str = "";
-		    for(MusicTrack mt: musicTracks) {
-          str += mt.toString();
-        }
-		    textAreaMusicTrack.setText(str);
-		  }
-		});
-		
-		JButton btnSubmit = new JButton("Submit");
-		btnSubmit.addActionListener(new ActionListener() {
-		  public void actionPerformed(ActionEvent e) {
-		    String albumName = null, producer = null;
-        int year = -1;
-        
-        // check all fields are filled in or not
-        if (insAlbumTx.getText().equals("") || insYearTx.getText().equals("") || insProducerTx.getText().equals("")) {
-          // show error - mandatory fields
-          System.out.println("fill in all mandatory fields and in correct format");
-          JOptionPane.showMessageDialog(null, "fill in all mandatory fields and in correct format", "Insert music - wrong format", JOptionPane.ERROR_MESSAGE);
-        } else if (checkHelper.checkIfNumerical(insYearTx) <= 0) {
-          System.out.println("fill in the year in correct format (year > 0)");
-          JOptionPane.showMessageDialog(null, "fill in the year in correct range", "Insert music - wrong range", JOptionPane.ERROR_MESSAGE);
-        } else if (musicTracks.isEmpty()) {
-          JOptionPane.showMessageDialog(null, "You should have at least one music track", "Insert music - no music track", JOptionPane.ERROR_MESSAGE);
-        } else {
-          // get the string values
-          albumName = insAlbumTx.getText();
-          year = Integer.parseInt(insYearTx.getText());
-          producer = insProducerTx.getText();
-          if (!checkHelper.checkNameFormat(producer)) {
-            JOptionPane.showMessageDialog(null, "fill in the producer name in correct format", "Insert music - wrong name format", JOptionPane.ERROR_MESSAGE);
-          } else {
-          
-            // check if the music album exist in Music, insert if not
-            if (!checkHelper.albumExist(albumName)) {
-              // insert music
-              boolean success = TransactionHelper.insertMusicTransaction(albumName, year, producer, musicTracks);
-              if (success) {
-                JOptionPane.showMessageDialog(null, "Music inserted.", "Insert music - success", JOptionPane.INFORMATION_MESSAGE);
-              } else {
-                JOptionPane.showMessageDialog(null, "Music insertion fail due to unexpected error", "Insert music - error", JOptionPane.ERROR_MESSAGE);
-              }
-            } else {
-  //            System.out.println("music track of that album already existed.");
-              JOptionPane.showMessageDialog(null, "This music track of that album already existed", "Insert music - already existed", JOptionPane.ERROR_MESSAGE);
-            }
-          }
-        }
-		  }
-		});
-		
-		JLabel lblProducer_1 = new JLabel("Producer:");
-		
-		insProducerTx = new JTextField();
-		insProducerTx.setColumns(10);
-		
-		insAlbumTx = new JTextField();
-		insAlbumTx.setColumns(10);
-		GroupLayout gl_insertAlbum2 = new GroupLayout(insertAlbum2);
-		gl_insertAlbum2.setHorizontalGroup(
-		  gl_insertAlbum2.createParallelGroup(Alignment.TRAILING)
-		    .addGroup(gl_insertAlbum2.createSequentialGroup()
-		      .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.LEADING)
-		        .addGroup(gl_insertAlbum2.createSequentialGroup()
-		          .addGap(52)
-		          .addComponent(label))
-		        .addGroup(gl_insertAlbum2.createSequentialGroup()
-		          .addGap(52)
-		          .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.LEADING)
-		            .addComponent(label_44)
-		            .addComponent(label_45)
-		            .addComponent(label_46)))
-		        .addGroup(gl_insertAlbum2.createSequentialGroup()
-		          .addGap(289)
-		          .addComponent(label_38)
-		          .addGap(39)
-		          .addComponent(textField_17, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
-		        .addGroup(gl_insertAlbum2.createSequentialGroup()
-		          .addGap(279)
-		          .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.LEADING, false)
-		            .addGroup(gl_insertAlbum2.createSequentialGroup()
-		              .addComponent(lblMusicTracks)
-		              .addGap(314))
-		            .addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 397, GroupLayout.PREFERRED_SIZE)
-		            .addGroup(gl_insertAlbum2.createSequentialGroup()
-		              .addComponent(button_2)
-		              .addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-		              .addComponent(btnTry))
-		            .addGroup(gl_insertAlbum2.createSequentialGroup()
-		              .addGap(319)
-		              .addComponent(btnSubmit))
-		            .addGroup(gl_insertAlbum2.createSequentialGroup()
-		              .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.LEADING, false)
-		                .addComponent(label_43, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-		                .addComponent(label_1)
-		                .addComponent(lblProducer_1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-		              .addPreferredGap(ComponentPlacement.UNRELATED)
-		              .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.LEADING)
-		                .addComponent(insAlbumTx, GroupLayout.PREFERRED_SIZE, 308, GroupLayout.PREFERRED_SIZE)
-		                .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.LEADING)
-		                  .addComponent(insProducerTx, GroupLayout.PREFERRED_SIZE, 308, GroupLayout.PREFERRED_SIZE)
-		                  .addComponent(insYearTx, GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)))))))
-		      .addGap(155))
-		);
-		gl_insertAlbum2.setVerticalGroup(
-		  gl_insertAlbum2.createParallelGroup(Alignment.LEADING)
-		    .addGroup(gl_insertAlbum2.createSequentialGroup()
-		      .addGap(38)
-		      .addComponent(label)
-		      .addGap(11)
-		      .addComponent(label_45)
-		      .addPreferredGap(ComponentPlacement.UNRELATED)
-		      .addComponent(label_44)
-		      .addPreferredGap(ComponentPlacement.UNRELATED)
-		      .addComponent(label_46)
-		      .addGap(22)
-		      .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.BASELINE)
-		        .addComponent(label_43)
-		        .addComponent(insAlbumTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		      .addPreferredGap(ComponentPlacement.UNRELATED)
-		      .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.BASELINE)
-		        .addComponent(label_1)
-		        .addComponent(insYearTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		      .addPreferredGap(ComponentPlacement.UNRELATED)
-		      .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.BASELINE)
-		        .addComponent(lblProducer_1)
-		        .addComponent(insProducerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		      .addGap(30)
-		      .addComponent(lblMusicTracks)
-		      .addGap(18)
-		      .addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 98, GroupLayout.PREFERRED_SIZE)
-		      .addGap(35)
-		      .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.BASELINE)
-		        .addComponent(button_2)
-		        .addComponent(btnTry))
-		      .addGap(86)
-		      .addComponent(btnSubmit)
-		      .addGap(49)
-		      .addGroup(gl_insertAlbum2.createParallelGroup(Alignment.LEADING)
-		        .addGroup(gl_insertAlbum2.createSequentialGroup()
-		          .addGap(376)
-		          .addComponent(label_38))
-		        .addGroup(gl_insertAlbum2.createSequentialGroup()
-		          .addGap(373)
-		          .addComponent(textField_17, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-		      .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-		);
-		
 		musicTracks = new ArrayList<MusicTrack>();
-		
-		insertAlbum2.setLayout(gl_insertAlbum2);
 		
 		JPanel AddMusicTrackPanel = new JPanel();
 		frame.getContentPane().add(AddMusicTrackPanel, "AddMusicTrackPanel");
@@ -1683,7 +1461,7 @@ public class MainFrame {
 		  gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
 		    .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
 		      .addGap(149)
-		      .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
+		      .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING, false)
 		        .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.TRAILING)
 		          .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
 		            .addComponent(button_3, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
@@ -1713,7 +1491,7 @@ public class MainFrame {
 		        .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
 		          .addComponent(label_4, GroupLayout.PREFERRED_SIZE, 73, GroupLayout.PREFERRED_SIZE)
 		          .addGap(22)
-		          .addComponent(insMusicTx, GroupLayout.PREFERRED_SIZE, 116, GroupLayout.PREFERRED_SIZE))
+		          .addComponent(insMusicTx))
 		        .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
 		          .addComponent(label_5, GroupLayout.PREFERRED_SIZE, 57, GroupLayout.PREFERRED_SIZE)
 		          .addGap(38)
@@ -1727,14 +1505,15 @@ public class MainFrame {
 		      .addContainerGap(566, Short.MAX_VALUE))
 		);
 		gl_AddMusicTrackPanel.setVerticalGroup(
-		  gl_AddMusicTrackPanel.createParallelGroup(Alignment.TRAILING)
-		    .addGroup(Alignment.LEADING, gl_AddMusicTrackPanel.createSequentialGroup()
-		      .addGap(57)
+		  gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
+		    .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
 		      .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
 		        .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
-		          .addGap(3)
+		          .addGap(60)
 		          .addComponent(label_4))
-		        .addComponent(insMusicTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		        .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
+		          .addGap(57)
+		          .addComponent(insMusicTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
 		      .addGap(18)
 		      .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
 		        .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
@@ -1794,20 +1573,17 @@ public class MainFrame {
     
     JLabel label_3 = new JLabel("Crews and casts");
     
-    textField_1 = new JTextField();
-    textField_1.setColumns(10);
+    insCastNameTx = new JTextField();
+    insCastNameTx.setColumns(10);
+
+    JLabel lblGotAward = new JLabel("got award:");
+    JCheckBox chckbxTickIfYes = new JCheckBox("Tick if yes");
     
     JButton button_4 = new JButton("Cancel");
-    button_4.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent arg0) {
-      }
-    });
     
     String[] movieCastRoles = {"director", "script writer", "cast", "producer",
         "composer", "editor", "costume designer"};
     
-    
-    ButtonGroup castRewardGroup = new ButtonGroup();
     
     JLabel lblName = new JLabel("Name:");
     
@@ -1822,12 +1598,9 @@ public class MainFrame {
     castGenderGroup.add(rdbtnMale);
     castGenderGroup.add(rdbtnFemale);
     
-    JLabel lblGotAward = new JLabel("got award:");
-    JCheckBox chckbxTickIfYes = new JCheckBox("Tick if yes");
-    
-    JList list = new JList(movieCastRoles);
-    list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    
+    JList insRoleTx = new JList(movieCastRoles);
+    insRoleTx.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
     GroupLayout gl_AddMovieCrewPanel = new GroupLayout(AddMovieCrewPanel);
     gl_AddMovieCrewPanel.setHorizontalGroup(
       gl_AddMovieCrewPanel.createParallelGroup(Alignment.LEADING)
@@ -1845,13 +1618,13 @@ public class MainFrame {
               .addComponent(rdbtnMale)
               .addGap(18)
               .addComponent(rdbtnFemale))
-            .addComponent(textField_1, GroupLayout.PREFERRED_SIZE, 224, GroupLayout.PREFERRED_SIZE)
+            .addComponent(insCastNameTx, GroupLayout.PREFERRED_SIZE, 224, GroupLayout.PREFERRED_SIZE)
             .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.TRAILING)
               .addGroup(gl_AddMovieCrewPanel.createSequentialGroup()
                 .addComponent(button, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
                 .addGap(48)
                 .addComponent(button_4, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE))
-              .addComponent(list, GroupLayout.PREFERRED_SIZE, 226, GroupLayout.PREFERRED_SIZE))
+              .addComponent(insRoleTx, GroupLayout.PREFERRED_SIZE, 226, GroupLayout.PREFERRED_SIZE))
             .addGroup(gl_AddMovieCrewPanel.createSequentialGroup()
               .addPreferredGap(ComponentPlacement.RELATED)
               .addComponent(chckbxTickIfYes)))
@@ -1865,11 +1638,11 @@ public class MainFrame {
           .addGap(16)
           .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.BASELINE)
             .addComponent(lblName)
-            .addComponent(textField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            .addComponent(insCastNameTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
           .addGap(18)
           .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.BASELINE)
             .addComponent(lblRole)
-            .addComponent(list, GroupLayout.PREFERRED_SIZE, 184, GroupLayout.PREFERRED_SIZE))
+            .addComponent(insRoleTx, GroupLayout.PREFERRED_SIZE, 184, GroupLayout.PREFERRED_SIZE))
           .addGap(18)
           .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.BASELINE)
             .addComponent(lblGender)
@@ -1915,6 +1688,8 @@ public class MainFrame {
         	// go to insert book page
         	  CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
         	  c.show(frame.getContentPane(), "insertAlbum2");
+        	  // clear the musicTrack list
+        	  musicTracks.clear();
           }
         });
 		mnInsert.add(mntmAlbum);
@@ -1922,9 +1697,13 @@ public class MainFrame {
 		JMenuItem mntmMovie = new JMenuItem("Movie");
 		mntmMovie.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent event) {
-      	// go to insert book page
-      	  CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
-      	  c.show(frame.getContentPane(), "insertMovie");
+          crews.clear();
+      	  for (String role: movieCastRoles) {
+            crews.put(role, new ArrayList<MovieCrew>());
+          }
+      	  // go to insert book page
+          CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
+          c.show(frame.getContentPane(), "insertMovie");
         }
       });
 		mnInsert.add(mntmMovie);
@@ -2252,18 +2031,6 @@ public class MainFrame {
 		insertauthor5.setText("");
 	}	
 	
-	private void clearInsertAlbum() {
-	  langTx.setText("");
-    musicNameTx.setText("");
-    yearTx.setText("");
-    albumNameTx.setText("");
-    ComposerTx.setText("");
-    producerTx.setText("");
-    songWriterTx.setText("");
-    arrangerTx.setText("");
-    singersTx.setText("");
-	}
-	
 	private void clearUpdateBook() {
 	  upBookTitleTx.setText("");
     upISBN.setText("");
@@ -2278,6 +2045,30 @@ public class MainFrame {
     upAuthorTx3.setText("");
     upAuthorTx4.setText("");
     upAuthorTx5.setText("");
+	}
+
+  private void clearInsertMusic() {
+    insAlbumTx.setText("");
+    insYearTx.setText("");
+    insProducerTx.setText("");
+    textAreaMusicTrack.setText("");
+    musicTracks.clear();
+  }
+  
+	private void clearInsertMovies() {
+	  textArea.setText("");
+	  textArea_1.setText("");
+	  movieNameTx.setText("");
+	  movieYearTx.setText("");
+	  // reset the list
+	  crews.clear();
+    for (String role: movieCastRoles) {
+      crews.put(role, new ArrayList<MovieCrew>());
+    }
+	}
+	
+	private void clearInsertMovieCrews() {
+	  
 	}
 	
 	
@@ -2441,6 +2232,45 @@ public class MainFrame {
 	    }
 	    return -1;
 	  }
+	  
+	  public static int insertNewPeople(MovieCrew crew) throws SQLException {
+      int nextID = SelectHelper.getNextPeopleID();
+      String first=null, mid=null, last = null;
+      String[] name = crew.getCrewName().split(" ");
+      if (nextID > 0) {
+        if (name.length == 2) {
+          first = name[0];
+          last = name[1];
+        } else if (name.length >= 3) {
+          first = name[0];
+          mid = name[1];
+          last = name[2];
+        } else {
+          // sth wrong
+          System.out.println("should be first + [mid] + last name");
+        }
+        if (name.length >= 2) {
+          // insert new author
+          String sql = "insert into PeopleInvolved values (?,?,?,?,?);";
+          try {
+            PreparedStatement preparedStatement;
+            preparedStatement = con.prepareStatement(sql);
+            preparedStatement.setInt(1, nextID);
+            preparedStatement.setString(2, first);
+            preparedStatement.setString(3, mid);
+            preparedStatement.setString(4, last);
+            preparedStatement.setBoolean(5, crew.getGender());
+            preparedStatement.executeUpdate();
+            System.out.println("added new people");
+            return nextID;
+          } catch (SQLException e) {
+            e.printStackTrace();
+          }
+        }
+      }
+      return -1;
+    }
+	  
 	  public static void insertAlbum(String albumName, int year, String musicName, String language, diskType diskType, String producer) throws SQLException {
 	     int producerID = SelectHelper.getPeopleID(producer);
 	     String sql = "insert into Music values (?,?,?,?,?,?);";
@@ -2489,47 +2319,49 @@ public class MainFrame {
 	   }
 	   
 //	   public static boolean insertAward(String movieName, int movieYear, Map<String, String> allCrewNameRole, List<String> castNameList) {
-	   public static void insertAward(String movieName, int movieYear, Map<String, List<String>> allCrewNameRole) throws SQLException {
+	   public static void insertAward(String movieName, int movieYear, Map<String, List<MovieCrew>> crews) throws SQLException {
 	     String sql = "insert ignore into award values (?,?,?,?);";
 	     PreparedStatement ps;
        ps = con.prepareStatement(sql);
        ps.setString(2, movieName);
        ps.setInt(3, movieYear);
-       ps.setInt(4, 0);
-       for (String name : allCrewNameRole.keySet()) {
-         // get id
-         ps.setInt(1, SelectHelper.getPeopleID(name));
-         ps.executeUpdate();
+       for (List<MovieCrew> list : crews.values()) {
+         for (MovieCrew crew: list) {
+           ps.setInt(1, crew.getPeopleID());
+           ps.setBoolean(4, crew.getAward());
+           ps.executeUpdate();
+         }
        }
 	   }
 	   
-	  public static void insertCrewMember(String movieName, int movieYear, Map<String, List<String>> allCrewNameRole) throws SQLException {
-	    String sql = "insert into CrewMember values (?,?,?,?);";
-	    Map<String,String> flags = new HashMap<String,String>();  
+	  public static void insertCrewMember(String movieName, int movieYear, Map<String, List<MovieCrew>> crews) throws SQLException {
+	    String sql = "insert into CrewMember values (?,?,?,?);";  
 	    PreparedStatement ps;
       ps = con.prepareStatement(sql);
       ps.setString(2, movieName);
       ps.setInt(3, movieYear);
-      for (String name : allCrewNameRole.keySet()) {
-        // get peopleID for people
-        ps.setInt(1, SelectHelper.getPeopleID(name));
-        // for each role the person has
-        for (String role: allCrewNameRole.get(name)) {
-          ps.setInt(4, SelectHelper.getRoleID(role));
+      for (List<MovieCrew> list : crews.values()) {
+        for (MovieCrew crew: list) {
+          // get peopleID for people
+          ps.setInt(1, crew.getPeopleID());
+          // for each role the person has 
+          ps.setInt(4, crew.getRoleID());
           ps.executeUpdate();
-          flags.put(role, name);
         }
-	    }
-      // check if all the roles have at least 1 people
-      if (flags.size() < 7) {
-        throw new SQLException();
       }
 	  }
-	   
 	}
 	
 	public static class checkHelper {
 	  
+	  public static boolean checkIfEmptyCrew(Map<String, List<MovieCrew>> crews) {
+	    for (List<MovieCrew> list : crews.values()) {
+	      if (list.isEmpty()) {
+	        return true;
+	      }
+	    }
+	    return false;
+	  }
 	  public static boolean checkNameFormat(String name) {
 	    String[] temp = name.split(" ");
       if ((temp.length < 2) || (temp.length>3)) {
@@ -3149,18 +2981,26 @@ public class MainFrame {
       return false;
 	  }
 	  
-	  public static boolean insertMovieTransaction(String movieName, int movieYear, Map<String, List<String>> allCrewNameRole) {
+	  public static boolean insertMovieTransaction(String movieName, int movieYear, Map<String, List<MovieCrew>> crews) {
       try {
 	      con.setAutoCommit(false);
-	       // insert movie if not exist
+	      // check if the people involved exist, insert if not
+	      for (List<MovieCrew> list: crews.values()) {
+	        for (MovieCrew crew: list) {
+	          if (SelectHelper.getPeopleID(crew.getCrewName()) < 0) {
+	            InserterHelper.insertNewPeople(crew);
+	          }
+	        }
+	      }
+	      // insert movie
 	      InserterHelper.insertMovie(movieName, movieYear);
 	      System.out.println("movie inserted");
 	      // insert crew into crewMember
-	      InserterHelper.insertCrewMember(movieName, movieYear, allCrewNameRole);
+	      InserterHelper.insertCrewMember(movieName, movieYear, crews);
 	      System.out.println("crewMember inserted");
         // insert award
-        InserterHelper.insertAward(movieName, movieYear, allCrewNameRole);
-        System.out.println("award inserted - default all no award");
+        InserterHelper.insertAward(movieName, movieYear, crews);
+        System.out.println("award inserted");
 	      con.commit();
 	      return true;
 	    } catch (SQLException e) {
@@ -3962,7 +3802,7 @@ public class MainFrame {
     private String name;
     private boolean gender, award;
     int roleid;
-    public MovieCrew(String name, boolean gender, boolean award, int roleid, int year) {
+    public MovieCrew(String name, boolean gender, boolean award, int roleid) {
       this.name = name;
       this.gender = gender;
       this.award = award;
@@ -3972,11 +3812,36 @@ public class MainFrame {
     public MovieCrew get() {
       return this;
     }
+    
+    public String getCrewName() {
+      return this.name;
+    }
+    
+    public boolean getGender() {
+      return this.gender;
+    }
+    
+    public boolean getAward() {
+      return this.award;
+    }
+    
+    public int getRoleID() {
+      return this.roleid;
+    }
+    
+    public int getPeopleID() {
+      return SelectHelper.getPeopleID(this.name);
+    }
+    
+    @Override
+    public String toString() {
+      return this.name + ' ' + this.roleid;
+    }
   }
 	
 	
 	 public class CreateFrameMovieCrew {
-	   public CreateFrameMovieCrew(HashMap<String, List<MovieCrew>> crews)
+	   public CreateFrameMovieCrew(Map<String, List<MovieCrew>> crews)
      {
        JFrame frame = new JFrame("Test2");
 	     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -3988,26 +3853,16 @@ public class MainFrame {
        }
        JPanel AddMovieCrewPanel = new JPanel();
        AddMovieCrewPanel.setOpaque(true);
-//       frame.getContentPane().add(AddMovieCrewPanel, "AddMovieCrewPanel2");
-       
-       JButton button = new JButton("Submit");
+//       frame.getContentPane().add(AddMovieCrewPanel, "AddMovieCrewPanel");
        
        JLabel label_3 = new JLabel("Crews and casts");
        
-       textField_1 = new JTextField();
-       textField_1.setColumns(10);
+       insCastNameTx = new JTextField();
+       insCastNameTx.setColumns(10);
        
-       JButton button_4 = new JButton("Cancel");
-       button_4.addActionListener(new ActionListener() {
-         public void actionPerformed(ActionEvent arg0) {
-         }
-       });
-       
-       String[] movieCastRoles = {"director", "script writer", "cast", "producer",
-           "composer", "editor", "costume designer"};
-       
-       
-//       ButtonGroup castRewardGroup = new ButtonGroup();
+       JList insRoleTx = new JList(movieCastRoles);
+       insRoleTx.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+       insRoleTx.setSelectedIndex(0);
        
        JLabel lblName = new JLabel("Name:");
        
@@ -4016,6 +3871,7 @@ public class MainFrame {
        JLabel lblGender = new JLabel("Gender:");
        
        JRadioButton rdbtnMale = new JRadioButton("male");
+       rdbtnMale.setSelected(true);
        JRadioButton rdbtnFemale = new JRadioButton("female");
        
        ButtonGroup castGenderGroup = new ButtonGroup();
@@ -4025,9 +3881,73 @@ public class MainFrame {
        JLabel lblGotAward = new JLabel("got award:");
        JCheckBox chckbxTickIfYes = new JCheckBox("Tick if yes");
        
-       JList list = new JList(movieCastRoles);
-       list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
        
+       JButton button = new JButton("Submit");
+       button.addActionListener(new ActionListener() {
+         public void actionPerformed(ActionEvent arg0) {
+        // validate all input fields
+           String name = insCastNameTx.getText();
+           boolean male = false; // 0 - female, 1 - male
+           boolean award = false; // 0 - no award, 1 - has award
+           boolean valid = true;
+           String role = "director";
+           if (insCastNameTx.getText().equals("")) {
+             JOptionPane.showMessageDialog(null, "fill in the name of the cast", "Insert movie cast - missing name", JOptionPane.ERROR_MESSAGE);
+           } else if (!checkHelper.checkNameFormat(name)) {
+             JOptionPane.showMessageDialog(null, "Please fill in the name in correct format", "Insert movie cast - wrong name format", JOptionPane.ERROR_MESSAGE);
+           } else {
+             // get all the inputs
+             role = insRoleTx.getSelectedValue().toString();
+             if (castGenderGroup.getSelection().toString().equalsIgnoreCase("male")) {
+               male = true;
+             }
+             if (chckbxTickIfYes.isSelected()) {
+               award = true;
+             }
+             
+             // check if the name is already in the current list with same role
+             ///... unique name so skip?
+
+             // check if there are still space for entering this people
+             for (String crewRole: crews.keySet()) {
+               if (crewRole.equalsIgnoreCase("cast")) {
+                 // check if there are already 10 people
+                 if (crews.get(crewRole).size() >= 10 && role.equalsIgnoreCase(crewRole)) {
+                   valid = false;
+                   JOptionPane.showMessageDialog(null, "You have already entered 10 Casts", "Insert movie crew - too many cast entered", JOptionPane.ERROR_MESSAGE);
+                   break;
+                 }
+               } else {
+                 // check if there are already 3 people
+                 if (crews.get(crewRole).size() >= 3 && role.equalsIgnoreCase(crewRole)) {
+                   valid = false;
+                   JOptionPane.showMessageDialog(null, "You have already entered 3 " + crewRole, "Insert movie crew - too many crews entered", JOptionPane.ERROR_MESSAGE);
+                   break;
+                 }
+               }
+             }
+             
+             if (valid) {
+               // make a new MovieCrew object
+               MovieCrew mc = new MovieCrew(name, male, award, SelectHelper.getRoleID(role));
+               crews.get(role).add(mc);
+               JOptionPane.showMessageDialog(null, "submitted", "Insert movie crew - submitted", JOptionPane.INFORMATION_MESSAGE);
+             }           
+           }
+         }
+       });
+       
+       JButton button_4 = new JButton("Cancel");
+       button_4.addActionListener(new ActionListener() {
+         public void actionPerformed(ActionEvent arg0) {
+           // clear fields
+           insCastNameTx.setText("");
+           chckbxTickIfYes.setSelected(false);
+         }
+       });
+       
+       
+           
        GroupLayout gl_AddMovieCrewPanel = new GroupLayout(AddMovieCrewPanel);
        gl_AddMovieCrewPanel.setHorizontalGroup(
          gl_AddMovieCrewPanel.createParallelGroup(Alignment.LEADING)
@@ -4045,13 +3965,13 @@ public class MainFrame {
                  .addComponent(rdbtnMale)
                  .addGap(18)
                  .addComponent(rdbtnFemale))
-               .addComponent(textField_1, GroupLayout.PREFERRED_SIZE, 224, GroupLayout.PREFERRED_SIZE)
+               .addComponent(insCastNameTx, GroupLayout.PREFERRED_SIZE, 224, GroupLayout.PREFERRED_SIZE)
                .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.TRAILING)
                  .addGroup(gl_AddMovieCrewPanel.createSequentialGroup()
                    .addComponent(button, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
                    .addGap(48)
                    .addComponent(button_4, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE))
-                 .addComponent(list, GroupLayout.PREFERRED_SIZE, 226, GroupLayout.PREFERRED_SIZE))
+                 .addComponent(insRoleTx, GroupLayout.PREFERRED_SIZE, 226, GroupLayout.PREFERRED_SIZE))
                .addGroup(gl_AddMovieCrewPanel.createSequentialGroup()
                  .addPreferredGap(ComponentPlacement.RELATED)
                  .addComponent(chckbxTickIfYes)))
@@ -4065,11 +3985,11 @@ public class MainFrame {
              .addGap(16)
              .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.BASELINE)
                .addComponent(lblName)
-               .addComponent(textField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+               .addComponent(insCastNameTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
              .addGap(18)
              .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.BASELINE)
                .addComponent(lblRole)
-               .addComponent(list, GroupLayout.PREFERRED_SIZE, 184, GroupLayout.PREFERRED_SIZE))
+               .addComponent(insRoleTx, GroupLayout.PREFERRED_SIZE, 184, GroupLayout.PREFERRED_SIZE))
              .addGap(18)
              .addGroup(gl_AddMovieCrewPanel.createParallelGroup(Alignment.BASELINE)
                .addComponent(lblGender)
@@ -4106,290 +4026,292 @@ public class MainFrame {
         private JTextField insSingerTx2;
         private JTextField insMusicTx;
         private JTextField insLangTx;
-        private JTextField insProducerTx;
         private JTextField insSongWriterTx;
         private JTextField insComposerTx;
         private JTextField insArrangerTx;
         private JTextField insSingerTx1;
         private ButtonGroup diskTypeTx;
         
-          public CreateFrame(List<MusicTrack> musicTracks)
+      public CreateFrame(List<MusicTrack> musicTracks)
+      {
+          JFrame frame = new JFrame("Test");
+          frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+          try 
           {
-              JFrame frame = new JFrame("Test");
-              frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-              try 
-              {
-                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-              } catch (Exception e) {
-                 e.printStackTrace();
-              }
-              JPanel AddMusicTrackPanel = new JPanel();
-              AddMusicTrackPanel.setOpaque(true);
+             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+          } catch (Exception e) {
+             e.printStackTrace();
+          }
+          JPanel AddMusicTrackPanel = new JPanel();
+          AddMusicTrackPanel.setOpaque(true);
+          
+          JButton button_3 = new JButton("Submit");
+          button_3.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+              String musicName = null, lang = null, arranger = null, composer = null, songWriter = null, singer1 = null, singer2 = null;
+              diskType type = diskType.AUDIOCD;
+              boolean valid = true;
               
-              JButton button_3 = new JButton("Submit");
-              button_3.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                  String musicName = null, lang = null, arranger = null, composer = null, songWriter = null, singer1 = null, singer2 = null;
-                  diskType type = diskType.AUDIOCD;
-                  boolean valid = true;
-                  
-                  // check all fields are filled in or not
-                  if (insMusicTx.getText().equals("")|| insLangTx.getText().equals("") ||
-                      insArrangerTx.getText().equals("") || insComposerTx.getText().equals("") || insSongWriterTx.getText().equals("") ||
-                      insSingerTx1.getText().equals("")) {
-                    // show error - mandatory fields
-                    System.out.println("fill in all mandatory fields and in correct format");
-                    JOptionPane.showMessageDialog(null, "fill in all mandatory fields and in correct format", "Insert music - wrong format", JOptionPane.ERROR_MESSAGE);
-                  } else {
-                    // get the string values
-                    musicName = insMusicTx.getText();
-                    lang = insLangTx.getText();
-                    arranger = insArrangerTx.getText();
-                    composer = insComposerTx.getText();
-                    songWriter = insSongWriterTx.getText();
-                    singer1 = insSingerTx1.getText();
-                    if (!insSingerTx2.getText().equals("")) {
-                      singer2 = insSingerTx2.getText();
-                      valid = (checkHelper.checkNameFormat(singer1) && checkHelper.checkNameFormat(singer2));
-                      if (singer2.equals(singer1)) {
-                        valid = false;
-                      }
-                    } else {
-                      valid = checkHelper.checkNameFormat(singer1);
-                    }
+              // check all fields are filled in or not
+              if (insMusicTx.getText().equals("")|| insLangTx.getText().equals("") ||
+                  insArrangerTx.getText().equals("") || insComposerTx.getText().equals("") || insSongWriterTx.getText().equals("") ||
+                  insSingerTx1.getText().equals("")) {
+                // show error - mandatory fields
+                System.out.println("fill in all mandatory fields and in correct format");
+                JOptionPane.showMessageDialog(null, "fill in all mandatory fields and in correct format", "Insert music - wrong format", JOptionPane.ERROR_MESSAGE);
+              } else {
+                // get the string values
+                musicName = insMusicTx.getText();
+                lang = insLangTx.getText();
+                arranger = insArrangerTx.getText();
+                composer = insComposerTx.getText();
+                songWriter = insSongWriterTx.getText();
+                singer1 = insSingerTx1.getText();
+                if (!insSingerTx2.getText().equals("")) {
+                  singer2 = insSingerTx2.getText();
+                  valid = (checkHelper.checkNameFormat(singer1) && checkHelper.checkNameFormat(singer2));
+                  if (singer2.equals(singer1)) {
+                    valid = false;
+                  }
+                } else {
+                  valid = checkHelper.checkNameFormat(singer1);
+                }
 
-                    
-                    
-                    // musicpeoples: key - roleTitle, value - peopleName
-                    Map<String, String> musicpeoples = new HashMap<String,String>();
-                    musicpeoples.put("songWriter", songWriter);
-                    musicpeoples.put("composer", composer);
-                    musicpeoples.put("arranger", arranger);
-                    
-                    // check if the names are valid name
-                    for (String name:musicpeoples.values()) {
-                      if (!checkHelper.checkNameFormat(name)) {
-                        valid = false;
-                        break;
-                      }
-                    }
-                    
-                    // get diskType
-                    String typeString = null;
-                    for (Enumeration<AbstractButton> buttons = diskTypeTx.getElements(); buttons.hasMoreElements();) {
-                      AbstractButton button = buttons.nextElement();
-                      if (button.isSelected()) {
-                        typeString = button.getText();
-                      }
-                    }
-                    for (diskType d : type.getIteration()) {
-                      if (d.getString().equalsIgnoreCase(typeString)) {
-                        type = d.getEnum();
-                      }
-                    }
-                    
-                 // check if the music track name already exist in the list
-                    for (MusicTrack mutrack: musicTracks) {
-                      String mName = mutrack.getMusicName();
-                      if (mName.equalsIgnoreCase(musicName)) {
-                        JOptionPane.showMessageDialog(null, "Music track name already entered", "Insert music - duplicated music name", JOptionPane.ERROR_MESSAGE);
-                        valid = false;
-                        break;
-                      }
-                    }
-                    
-                    if (valid) {
-                      // store as music track
-                      MusicTrack mt = new MusicTrack(musicName, lang, type, singer1, singer2, songWriter, composer, arranger);
-                      musicTracks.add(mt);
-                      JOptionPane.showMessageDialog(null, "submitted", "Insert music - submitted", JOptionPane.ERROR_MESSAGE);
-                      
-                      // TODO: clear fields
-                    } else {
-                      JOptionPane.showMessageDialog(null, "Some input are invalid", "Insert music - invalid name input", JOptionPane.ERROR_MESSAGE);
-                    }
+                
+                
+                // musicpeoples: key - roleTitle, value - peopleName
+                Map<String, String> musicpeoples = new HashMap<String,String>();
+                musicpeoples.put("songWriter", songWriter);
+                musicpeoples.put("composer", composer);
+                musicpeoples.put("arranger", arranger);
+                
+                // check if the names are valid name
+                for (String name:musicpeoples.values()) {
+                  if (!checkHelper.checkNameFormat(name)) {
+                    valid = false;
+                    break;
                   }
                 }
-              });
-              
-              JButton button_9 = new JButton("Cancel");
-              // TODO: clear fields
-              
-              JLabel label_2 = new JLabel("Singer 2:");
-              
-              insSingerTx2 = new JTextField();
-              insSingerTx2.setColumns(10);
-              
-              JLabel label_4 = new JLabel("Music name:");
-              
-              insMusicTx = new JTextField();
-              insMusicTx.setColumns(10);
-              
-              JLabel label_5 = new JLabel("language:");
-              
-              insLangTx = new JTextField();
-              insLangTx.setColumns(10);
-              
-              JLabel label_39 = new JLabel("Disk type:");
-              
-              
-              JRadioButton radioButton_cd = new JRadioButton("audioCD");
-              radioButton_cd.setSelected(true);
-              
-              JRadioButton radioButton_vinyl = new JRadioButton("vinyl");
+                
+                // get diskType
+                String typeString = null;
+                for (Enumeration<AbstractButton> buttons = diskTypeTx.getElements(); buttons.hasMoreElements();) {
+                  AbstractButton button = buttons.nextElement();
+                  if (button.isSelected()) {
+                    typeString = button.getText();
+                  }
+                }
+                for (diskType d : type.getIteration()) {
+                  if (d.getString().equalsIgnoreCase(typeString)) {
+                    type = d.getEnum();
+                  }
+                }
+                
+             // check if the music track name already exist in the list
+                for (MusicTrack mutrack: musicTracks) {
+                  String mName = mutrack.getMusicName();
+                  if (mName.equalsIgnoreCase(musicName)) {
+                    JOptionPane.showMessageDialog(null, "Music track name already entered", "Insert music - duplicated music name", JOptionPane.ERROR_MESSAGE);
+                    valid = false;
+                    break;
+                  }
+                }
+                
+                if (valid) {
+                  // store as music track
+                  MusicTrack mt = new MusicTrack(musicName, lang, type, singer1, singer2, songWriter, composer, arranger);
+                  musicTracks.add(mt);
+                  JOptionPane.showMessageDialog(null, "submitted", "Insert music - submitted", JOptionPane.INFORMATION_MESSAGE);
+                  
+                  // TODO: clear fields
+                  
+                } else {
+                  JOptionPane.showMessageDialog(null, "Some input are invalid", "Insert music - invalid name input", JOptionPane.ERROR_MESSAGE);
+                }
+              }
+            }
+          });
+          
+          JButton button_9 = new JButton("Cancel");
+          button_9.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+              clearInsertMusicTrack();
+            }
+          });
+          
+          JLabel label_2 = new JLabel("Singer 2:");
+          
+          insSingerTx2 = new JTextField();
+          insSingerTx2.setColumns(10);
+          
+          JLabel label_4 = new JLabel("Music name:");
+          
+          insMusicTx = new JTextField();
+          insMusicTx.setColumns(10);
+          
+          JLabel label_5 = new JLabel("language:");
+          
+          insLangTx = new JTextField();
+          insLangTx.setColumns(10);
+          
+          JLabel label_39 = new JLabel("Disk type:");
+          
+          
+          JRadioButton radioButton_cd = new JRadioButton("audioCD");
+          radioButton_cd.setSelected(true);
+          
+          JRadioButton radioButton_vinyl = new JRadioButton("vinyl");
 
-              diskTypeTx = new ButtonGroup();
-              diskTypeTx.add(radioButton_cd);
-              diskTypeTx.add(radioButton_vinyl);
-              
-              JLabel label_40 = new JLabel("Producer:");
-              
-              insProducerTx = new JTextField();
-              insProducerTx.setColumns(10);
-              
-              JLabel label_41 = new JLabel("Song writer:");
-              
-              insSongWriterTx = new JTextField();
-              insSongWriterTx.setColumns(10);
-              
-              JLabel label_42 = new JLabel("Composer:");
-              
-              insComposerTx = new JTextField();
-              insComposerTx.setColumns(10);
-              
-              JLabel label_47 = new JLabel("Singer 1:");
-              
-              JLabel label_48 = new JLabel("Arranger:");
-              
-              insArrangerTx = new JTextField();
-              insArrangerTx.setColumns(10);
-              
-              insSingerTx1 = new JTextField();
-              insSingerTx1.setColumns(10);
-              GroupLayout gl_AddMusicTrackPanel = new GroupLayout(AddMusicTrackPanel);
-              gl_AddMusicTrackPanel.setHorizontalGroup(
-                gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
-                  .addGap(0, 1098, Short.MAX_VALUE)
-                  .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
-                    .addGap(149)
-                    .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.TRAILING)
+          diskTypeTx = new ButtonGroup();
+          diskTypeTx.add(radioButton_cd);
+          diskTypeTx.add(radioButton_vinyl);
+          
+          JLabel label_40 = new JLabel("Producer:");
+          
+          JLabel label_41 = new JLabel("Song writer:");
+          
+          insSongWriterTx = new JTextField();
+          insSongWriterTx.setColumns(10);
+          
+          JLabel label_42 = new JLabel("Composer:");
+          
+          insComposerTx = new JTextField();
+          insComposerTx.setColumns(10);
+          
+          JLabel label_47 = new JLabel("Singer 1:");
+          
+          JLabel label_48 = new JLabel("Arranger:");
+          
+          insArrangerTx = new JTextField();
+          insArrangerTx.setColumns(10);
+          
+          insSingerTx1 = new JTextField();
+          insSingerTx1.setColumns(10);
+          GroupLayout gl_AddMusicTrackPanel = new GroupLayout(AddMusicTrackPanel);
+          gl_AddMusicTrackPanel.setHorizontalGroup(
+            gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
+              .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
+                .addGap(149)
+                .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING, false)
+                  .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.TRAILING)
+                    .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
+                      .addComponent(button_3, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
+                      .addGap(18)
+                      .addComponent(button_9, GroupLayout.PREFERRED_SIZE, 71, GroupLayout.PREFERRED_SIZE))
+                    .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING, false)
                       .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
-                        .addComponent(button_3, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
-                        .addGap(18)
-                        .addComponent(button_9, GroupLayout.PREFERRED_SIZE, 71, GroupLayout.PREFERRED_SIZE))
-                      .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING, false)
-                        .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
-                          .addComponent(label_2)
-                          .addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                          .addComponent(insSingerTx2, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
-                        .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
-                          .addComponent(label_4, GroupLayout.PREFERRED_SIZE, 73, GroupLayout.PREFERRED_SIZE)
-                          .addGap(22)
-                          .addComponent(insMusicTx, GroupLayout.PREFERRED_SIZE, 116, GroupLayout.PREFERRED_SIZE))
-                        .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
-                          .addComponent(label_5, GroupLayout.PREFERRED_SIZE, 57, GroupLayout.PREFERRED_SIZE)
-                          .addGap(38)
-                          .addComponent(insLangTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
-                        .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
-                          .addComponent(label_39)
-                          .addGap(39)
-                          .addComponent(radioButton_cd, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
-                          .addGap(64)
-                          .addComponent(radioButton_vinyl, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE))
-                        .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
-                          .addComponent(label_40)
-                          .addGap(39)
-                          .addComponent(insProducerTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
-                        .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
-                          .addComponent(label_41, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE)
-                          .addGap(23)
-                          .addComponent(insSongWriterTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
-                        .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
-                          .addComponent(label_42, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
-                          .addGap(32)
-                          .addComponent(insComposerTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
-                        .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
-                          .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.TRAILING, false)
-                            .addComponent(label_47, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(label_48, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                          .addGap(39)
-                          .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.TRAILING)
-                            .addComponent(insArrangerTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(insSingerTx1, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))))
-                    .addContainerGap(556, Short.MAX_VALUE))
-              );
-              gl_AddMusicTrackPanel.setVerticalGroup(
-                gl_AddMusicTrackPanel.createParallelGroup(Alignment.TRAILING)
-                  .addGap(0, 519, Short.MAX_VALUE)
+                        .addComponent(label_2)
+                        .addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(insSingerTx2, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+                      .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
+                        .addComponent(label_41, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE)
+                        .addGap(23)
+                        .addComponent(insSongWriterTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+                      .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
+                        .addComponent(label_42, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
+                        .addGap(32)
+                        .addComponent(insComposerTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+                      .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
+                        .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.TRAILING, false)
+                          .addComponent(label_47, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                          .addComponent(label_48))
+                        .addGap(39)
+                        .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.TRAILING)
+                          .addComponent(insArrangerTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
+                          .addComponent(insSingerTx1, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))))
+                  .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
+                    .addComponent(label_4, GroupLayout.PREFERRED_SIZE, 73, GroupLayout.PREFERRED_SIZE)
+                    .addGap(22)
+                    .addComponent(insMusicTx))
+                  .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
+                    .addComponent(label_5, GroupLayout.PREFERRED_SIZE, 57, GroupLayout.PREFERRED_SIZE)
+                    .addGap(38)
+                    .addComponent(insLangTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+                  .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
+                    .addComponent(label_39)
+                    .addGap(39)
+                    .addComponent(radioButton_cd, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
+                    .addGap(64)
+                    .addComponent(radioButton_vinyl, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(566, Short.MAX_VALUE))
+          );
+          gl_AddMusicTrackPanel.setVerticalGroup(
+            gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
+              .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
+                .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
+                  .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
+                    .addGap(60)
+                    .addComponent(label_4))
                   .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
                     .addGap(57)
-                    .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
-                      .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
-                        .addGap(3)
-                        .addComponent(label_4))
-                      .addComponent(insMusicTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                    .addGap(18)
-                    .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
-                      .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
-                        .addGap(6)
-                        .addComponent(label_5))
-                      .addComponent(insLangTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                    .addGap(18)
-                    .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
-                      .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
-                        .addGap(4)
-                        .addComponent(label_39))
-                      .addComponent(radioButton_cd)
-                      .addComponent(radioButton_vinyl))
-                    .addGap(18)
-                    .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
-                      .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
-                        .addGap(3)
-                        .addComponent(label_40))
-                      .addComponent(insProducerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                    .addGap(18)
-                    .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
-                      .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
-                        .addGap(3)
-                        .addComponent(label_41))
-                      .addComponent(insSongWriterTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                    .addGap(18)
-                    .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
-                      .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
-                        .addGap(3)
-                        .addComponent(label_42))
-                      .addComponent(insComposerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                    .addGap(18)
-                    .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
-                      .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
-                        .addGap(3)
-                        .addComponent(label_48))
-                      .addComponent(insArrangerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                    .addGap(18)
-                    .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
-                      .addComponent(insSingerTx1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                      .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
-                        .addGap(3)
-                        .addComponent(label_47)))
-                    .addGap(18)
-                    .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.BASELINE)
-                      .addComponent(label_2)
-                      .addComponent(insSingerTx2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                    .addGap(18)
-                    .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.BASELINE)
-                      .addComponent(button_3)
-                      .addComponent(button_9))
-                    .addContainerGap(74, Short.MAX_VALUE))
-              );
-              AddMusicTrackPanel.setLayout(gl_AddMusicTrackPanel);
-              
-            frame.getContentPane().add(BorderLayout.CENTER, AddMusicTrackPanel);
-            frame.pack();
-            frame.setLocationByPlatform(true);
-            frame.setVisible(true);
-            frame.setResizable(false);
-            
-          }
+                    .addComponent(insMusicTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                .addGap(18)
+                .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
+                  .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
+                    .addGap(6)
+                    .addComponent(label_5))
+                  .addComponent(insLangTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addGap(18)
+                .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
+                  .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
+                    .addGap(4)
+                    .addComponent(label_39))
+                  .addComponent(radioButton_cd)
+                  .addComponent(radioButton_vinyl))
+                .addGap(18)
+                .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
+                  .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
+                    .addGap(3)
+                    .addComponent(label_41))
+                  .addComponent(insSongWriterTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addGap(18)
+                .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
+                  .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
+                    .addGap(3)
+                    .addComponent(label_42))
+                  .addComponent(insComposerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addGap(18)
+                .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
+                  .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
+                    .addGap(3)
+                    .addComponent(label_48))
+                  .addComponent(insArrangerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addGap(18)
+                .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
+                  .addComponent(insSingerTx1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                  .addGroup(gl_AddMusicTrackPanel.createSequentialGroup()
+                    .addGap(3)
+                    .addComponent(label_47)))
+                .addGap(18)
+                .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.BASELINE)
+                  .addComponent(label_2)
+                  .addComponent(insSingerTx2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addGap(18)
+                .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.BASELINE)
+                  .addComponent(button_3)
+                  .addComponent(button_9))
+                .addContainerGap(366, Short.MAX_VALUE))
+          );
+          AddMusicTrackPanel.setLayout(gl_AddMusicTrackPanel);
+          
+        frame.getContentPane().add(BorderLayout.CENTER, AddMusicTrackPanel);
+        frame.pack();
+        frame.setLocationByPlatform(true);
+        frame.setVisible(true);
+        frame.setResizable(false);
+        
+      }
+
+      
+      private void clearInsertMusicTrack() {
+        insSingerTx1.setText("");
+        insSingerTx2.setText("");
+        insComposerTx.setText("");
+        insArrangerTx.setText("");
+        insMusicTx.setText("");
+        insLangTx.setText("");
+        insSongWriterTx.setText("");
+      }
       
   }
 }
