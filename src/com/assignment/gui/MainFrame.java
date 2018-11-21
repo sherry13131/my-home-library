@@ -1949,6 +1949,22 @@ public class MainFrame {
 		mnReport.add(mntmRMulti);
 		
 		JMenuItem mntmRAward = new JMenuItem("R7 - Award winning movies");
+		mntmRAward.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        ResultSet rs = null;
+        rs = ReportHelper.createR7Report();
+        try {
+          if (rs != null) {
+            JTable table;
+            table = new JTable(buildTableModel(rs));
+            // show views
+            JOptionPane.showMessageDialog(null, new JScrollPane(table), "Data Table Preview", JOptionPane.INFORMATION_MESSAGE);
+          }
+        } catch (SQLException e1) {
+          e1.printStackTrace();
+        }
+      }
+    });
 		mnReport.add(mntmRAward);
 		
 		JMenuItem mntmRMusic = new JMenuItem("R8 - Music with similar name");
@@ -3372,6 +3388,36 @@ public class MainFrame {
       return rs;
     }
 	  
+	  public static ResultSet createR7Report() {
+	    // create a view if not exist yet
+	    boolean exist = checkIfTableExist("movieWithAward"), exist2 = checkIfTableExist("movieCrew");;
+	    boolean success = true, success2 = true;
+	    ResultSet rs = null;
+	    if (!exist) {
+	      success = CreateViewHelper.createViewForR7MovieAward();
+	    }
+	    if (!exist2) {
+	      success = CreateViewHelper.createViewForR7MovieCrew();
+	    }
+	    // execute query if view exist
+	    if (success && success2) {
+	      String sql = "select cm.moviename, mc.director_name, mwa.numAward " + 
+	          "from movieWithAward mwa, crewmember cm, movieCrew mc " + 
+	          "where mwa.moviename = cm.moviename and mc.peopleInvolved_id = cm.peopleinvolved_id " + 
+	          "and mc.description = 'director' " + 
+	          "group by mc.director_name, moviename " + 
+	          "order by mc.familyname;";
+	      Statement statement;
+        try {
+          statement = con.createStatement();
+          rs = statement.executeQuery(sql);
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
+      }
+      return rs;
+	  }
+	  
 	  public static ResultSet createR8Report() {
       // create a view if not exist yet
       boolean exist = checkIfTableExist("musicNameDupNum");
@@ -3579,6 +3625,42 @@ public class MainFrame {
       }
       return false;
     }
+	  
+	  public static boolean createViewForR7MovieAward() {
+	    String sql = "create view movieWithAward as " + 
+	        "select moviename, sum(award) numAward " + 
+	        "from award " + 
+	        "group by moviename " + 
+	        "having numAward > 0;";
+      Statement statement;
+      try {
+        statement = con.createStatement();
+        statement.executeUpdate(sql);
+        return true;
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return false;
+	  }
+	  
+	  public static boolean createViewForR7MovieCrew() {
+	    String sql = "create view movieCrew as " + 
+	        "select cm.PeopleInvolved_ID, r.description, CASE WHEN ISNULL(p.MiddleName)  " + 
+	        "THEN concat(p.firstName, ' ', p.familyname) " + 
+	        "ELSE concat(p.firstName, ' ',p.middlename, ' ', p.familyname) " + 
+	        "END 'Director_name', p.familyname " + 
+	        "from crewmember cm, role r, peopleinvolved p " + 
+	        "where cm.Role_ID = r.id and cm.peopleinvolved_id = p.id;";
+      Statement statement;
+      try {
+        statement = con.createStatement();
+        statement.executeUpdate(sql);
+        return true;
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return false;
+	  }
 	  
 	  public static boolean createViewForR8() {
       String sql = "create view musicNameDupNum as " + 
