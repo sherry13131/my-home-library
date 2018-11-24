@@ -283,7 +283,6 @@ public class MainFrame {
 					  JOptionPane.showMessageDialog(null, "Please fill in with correct range", "Insert book - wrong format on range", JOptionPane.ERROR_MESSAGE);
 					} else if (bookExist) {
 						// error - book isbn duplicated
-						System.out.println("ISBN already exist in the database");
 						JOptionPane.showMessageDialog(null, "This book has already exist in the database", "Insert book - book existed", JOptionPane.ERROR_MESSAGE);
 					} else {
 						
@@ -525,10 +524,8 @@ public class MainFrame {
         // check all fields are filled in or not
         if (insAlbumTx.getText().equals("") || insYearTx.getText().equals("") || insProducerTx.getText().equals("")) {
           // show error - mandatory fields
-          System.out.println("fill in all mandatory fields and in correct format");
           JOptionPane.showMessageDialog(null, "fill in all mandatory fields and in correct format", "Insert music - wrong format", JOptionPane.ERROR_MESSAGE);
         } else if (checkHelper.checkIfNumerical(insYearTx) <= 0) {
-          System.out.println("fill in the year in correct format (year > 0)");
           JOptionPane.showMessageDialog(null, "fill in the year in correct range", "Insert music - wrong range", JOptionPane.ERROR_MESSAGE);
         } else if (musicTracks.isEmpty()) {
           JOptionPane.showMessageDialog(null, "You should have at least one music track", "Insert music - no music track", JOptionPane.ERROR_MESSAGE);
@@ -551,7 +548,6 @@ public class MainFrame {
                 JOptionPane.showMessageDialog(null, "Music insertion fail due to unexpected error", "Insert music - error", JOptionPane.ERROR_MESSAGE);
               }
             } else {
-  //            System.out.println("music track of that album already existed.");
               JOptionPane.showMessageDialog(null, "This music track of that album already existed", "Insert music - already existed", JOptionPane.ERROR_MESSAGE);
             }
           }
@@ -891,7 +887,7 @@ public class MainFrame {
 		btnNewButton_3.addActionListener(new ActionListener() {
 		  public void actionPerformed(ActionEvent arg0) {
 		    // get validate input
-		    // check if 
+		    // check if all the mandatory fields are filled in
 		  }
 		});
 		
@@ -1338,7 +1334,7 @@ public class MainFrame {
 		    // validate input fields
 		    String name = searchNameTx.getText();
 		    if (name.equals("") || checkHelper.checkIfNumerical(searchYearTx) < 0) {
-		      System.out.println("please enter valid information");
+		      JOptionPane.showMessageDialog(null, "please enter valid information", "View - wrong infomation", JOptionPane.ERROR_MESSAGE);
 		    } else {
 		      int year = Integer.parseInt(searchYearTx.getText());
 		      ResultSet rs = null;
@@ -1768,7 +1764,6 @@ public class MainFrame {
               try {
                 if (bookKeyword != null) {
                   keywords = bookKeyword.getString("Tag");
-                  System.out.println(keywords);
                   while (bookKeyword.next()) {
                     keywords += "," + bookKeyword.getString("Tag");
                   }
@@ -2188,12 +2183,9 @@ public class MainFrame {
       for (String author : authors) {
         pplID = SelectHelper.getPeopleID(author);
         if (pplID == -1) {
-          // author not exist
-          System.out.println("author not exist");
           // add new author
           pplID = InserterHelper.insertNewPeople(author);
           if (pplID == -1) {
-            System.out.println("The author name "+author+" is not in a correct format. will not add to database.");
             continue;
           }
         }
@@ -2205,7 +2197,6 @@ public class MainFrame {
         count++;
       }
       if (count <= 0) {
-        System.out.println("Need to add at least one valid author");
         throw new SQLException();
       }
 	  }
@@ -2228,8 +2219,8 @@ public class MainFrame {
           nextKeyID = SelectHelper.getNextKeywordID();
           keyID = SelectHelper.getKeywordID(keyword);
           if (nextKeyID == -1) {
-            // sth wrong on getting next keyword id
             System.out.println("sth wrong - keyword");
+            throw new SQLException();
           } else if (keyID < 0){
             preparedStatement = con.prepareStatement(sql);
             preparedStatement.setInt(1, nextKeyID);
@@ -2254,9 +2245,6 @@ public class MainFrame {
 	        first = name[0];
 	        mid = name[1];
 	        last = name[2];
-	      } else {
-	        // sth wrong
-	        System.out.println("should be first + [mid] + last name");
 	      }
 	      if (name.length >= 2) {
 	        // insert new author
@@ -2270,7 +2258,6 @@ public class MainFrame {
 	          preparedStatement.setString(4, last);
 	          preparedStatement.setString(5, null);
 	          preparedStatement.executeUpdate();
-	          System.out.println("added new people");
 	          return nextID;
 	        } catch (SQLException e) {
 	          e.printStackTrace();
@@ -2292,9 +2279,6 @@ public class MainFrame {
           first = name[0];
           mid = name[1];
           last = name[2];
-        } else {
-          // sth wrong
-          System.out.println("should be first + [mid] + last name");
         }
         if (name.length >= 2) {
           // insert new author
@@ -2308,7 +2292,6 @@ public class MainFrame {
             preparedStatement.setString(4, last);
             preparedStatement.setBoolean(5, crew.getGender());
             preparedStatement.executeUpdate();
-            System.out.println("added new people");
             return nextID;
           } catch (SQLException e) {
             e.printStackTrace();
@@ -2999,13 +2982,10 @@ public class MainFrame {
         con.setAutoCommit(false);
         // insert book
         InserterHelper.insertBook(isbn, title, pub, pages, year, edition, bookabs);
-        System.out.println("book inserted");
         // insert authors
         InserterHelper.insertBookAuthor(isbn, authors);
-        System.out.println("book authors inserted");
         // insert keywords
         InserterHelper.insertKeyword(isbn, keywords);
-        System.out.println("book keywords inserted");
         con.commit();
         return true;
       } catch (SQLException e) {
@@ -3039,13 +3019,10 @@ public class MainFrame {
 	      }
 	      // insert movie
 	      InserterHelper.insertMovie(movieName, movieYear);
-	      System.out.println("movie inserted");
 	      // insert crew into crewMember
 	      InserterHelper.insertCrewMember(movieName, movieYear, crews);
-	      System.out.println("crewMember inserted");
         // insert award
         InserterHelper.insertAward(movieName, movieYear, crews);
-        System.out.println("award inserted");
 	      con.commit();
 	      return true;
 	    } catch (SQLException e) {
@@ -3077,12 +3054,9 @@ public class MainFrame {
              pplID = SelectHelper.getPeopleID(s);
              if (pplID == -1) {
                // author not exist
-               System.out.println("singer not exist");
                // add new author
                pplID = InserterHelper.insertNewPeople(s);
                if (pplID == -1) {
-                 System.out.println("The author name "+ s +" is not in a correct format. will not add to database.");
-                 // revert - remove 
                  break;
                }
              }
@@ -3092,12 +3066,9 @@ public class MainFrame {
              pplID = SelectHelper.getPeopleID(s);
              if (pplID == -1) {
                // author not exist
-               System.out.println("music cast not exist");
                // add new author
                pplID = InserterHelper.insertNewPeople(s);
                if (pplID == -1) {
-                 System.out.println("The music cast name "+ s +" is not in a correct format. will not add to database.");
-                 // revert - remove 
                  break;
                }
              }
@@ -3106,7 +3077,6 @@ public class MainFrame {
            pplID = SelectHelper.getPeopleID(producer);
            if (pplID == -1) {
              // producer not exist
-             System.out.println("producer not exist");
              // add new producer
              pplID = InserterHelper.insertNewPeople(producer);
              if (pplID == -1) {
@@ -3120,7 +3090,6 @@ public class MainFrame {
            Map<String, Integer> musicpeopleid = new HashMap<String, Integer>();
            musicpeopleid = mt.getCastIDHashMap();
            
-             System.out.println("here");
              // insert only if that piece of soundtrack is not in db
              // insert into Music table
              InserterHelper.insertAlbum(albumName, year, mt.getMusicName(), mt.getLanguage(), mt.getType(), producer);
@@ -3129,7 +3098,6 @@ public class MainFrame {
              for (int sid : mt.getSingerIDHashMap().values()) {
                // add the people is exist in peopleInvolved
                InserterHelper.insertMusicSinger(albumName, year, mt.getMusicName(), sid);
-               System.out.println("inserted music singer");
              }
              // insert into PeopleInvolvedMusic
              // check the role for each people
@@ -3157,7 +3125,6 @@ public class MainFrame {
                  }
                  // insert 
                  InserterHelper.insertMusicPeopleInvolved(albumName, year, mt.getMusicName(), ppl, sw, c, a);
-                 System.out.println("inserted music people involved " + ppl);
                  // reset the hashmap
                  temprole.clear();
                  sw = 0; c = 0; a= 0;
@@ -3504,9 +3471,12 @@ public class MainFrame {
       // create a view if not exist yet
       boolean exist = checkIfTableExist("lnameofbook");
       boolean success = true;
-      Map<String, String> viewNames = new HashMap<String, String>();//{"lnameofbook","lnameofmusic","lnameofmovie","distinctFamilyname"};
+      Map<String, String> viewNames = new HashMap<String, String>();
+      //{"lnameofbook","lnameofmusicsinger","lnameofmusiccrews","lnameofmusicallpeople","lnameofmovie","distinctFamilyname"};
       viewNames.put("lnameofbook", "b");
-      viewNames.put("lnameofmusic", "mu");
+      viewNames.put("lnameofmusicsinger", "mus");
+      viewNames.put("lnameofmusiccrews", "muc");
+      viewNames.put("lnameofmusicallpeople", "mup");
       viewNames.put("lnameofmovie", "mv");
       viewNames.put("distinctFamilyname", "d");
       ResultSet rs = null;
@@ -3516,8 +3486,10 @@ public class MainFrame {
           switch (viewNames.get(viewname)) {
             case "b":
               success = CreateViewHelper.createViewForR10Book();
-            case "mu":
-              success = CreateViewHelper.createViewForR10Music();
+            case "mus":
+              success = CreateViewHelper.createViewForR10MusicSinger();
+              success = CreateViewHelper.createViewForR10MusicCrews();
+              success = CreateViewHelper.createViewForR10MusicAllPeople();
             case "mv":
               success = CreateViewHelper.createViewForR10Movie();
             case "d":
@@ -3538,8 +3510,23 @@ public class MainFrame {
             "group by d.familyname " + 
             "union " + 
             "select d.familyname, 'singer' role " + 
-            "from distinctFamilyname d, musicsinger s, peopleinvolved p " + 
-            "where s.peopleinvolved_id = p.id and d.familyname = p.familyname " + 
+            "from distinctFamilyname d, lnameofmusicallpeople s, peopleinvolved p " + 
+            "where s.id = p.id and d.familyname = p.familyname and s.issinger = 1 " + 
+            "group by d.familyname " + 
+            "union " + 
+            "select d.familyname, 'arranger' role " + 
+            "from distinctFamilyname d, lnameofmusicallpeople s, peopleinvolved p " + 
+            "where s.id = p.id and d.familyname = p.familyname and s.isarranger = 1 " + 
+            "group by d.familyname " + 
+            "union " + 
+            "select d.familyname, 'composer' role " + 
+            "from distinctFamilyname d, lnameofmusicallpeople s, peopleinvolved p " + 
+            "where s.id = p.id and d.familyname = p.familyname and s.iscomposer = 1 " + 
+            "group by d.familyname " + 
+            "union " + 
+            "select d.familyname, 'song writer' role " + 
+            "from distinctFamilyname d, lnameofmusicallpeople s, peopleinvolved p " + 
+            "where s.id = p.id and d.familyname = p.familyname and s.issongwriter = 1 " + 
             "group by d.familyname " + 
             "union " + 
             "select d.familyname, r.description role " + 
@@ -3582,8 +3569,8 @@ public class MainFrame {
       }
       return false;
 	  }
-	  
-	  public static boolean createViewForViewPartSinger() {
+
+    public static boolean createViewForViewPartSinger() {
       String sql = "create view SingerView as " + 
           "select mu.albumName ProductName, mu.Year Year, 'M' Type, min(CASE WHEN ISNULL(p.MiddleName) " + 
           "THEN concat(p.firstName, ' ', p.familyname) " + 
@@ -3741,12 +3728,44 @@ public class MainFrame {
       return false;
 	  }
 	  
-	  public static boolean createViewForR10Music() {
-      String sql = "create view lnameofmusic as " + 
-          "select p.familyname, count(*) " + 
+	  public static boolean createViewForR10MusicSinger() {
+      String sql = "create view lnameofmusicsinger as " + 
+          "select p.id, p.familyname, 1 'IsSinger' " + 
           "from peopleinvolved p, musicsinger m " + 
-          "where p.id = m.peopleinvolved_id " + 
-          "group by p.familyname;";
+          "where p.id = m.peopleinvolved_id;";
+      Statement statement;
+      try {
+        statement = con.createStatement();
+        statement.executeUpdate(sql);
+        return true;
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return false;
+    }
+    
+    public static boolean createViewForR10MusicCrews() {
+      String sql = "create view lnameofmusiccrews as " + 
+          "select p.id, p.familyname, pm.IsArranger, pm.IsComposer, pm.IsSongwriter " + 
+          "from peopleinvolved p, peopleinvolvedmusic pm " + 
+          "where p.id = pm.peopleinvolved_id;";
+      Statement statement;
+      try {
+        statement = con.createStatement();
+        statement.executeUpdate(sql);
+        return true;
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return false;
+    }
+
+    public static boolean createViewForR10MusicAllPeople() {
+      String sql = "create view lnameofmusicallpeople as " + 
+          "select distinct p.id, p.familyname, p.IsSinger, pm.IsArranger, pm.IsComposer, pm.IsSongWriter " + 
+          "from lnameofmusicsinger p " + 
+          "left outer join lnameofmusiccrews pm " + 
+          "on p.id = pm.id;";
       Statement statement;
       try {
         statement = con.createStatement();
@@ -3776,12 +3795,12 @@ public class MainFrame {
     }
 	  
 	  public static boolean createViewForR10DistinctLname() {
-      String sql = "create view distinctFamilyname as " + 
-          "select distinct p.familyname " + 
-          "from peopleinvolved p " + 
-          "where (p.familyname in (select familyname from lnameofbook) and p.familyname in (select familyname from lnameofmusic)) " + 
-          "or (p.familyname in (select familyname from lnameofbook) and p.familyname in (select familyname from lnameofmovie)) " + 
-          "or (p.familyname in (select familyname from lnameofmusic) and p.familyname in (select familyname from lnameofmovie));";
+      String sql = "create view distinctFamilyname as\r\n" + 
+          "    select distinct p.familyname\r\n" + 
+          "    from peopleinvolved p\r\n" + 
+          "    where (p.familyname in (select familyname from lnameofbook) and p.familyname in (select familyname from lnameofmusicallpeople))\r\n" + 
+          "    or (p.familyname in (select familyname from lnameofbook) and p.familyname in (select familyname from lnameofmovie))\r\n" + 
+          "    or (p.familyname in (select familyname from lnameofmusicallpeople) and p.familyname in (select familyname from lnameofmovie));";
       Statement statement;
       try {
         statement = con.createStatement();
@@ -3954,7 +3973,7 @@ public class MainFrame {
 	 public class CreateFrameMovieCrew {
 	   public CreateFrameMovieCrew(Map<String, List<MovieCrew>> crews)
      {
-       JFrame frame = new JFrame("Test2");
+       JFrame frame = new JFrame("Add movie crews");
 	     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
        try 
        {
@@ -3964,7 +3983,6 @@ public class MainFrame {
        }
        JPanel AddMovieCrewPanel = new JPanel();
        AddMovieCrewPanel.setOpaque(true);
-//       frame.getContentPane().add(AddMovieCrewPanel, "AddMovieCrewPanel");
        
        JLabel label_3 = new JLabel("Crews and casts");
        
@@ -4227,8 +4245,6 @@ public class MainFrame {
                   
                   // TODO: clear fields
                   clearInsertMusicTrack();
-                } else {
-                  JOptionPane.showMessageDialog(null, "Some input are invalid", "Insert music - invalid name input", JOptionPane.ERROR_MESSAGE);
                 }
               }
             }
