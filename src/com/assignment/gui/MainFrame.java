@@ -18,6 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -90,12 +91,8 @@ public class MainFrame {
 	private JTextField insertauthor4;
 	private JTextField insertauthor3;
 	private JTextField insertauthor5;
-	private ButtonGroup diskTypeTx;
 	private JTextField movieYearTx;
 	private JTextField movieNameTx;
-	private JTextField upAlbumSearch;
-	private JTextField upMusicYearSearch;
-	private JTextField upMusicNameSearch;
 	private JTextField textField_30;
 	private JTextField textField_31;
 	private JTextField upBookYearTx;
@@ -111,15 +108,6 @@ public class MainFrame {
 	private JTextField upISBN;
 	private JTextField upPublisherTx;
 	private JTextField upPagesTx;
-	private JTextField upAlbumNameTx;
-	private JTextField upComposerTx;
-	private JTextField upMusicProducerTx;
-	private JTextField upSongWriterTx;
-	private JTextField upLangTx;
-	private JTextField upArrangerTx;
-	private JTextField upMusicYearTx;
-	private JTextField upMusicNameTx;
-	private JTextField upSingersTx;
 //	private JList<String> upTrackList = new JList<String>();
 	private Map<String, MusicTrack> tracks = new HashMap<String, MusicTrack>();
 	private JTextField searchNameTx;
@@ -505,7 +493,6 @@ public class MainFrame {
 		);
 		insertBook.setLayout(gl_insertBook);
     
-		diskTypeTx = new ButtonGroup();
 		
 		JPanel insertAlbum2 = new JPanel();
 		frame.getContentPane().add(insertAlbum2, "insertAlbum2");
@@ -1233,239 +1220,6 @@ public class MainFrame {
 		);
 		updateBook.setLayout(gl_updateBook);
 		
-		JPanel updateAlbumOld = new JPanel();
-		frame.getContentPane().add(updateAlbumOld, "updateAlbum");
-		
-		JButton btnSearchMusic = new JButton("Search Music");
-		
-		JLabel lblAlbumName_1 = new JLabel("Album name:");
-		
-		upAlbumSearch = new JTextField();
-		upAlbumSearch.setColumns(10);
-		
-		JLabel lblYear_1 = new JLabel("Year:");
-		
-		JLabel lblMusicName_1 = new JLabel("Music name:");
-		
-		upMusicYearSearch = new JTextField();
-		upMusicYearSearch.setColumns(10);
-		
-		upMusicNameSearch = new JTextField();
-		upMusicNameSearch.setColumns(10);
-		
-		JLabel label_12 = new JLabel("Year:");
-		
-		JLabel label_13 = new JLabel("Music name:");
-		
-		JLabel label_14 = new JLabel("language:");
-		
-		JLabel label_15 = new JLabel("Disk type:");
-		
-		JLabel label_16 = new JLabel("Producer:");
-		
-		JLabel label_17 = new JLabel("Song writer:");
-		
-		JLabel label_18 = new JLabel("Composer:");
-		
-		JLabel label_19 = new JLabel("Arranger:");
-		
-		JLabel label_20 = new JLabel("Singers:");
-		
-		JLabel label_21 = new JLabel("Album name:");
-		
-		upAlbumNameTx = new JTextField();
-		upAlbumNameTx.setColumns(10);
-		
-		upComposerTx = new JTextField();
-		upComposerTx.setColumns(10);
-		
-		upMusicProducerTx = new JTextField();
-		upMusicProducerTx.setColumns(10);
-		
-		upSongWriterTx = new JTextField();
-		upSongWriterTx.setColumns(10);
-		
-		upLangTx = new JTextField();
-		upLangTx.setColumns(10);
-		
-		upArrangerTx = new JTextField();
-		upArrangerTx.setColumns(10);
-		
-		upMusicYearTx = new JTextField();
-		upMusicYearTx.setColumns(10);
-		
-		upMusicNameTx = new JTextField();
-		upMusicNameTx.setColumns(10);
-		
-		upSingersTx = new JTextField();
-		upSingersTx.setColumns(10);
-		
-		JRadioButton upAudioCDBtn = new JRadioButton("audioCD");
-		upAudioCDBtn.setSelected(true);
-		
-		JRadioButton upVinylBtn = new JRadioButton("vinyl");
-		
-		JButton btnNewButton_1 = new JButton("Cancel");
-		
-		JButton btnNewButton_2 = new JButton("Update");
-		GroupLayout gl_updateAlbumOld = new GroupLayout(updateAlbumOld);
-		gl_updateAlbumOld.setHorizontalGroup(
-		  gl_updateAlbumOld.createParallelGroup(Alignment.LEADING)
-		    .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		      .addGroup(gl_updateAlbumOld.createParallelGroup(Alignment.LEADING)
-		        .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		          .addGap(108)
-		          .addGroup(gl_updateAlbumOld.createParallelGroup(Alignment.TRAILING)
-		            .addComponent(btnSearchMusic)
-		            .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		              .addGroup(gl_updateAlbumOld.createParallelGroup(Alignment.LEADING)
-		                .addComponent(lblMusicName_1)
-		                .addComponent(lblYear_1))
-		              .addGap(18)
-		              .addGroup(gl_updateAlbumOld.createParallelGroup(Alignment.LEADING)
-		                .addComponent(upMusicYearSearch, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)
-		                .addComponent(upMusicNameSearch, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)))
-		            .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		              .addComponent(lblAlbumName_1)
-		              .addGap(18)
-		              .addComponent(upAlbumSearch, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE))
-		            .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		              .addComponent(btnNewButton_2)
-		              .addGap(18)
-		              .addComponent(btnNewButton_1))))
-		        .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		          .addGap(171)
-		          .addGroup(gl_updateAlbumOld.createParallelGroup(Alignment.LEADING)
-		            .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		              .addComponent(label_21, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-		              .addGap(18)
-		              .addComponent(upAlbumNameTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
-		            .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		              .addComponent(label_12, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
-		              .addGap(64)
-		              .addComponent(upMusicYearTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
-		            .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		              .addComponent(label_13, GroupLayout.PREFERRED_SIZE, 73, GroupLayout.PREFERRED_SIZE)
-		              .addGap(22)
-		              .addComponent(upMusicNameTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
-		            .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		              .addComponent(label_14, GroupLayout.PREFERRED_SIZE, 57, GroupLayout.PREFERRED_SIZE)
-		              .addGap(38)
-		              .addComponent(upLangTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
-		            .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		              .addComponent(label_15)
-		              .addGap(39)
-		              .addComponent(upAudioCDBtn, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
-		              .addGap(64)
-		              .addComponent(upVinylBtn, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE))
-		            .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		              .addComponent(label_16)
-		              .addGap(39)
-		              .addComponent(upMusicProducerTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
-		            .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		              .addComponent(label_17, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE)
-		              .addGap(23)
-		              .addComponent(upSongWriterTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
-		            .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		              .addComponent(label_18, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
-		              .addGap(32)
-		              .addComponent(upComposerTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
-		            .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		              .addComponent(label_19)
-		              .addGap(39)
-		              .addComponent(upArrangerTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
-		            .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		              .addComponent(label_20, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
-		              .addGap(47)
-		              .addComponent(upSingersTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))))
-		      .addContainerGap(185, Short.MAX_VALUE))
-		);
-		gl_updateAlbumOld.setVerticalGroup(
-		  gl_updateAlbumOld.createParallelGroup(Alignment.LEADING)
-		    .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		      .addContainerGap()
-		      .addGroup(gl_updateAlbumOld.createParallelGroup(Alignment.BASELINE)
-		        .addComponent(lblAlbumName_1)
-		        .addComponent(upAlbumSearch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		      .addPreferredGap(ComponentPlacement.UNRELATED)
-		      .addGroup(gl_updateAlbumOld.createParallelGroup(Alignment.BASELINE)
-		        .addComponent(lblYear_1)
-		        .addComponent(upMusicYearSearch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		      .addGap(18)
-		      .addGroup(gl_updateAlbumOld.createParallelGroup(Alignment.BASELINE)
-		        .addComponent(lblMusicName_1)
-		        .addComponent(upMusicNameSearch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		      .addGap(18)
-		      .addComponent(btnSearchMusic)
-		      .addGap(18)
-		      .addGroup(gl_updateAlbumOld.createParallelGroup(Alignment.LEADING)
-		        .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		          .addGap(3)
-		          .addComponent(label_21))
-		        .addComponent(upAlbumNameTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		      .addGap(13)
-		      .addGroup(gl_updateAlbumOld.createParallelGroup(Alignment.LEADING)
-		        .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		          .addGap(3)
-		          .addComponent(label_12))
-		        .addComponent(upMusicYearTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		      .addGap(18)
-		      .addGroup(gl_updateAlbumOld.createParallelGroup(Alignment.LEADING)
-		        .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		          .addGap(3)
-		          .addComponent(label_13))
-		        .addComponent(upMusicNameTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		      .addGap(18)
-		      .addGroup(gl_updateAlbumOld.createParallelGroup(Alignment.LEADING)
-		        .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		          .addGap(6)
-		          .addComponent(label_14))
-		        .addComponent(upLangTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		      .addGap(18)
-		      .addGroup(gl_updateAlbumOld.createParallelGroup(Alignment.LEADING)
-		        .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		          .addGap(4)
-		          .addComponent(label_15))
-		        .addComponent(upAudioCDBtn)
-		        .addComponent(upVinylBtn))
-		      .addGap(18)
-		      .addGroup(gl_updateAlbumOld.createParallelGroup(Alignment.LEADING)
-		        .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		          .addGap(3)
-		          .addComponent(label_16))
-		        .addComponent(upMusicProducerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		      .addGap(18)
-		      .addGroup(gl_updateAlbumOld.createParallelGroup(Alignment.LEADING)
-		        .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		          .addGap(3)
-		          .addComponent(label_17))
-		        .addComponent(upSongWriterTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		      .addGap(18)
-		      .addGroup(gl_updateAlbumOld.createParallelGroup(Alignment.LEADING)
-		        .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		          .addGap(3)
-		          .addComponent(label_18))
-		        .addComponent(upComposerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		      .addGap(18)
-		      .addGroup(gl_updateAlbumOld.createParallelGroup(Alignment.LEADING)
-		        .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		          .addGap(3)
-		          .addComponent(label_19))
-		        .addComponent(upArrangerTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		      .addGap(18)
-		      .addGroup(gl_updateAlbumOld.createParallelGroup(Alignment.LEADING)
-		        .addGroup(gl_updateAlbumOld.createSequentialGroup()
-		          .addGap(3)
-		          .addComponent(label_20))
-		        .addComponent(upSingersTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		      .addPreferredGap(ComponentPlacement.UNRELATED)
-		      .addGroup(gl_updateAlbumOld.createParallelGroup(Alignment.BASELINE)
-		        .addComponent(btnNewButton_1)
-		        .addComponent(btnNewButton_2))
-		      .addContainerGap(27, Short.MAX_VALUE))
-		);
-		updateAlbumOld.setLayout(gl_updateAlbumOld);
-		
 		JPanel updateMovie = new JPanel();
 		frame.getContentPane().add(updateMovie, "updateMovie");
 		
@@ -1740,7 +1494,7 @@ public class MainFrame {
 		          .addComponent(radioButton_cd, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
 		          .addGap(64)
 		          .addComponent(radioButton_vinyl, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)))
-		      .addContainerGap(566, Short.MAX_VALUE))
+		      .addContainerGap(325, Short.MAX_VALUE))
 		);
 		gl_AddMusicTrackPanel.setVerticalGroup(
 		  gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
@@ -1797,7 +1551,7 @@ public class MainFrame {
 		      .addGroup(gl_AddMusicTrackPanel.createParallelGroup(Alignment.BASELINE)
 		        .addComponent(button_3)
 		        .addComponent(button_9))
-		      .addContainerGap(366, Short.MAX_VALUE))
+		      .addContainerGap(224, Short.MAX_VALUE))
 		);
 		AddMusicTrackPanel.setLayout(gl_AddMusicTrackPanel);
 		
@@ -1942,6 +1696,89 @@ public class MainFrame {
     JButton button_6 = new JButton("Cancel");
     
     JButton button_7 = new JButton("Submit");
+    button_7.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        String albumName = null, producer = null;
+        int year = -1;
+        
+        // check all fields are filled in or not
+        if (upAlbumTx.getText().equals("") || upYearTx.getText().equals("") || upProducerTx.getText().equals("")) {
+          // show error - mandatory fields
+          JOptionPane.showMessageDialog(null, "fill in all mandatory fields and in correct format", "Update music - wrong format", JOptionPane.ERROR_MESSAGE);
+        } else if (checkHelper.checkIfNumerical(upYearTx) <= 0) {
+          JOptionPane.showMessageDialog(null, "fill in the year in correct range", "Update music - wrong range", JOptionPane.ERROR_MESSAGE);
+        } else if (tracks.isEmpty()) {
+          JOptionPane.showMessageDialog(null, "You should have at least one music track", "Update music - no music track", JOptionPane.ERROR_MESSAGE);
+        } else {
+          // get the string values
+          albumName = upAlbumTx.getText();
+          year = Integer.parseInt(upYearTx.getText());
+          producer = upProducerTx.getText();
+          if (!checkHelper.checkNameFormat(producer)) {
+            JOptionPane.showMessageDialog(null, "fill in the producer name in correct format", "Update music - wrong name format", JOptionPane.ERROR_MESSAGE);
+          } else {
+            String newName = albumName, newProducer = producer;
+            int newYear = year;
+            boolean changedn = false, changedy = false, changedp = false;
+            String oldAlbumName = oldAlbum.getAlbumName();
+            int oldYear = oldAlbum.getYear();
+            // check if the album name the same
+            if (!oldAlbum.compareAlbumName(albumName)) {
+              // check if the music album exist in Music
+              if (!checkHelper.albumExist(albumName)) {
+                // update the album name for all music tracks
+                changedn = true;
+              } else {
+                JOptionPane.showMessageDialog(null, "This album name already existed", "Update album name - already existed", JOptionPane.ERROR_MESSAGE);
+              }
+            }
+            // check if the year the same
+            if (!oldAlbum.compareYear(year)) {
+              changedy = true;
+            }
+            // check if the producer the same
+            if (!oldAlbum.compareProducer(producer)) {
+              changedp = true;
+              // update
+            }
+
+            try {
+              con.setAutoCommit(false);
+              if (changedp) {
+                // only update the producer in table music
+                UpdateHelper.updateMusicProducer(albumName, producer);
+              } else if (changedn) {
+                // update all the music track for this album
+                // insert music tracks with new album data
+                for (MusicTrack t : tracks.values()) {
+                  InserterHelper.insertAlbum(newName, newYear, t.musicName, t.language, t.type, newProducer);
+                  // update all the album name in 2 other tables
+                  UpdateHelper.updateAlbumNameSinger(oldAlbumName, oldYear, newName, newYear, t.musicName);
+                  UpdateHelper.updateAlbumNameCrew(oldAlbumName, oldYear, newName, newYear, t.musicName);
+                  // remove all the music track for old album
+                  DeleteHelper.removeMusic(oldAlbumName, t.musicName);
+                }
+              } //else if year changed......
+            } catch (SQLException e1) {
+              try {
+                con.rollback();
+              } catch (SQLException e2) {
+                e2.printStackTrace();
+              }
+              System.out.println("rollback");
+              e1.printStackTrace();
+            } finally {
+              try {
+                con.setAutoCommit(true);
+              } catch (SQLException e1) {
+                e1.printStackTrace();
+              }
+            }
+            
+          }
+        }
+      }
+    });
     
     JList upTrackList = new JList();
     upTrackList.addMouseListener(new MouseAdapter() {
@@ -1953,24 +1790,6 @@ public class MainFrame {
           String musicName = model.getElementAt(index);
           MusicTrack mt = tracks.get(musicName);
           CreateFrameMusicTrack createFrame = new CreateFrameMusicTrack(mt);
-          // set text fields
-          createFrame.insMusicTx.setText(mt.getMusicName());
-          createFrame.insLangTx.setText(mt.getLanguage());
-          System.out.println(mt.getType());
-          if (mt.getType().equals(diskType.AUDIOCD)) {
-            createFrame.diskTypeTx.setSelected(createFrame.model_cd, true);
-            System.out.println("cd");
-          } else {
-            createFrame.diskTypeTx.setSelected(createFrame.model_vinyl, true);
-            System.out.println("vinyl");
-          }
-          createFrame.insSongWriterTx.setText(mt.getSongWriter());
-          createFrame.insComposerTx.setText(mt.getComposer());
-          createFrame.insArrangerTx.setText(mt.getArranger());
-          createFrame.insSingerTx1.setText(mt.getSingers().get(0));
-          if (mt.getSingers().size() == 2) {
-            createFrame.insSingerTx2.setText(mt.getSingers().get(1));
-          }
         }
       
       }
@@ -2199,7 +2018,7 @@ public class MainFrame {
             albumName = name;
             
             String musicName = null, language = null;
-            diskType type = diskType.AUDIOCD;
+//            diskType type1;
             List<String> singers = new ArrayList<String>();
             Map<String, String> trackCrews = new HashMap<String, String>();
             try {
@@ -2214,14 +2033,14 @@ public class MainFrame {
                 // get language
                 language = tracksResult.getString("language");
                 // get disktype
-                type = checkHelper.checkDiskType(type, tracksResult.getString("diskType"));
+                diskType type1 = checkHelper.checkDiskType(tracksResult.getString("diskType"));
                 // get singers name
                 singers = SelectHelper.getSingersList(albumName, musicName);
                 // get crews name
                 trackCrews = SelectHelper.getTrackCrewName(name, tracksResult.getString("MusicName"));
                 
                 // make a new MusicTrack object
-                MusicTrack mt = new MusicTrack(musicName, language, type, singers.get(0), ((singers.size() == 2) ? singers.get(1) : null),
+                MusicTrack mt = new MusicTrack(musicName, language, ((type1 == diskType.AUDIOCD) ? diskType.AUDIOCD:diskType.VINYL), singers.get(0), ((singers.size() == 2) ? singers.get(1) : null),
                     trackCrews.get("songwriter"), trackCrews.get("composer"), trackCrews.get("arranger"));
                 // add it to an arraylist for showing in the JList
                 tracks.put(musicName, mt);
@@ -2601,7 +2420,7 @@ public class MainFrame {
         return 1;
       }
     };
-    public List<diskType> getIteration() {
+    public static List<diskType> getIteration() {
       List<diskType> diskTypes = new ArrayList<diskType>();
       for (diskType t : diskType.values()) {
         diskTypes.add(t.getEnum());
@@ -2828,6 +2647,21 @@ public class MainFrame {
 	      ps.executeUpdate();
 	   }
 	   
+	   public static void insertMusicSinger(String albumName, int year, String musicName, String sname) throws SQLException {
+	     String sql = "insert into MusicSinger values (?,?,?,?);";
+	     int id = SelectHelper.getPeopleID(sname);
+	     if (id < 0) {
+	       id = InserterHelper.insertNewPeople(sname);
+	     }
+	     PreparedStatement ps;
+       ps = con.prepareStatement(sql);
+       ps.setString(1, albumName);
+       ps.setInt(2, year);
+       ps.setString(3, musicName);
+       ps.setInt(4, id);
+       ps.executeUpdate();
+	   }
+	   
 	   public static void insertMusicPeopleInvolved(String albumName, int year, String musicName, int ppl, int sw, int c, int a) throws SQLException {
 	     String sql = "insert into PeopleInvolvedMusic values (?,?,?,?,?,?,?);";
 	     PreparedStatement ps;
@@ -2841,6 +2675,27 @@ public class MainFrame {
 	      ps.setInt(7, a);
 	      ps.executeUpdate();
 	   }
+	   
+	   public static void insertMusicPeopleInvolved(String albumName, int year, String musicName, String name, int sw, int c, int a) throws SQLException {
+       String sql = "insert into PeopleInvolvedMusic values (?,?,?,?,?,?,?);";
+       int id = SelectHelper.getPeopleID(name);
+       if (id < 0) {
+         id = InserterHelper.insertNewPeople(name);
+         if (id < 0) {
+           throw new SQLException();
+         }
+       }
+       PreparedStatement ps;
+        ps = con.prepareStatement(sql);
+        ps.setString(1, albumName);
+        ps.setInt(2, year);
+        ps.setString(3, musicName);
+        ps.setInt(4, id);
+        ps.setInt(5, sw);
+        ps.setInt(6, c);
+        ps.setInt(7, a);
+        ps.executeUpdate();
+     }
 	   
 	   public static void insertMovie(String movieName, int movieYear) throws SQLException {
 	     String sql = "insert into Movie values (?,?);";
@@ -3009,13 +2864,29 @@ public class MainFrame {
 	     return false;
 	   }
 	   
-	   public static diskType checkDiskType(diskType type, String typeString) {
-	     for (diskType d : type.getIteration()) {
+	   public static diskType checkDiskType(String typeString) {
+	     diskType type = null;
+	     for (diskType d : diskType.getIteration()) {
          if (d.getString().equalsIgnoreCase(typeString)) {
            type = d.getEnum();
          }
        }
 	     return type;
+	   }
+	   
+	   public static int checkNumRoleMusic(String albumName, String musicName, String name) {
+	     int id = SelectHelper.getPeopleID(name);
+	     int num = SelectHelper.getNumRoleMusic(albumName, musicName, name);
+	     return num;
+	   }
+	   
+	   public static boolean checkMusicCrewExist(String albumName, String musicName, String name) {
+	     int id = SelectHelper.getPeopleID(name);
+	     if (id < 0) {
+	       return false;
+	     }
+	     boolean exist = SelectHelper.checkMusicCastExist(albumName, musicName, name);
+	     return exist;
 	   }
 	}
 	
@@ -3105,6 +2976,16 @@ public class MainFrame {
         preparedStatement.executeUpdate();
 	    }
 	    
+	    public static void removeMusicSinger(String albumName, String musicName, String singer) throws SQLException {
+	      String sql = "delete from musicsinger where albumname = ? and musicname = ? and peopleinvolved_id = ?;";
+	      PreparedStatement preparedStatement;
+        preparedStatement = con.prepareStatement(sql);
+        preparedStatement.setString(1, albumName);
+        preparedStatement.setString(2, musicName);
+        preparedStatement.setInt(3, SelectHelper.getPeopleID(singer));
+        preparedStatement.executeUpdate();
+	    }
+	    
 	    public static void removeMusicPeopleInvolved(String albumName, String musicName) throws SQLException {
 	      String sql = "delete from PeopleInvolvedMusic where AlbumName = ? and MusicName = ?;";
         PreparedStatement preparedStatement;
@@ -3113,6 +2994,17 @@ public class MainFrame {
         preparedStatement.setString(2, musicName);
         preparedStatement.executeUpdate();
 	    }
+	    
+	    public static void removeMusicPeopleInvolved(String albumName, String musicName, String name) throws SQLException {
+        String sql = "delete from PeopleInvolvedMusic where AlbumName = ? and MusicName = ? and peopleinvolved_id = ?;";
+        int id = SelectHelper.getPeopleID(name);
+        PreparedStatement preparedStatement;
+        preparedStatement = con.prepareStatement(sql);
+        preparedStatement.setString(1, albumName);
+        preparedStatement.setString(2, musicName);
+        preparedStatement.setInt(3, id);
+        preparedStatement.executeUpdate();
+      }
 	  
 	    public static void removeMovie(String movieName) throws SQLException {
 	      String sql = "delete from Movie where movieName = ?;";
@@ -3172,6 +3064,110 @@ public class MainFrame {
     
 	  }
 	  
+	  public static void updateMusicTrackString(String newdata, String musicName, String category) throws SQLException {
+	    // use for musicname and language
+	    String sql = "Update music set " + " " + category + " = ? where musicName = ?;";
+	    PreparedStatement ps;
+      
+      ps = con.prepareStatement(sql);
+      ps.setString(1, newdata);
+      ps.setString(2, musicName);
+      ps.executeUpdate();
+	  }
+	  
+	  // use when music people already in that music track
+	  public static void updateMusicTrackCrewOn(String newdata, String musicName, String albumName, String role) throws SQLException {
+	    String sql = "Update peopleinvolvedmusic set " + role + " = 1 where peopleinvolved_id = ? and albumname = ? and musicname = ?;";
+	    PreparedStatement ps;
+      int id = SelectHelper.getPeopleID(newdata);
+      ps = con.prepareStatement(sql);
+      ps.setInt(1, id);
+      ps.setString(2, albumName);
+      ps.setString(3, musicName);
+      ps.executeUpdate();
+	  }
+	  
+	  public static void updateMusicTrackCrewOff(String newdata, String musicName, String albumName, String role) throws SQLException {
+      String sql = "Update peopleinvolvedmusic set " + role + " = 0 where peopleinvolved_id = ? and albumname = ? and musicname = ?;";
+      PreparedStatement ps;
+      int id = SelectHelper.getPeopleID(newdata);
+      ps = con.prepareStatement(sql);
+      ps.setInt(1, id);
+      ps.setString(2, albumName);
+      ps.setString(3, musicName);
+      ps.executeUpdate();
+    }
+	  
+	  public static void updateAllMusicName(String oldMusicName, String musicName, String lang, diskType t, Album album) throws SQLException {
+      String albumName = album.albumName;
+	    // insert the new music track
+	    InserterHelper.insertAlbum(albumName, album.year, musicName, lang, t, album.producer);
+	    // update other
+      UpdateHelper.updateMusicNameSinger(oldMusicName, musicName, albumName);
+      UpdateHelper.updateMusicNamePeople(oldMusicName, musicName, albumName);
+      // delete the old music track
+      DeleteHelper.removeMusic(albumName, oldMusicName);
+	  }
+	  
+	  public static void updateMusicNameSinger(String oldMusicName, String musicName, String albumName) throws SQLException {
+	    String sql = "update musicsinger set musicName = ? where albumName = ? and musicName = ?;";
+	    PreparedStatement ps;
+      ps = con.prepareStatement(sql);
+      ps.setString(1, musicName);
+      ps.setString(2, albumName);
+      ps.setString(3, oldMusicName);
+      ps.executeUpdate();
+	  }
+	  
+	  public static void updateMusicNamePeople(String oldMusicName, String musicName, String albumName) throws SQLException {
+      String sql = "update peopleinvolvedmusic set musicName = ? where albumName = ? and musicName = ?;";
+      PreparedStatement ps;
+      ps = con.prepareStatement(sql);
+      ps.setString(1, musicName);
+      ps.setString(2, albumName);
+      ps.setString(3, oldMusicName);
+      ps.executeUpdate();
+    }
+	  
+	  public static void updateMusicProducer(String albumName, String producer) throws SQLException {
+	    String sql = "update music set producer_id = ? where albumName = ?";
+	    int id = SelectHelper.getPeopleID(producer);
+	    if (id < 0) {
+	      id = InserterHelper.insertNewPeople(producer);
+	      if (id < 0) {
+	        throw new SQLException();
+	      }
+	    }
+	    PreparedStatement ps;
+      ps = con.prepareStatement(sql);
+      ps.setInt(1, id);
+      ps.setString(2, albumName);
+      ps.executeUpdate();
+	  }
+	  
+	  public static void updateAlbumNameSinger(String oldAlbumName, int oldYear, String newName, int newYear, String musicName) throws SQLException {
+	    String sql = "update musicsinger set albumname = ?, year = ? where albumname = ? and year = ? and musicname = ?";
+	    PreparedStatement ps;
+      ps = con.prepareStatement(sql);
+      ps.setString(1, newName);
+      ps.setInt(2, newYear);
+      ps.setString(3, oldAlbumName);
+      ps.setInt(4, oldYear);
+      ps.setString(5, musicName);
+      ps.executeUpdate();
+	  }
+	  
+	  public static void updateAlbumNameCrew(String oldAlbumName, int oldYear, String newName, int newYear, String musicName) throws SQLException {
+	    String sql = "update peopleinvolvedmusic set albumname = ?, year = ? where albumname = ? and year = ? and musicname = ?";
+      PreparedStatement ps;
+      ps = con.prepareStatement(sql);
+      ps.setString(1, newName);
+      ps.setInt(2, newYear);
+      ps.setString(3, oldAlbumName);
+      ps.setInt(4, oldYear);
+      ps.setString(5, musicName);
+      ps.executeUpdate();
+	  }
 	}
 
 	public static class SelectHelper {
@@ -3327,6 +3323,26 @@ public class MainFrame {
         e.printStackTrace();
       }
       return crews;
+    }
+    
+    public static int getNumRoleMusic(String albumName, String musicName, String name) {
+      String sql = "select (isarranger + issongwriter + iscomposer ) as num from peopleinvolvedmusic where"
+          + " albumName = ? and musicname = ? and peopleinvolved_id = ?;";
+      ResultSet rs = null;
+      int num = -1;
+      PreparedStatement ps;
+      try {
+        ps = con.prepareStatement(sql);
+        ps.setString(1, albumName);
+        ps.setString(2, musicName);
+        ps.setInt(3, SelectHelper.getPeopleID(name));
+        rs = ps.executeQuery();
+        rs.next();
+        num = rs.getInt("num");
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return num;
     }
     
     public static ResultSet getSingersRs(String albumName, String musicName) {
@@ -3595,6 +3611,32 @@ public class MainFrame {
          ps.setInt(2, year);
          ps.setString(3, musicName);
          ps.setInt(4, ppl);
+         rs = ps.executeQuery();
+         if (rs.next()) {
+           found = rs.getInt("count(*)");
+         }
+         if (found > 0) {
+           return true;
+         }
+       } catch (Exception e){
+         e.printStackTrace();
+       }
+       return false;
+     }
+     
+     public static boolean checkMusicCastExist(String albumName, String musicName, String name) {
+       String sql = "Select count(*) from PeopleInvolvedMusic " + 
+           "group by AlbumName, MusicName, PeopleInvolved_ID " + 
+           "having AlbumName = ? and MusicName = ? and PeopleInvolved_ID = ?;";
+       ResultSet rs = null;
+       int found = -1, id = -1;
+       PreparedStatement ps;
+       id = SelectHelper.getPeopleID(name);
+       try {
+         ps = con.prepareStatement(sql);
+         ps.setString(1, albumName);
+         ps.setString(2, musicName);
+         ps.setInt(3, id);
          rs = ps.executeQuery();
          if (rs.next()) {
            found = rs.getInt("count(*)");
@@ -4683,6 +4725,10 @@ public class MainFrame {
 	    return this.albumName;
 	  }
 	  
+	  public int getYear() {
+	    return this.year;
+	  }
+	  
 	  public boolean compareAlbumName(String newAlbum) {
 	    if(this.albumName.equalsIgnoreCase(newAlbum)) {
 	      return true;
@@ -4721,20 +4767,50 @@ public class MainFrame {
 	public static class MusicTrack {
 	  private String musicName, language, singer1, singer2, songWriter, composer, arranger;
 	  private diskType type;
-	  public MusicTrack(String musicName, String language, diskType type, String singer1, String singer2,
+	  public MusicTrack(String musicName, String language, diskType typet, String singer1, String singer2,
 	      String songWriter, String composer, String arranger) {
 	    this.musicName = musicName;
 	    this.language = language;
-	    this.type = type;
+	    this.type = typet;
 	    this.singer1 = singer1;
 	    this.singer2 = singer2;
 	    this.songWriter = songWriter;
 	    this.composer = composer;
 	    this.arranger = arranger;
+//	    System.out.println(this.type + " " + this.type.getString() + " xD");
 	  }
 	  
 	  public MusicTrack get() {
 	    return this;
+	  }
+	  
+	  public void setMusicName(String name) {
+	    this.musicName = name;
+	  }
+	  
+	  public void setLanguage(String lang) {
+	    this.language = lang;
+	  }
+	  
+	  public void setType(diskType t) {
+	    this.type = t;
+	  }
+	  
+	  public void setSingers(String s1, String s2) {
+	    this.singer1 = s1;
+	    this.singer2 = s2;	    
+	  }
+	  
+	  public void setComposer(String comp) {
+	    this.composer = comp;
+	  }
+	  
+	  public void setArranger (String arr) {
+	    this.arranger = arr;
+	  }
+	  
+	  public void setSongWriter(String sw) {
+	    this.songWriter = sw;
 	  }
 	  
 	  @Override
@@ -5120,7 +5196,7 @@ public class MainFrame {
           button_3.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
               String musicName = null, lang = null, arranger = null, composer = null, songWriter = null, singer1 = null, singer2 = null;
-              diskType type = diskType.AUDIOCD;
+              diskType type;
               boolean valid = true;
               
               // check all fields are filled in or not
@@ -5174,7 +5250,7 @@ public class MainFrame {
 //                    type = d.getEnum();
 //                  }
 //                }
-                type = checkHelper.checkDiskType(type, typeString);
+                type = checkHelper.checkDiskType(typeString);
                 System.out.println(type.getString());
                 
                 if (update) {
@@ -5197,7 +5273,8 @@ public class MainFrame {
                 
                 if (valid) {
                   // store as music track
-                  MusicTrack mt = new MusicTrack(musicName, lang, type, singer1, singer2, songWriter, composer, arranger);
+                  MusicTrack mt = new MusicTrack(musicName, lang, ((type == diskType.VINYL) ? diskType.VINYL : diskType.AUDIOCD), singer1, singer2, songWriter, composer, arranger);
+                  System.out.println(type + "yoyo");
                   if (update) {
                     model.addElement(musicName);
                     tracks.put(musicName, mt);
@@ -5404,6 +5481,7 @@ public class MainFrame {
             public void actionPerformed(ActionEvent e) {
               String musicName = null, lang = null, arranger = null, composer = null, songWriter = null, singer1 = null, singer2 = null;
               diskType type = diskType.AUDIOCD;
+              Set<String> singerSet = new HashSet<String>();
               boolean valid = true;
               
               // check all fields are filled in or not
@@ -5420,11 +5498,14 @@ public class MainFrame {
                 composer = insComposerTx.getText();
                 songWriter = insSongWriterTx.getText();
                 singer1 = insSingerTx1.getText();
+                singerSet.add(singer1);
                 if (!insSingerTx2.getText().equals("")) {
                   singer2 = insSingerTx2.getText();
+                  singerSet.add(singer2);
                   valid = (checkHelper.checkNameFormat(singer1) && checkHelper.checkNameFormat(singer2));
                   if (singer2.equals(singer1)) {
                     valid = false;
+                    singer2 = null;
                   }
                 } else {
                   valid = checkHelper.checkNameFormat(singer1);
@@ -5457,7 +5538,138 @@ public class MainFrame {
 //                    type = d.getEnum();
 //                  }
 //                }
-                type = checkHelper.checkDiskType(type, typeString);
+                type = checkHelper.checkDiskType(typeString);
+                
+                // if valid
+                if (valid) {
+                  try {
+                    con.setAutoCommit(false);
+
+                    if (!oldmt.compareMusicName(musicName)) {
+                      String oldMusicName = oldmt.getMusicName();
+                      UpdateHelper.updateAllMusicName(oldMusicName, musicName, lang, type, oldAlbum);
+                      oldmt.setMusicName(musicName);
+                      model.addElement(musicName);
+                      model.removeElement(oldMusicName);
+                      tracks.put(musicName, oldmt);
+                      tracks.remove(oldMusicName);
+                    }
+                    
+                    // check what fields are different and change values in object
+                    if (!oldmt.compareLanguage(lang)) {
+                      // update lang
+                      UpdateHelper.updateMusicTrackString(lang, musicName, "language");
+                      oldmt.setLanguage(lang);
+                    }
+                    
+                    if (!oldmt.compareArranger(arranger)) {
+                      // update arranger
+                      // check old arranger
+                      if (checkHelper.checkNumRoleMusic(oldAlbum.albumName, musicName, oldmt.getArranger()) == 1) {
+                        // delete
+                        DeleteHelper.removeMusicPeopleInvolved(oldAlbum.albumName, musicName, oldmt.getArranger());
+                      } else {
+                        // set off
+                        UpdateHelper.updateMusicTrackCrewOff(oldmt.getArranger(), musicName, oldAlbum.albumName, "isarranger");
+                      }
+                      // check new aranger
+                      if (checkHelper.checkMusicCrewExist(oldAlbum.albumName, musicName, arranger)) {
+                        // set on
+                        UpdateHelper.updateMusicTrackCrewOn(arranger, musicName, oldAlbum.albumName, "isarranger");
+                      } else {
+                        // add musicCrew and set on
+                        InserterHelper.insertMusicPeopleInvolved(oldAlbum.albumName, oldAlbum.year, musicName, arranger, 0, 0, 1);
+                      }
+                      oldmt.setArranger(arranger);
+//                      UpdateHelper.updateMusicTrackCrew(arranger, musicName, oldAlbum.getAlbumName(), "isarranger");
+                    }
+                    if(!oldmt.compareComposer(composer)) {
+                      
+                      // update composer
+                      // check old composer
+                      if (checkHelper.checkNumRoleMusic(oldAlbum.albumName, musicName, oldmt.getComposer()) == 1) {
+                        // delete
+                        DeleteHelper.removeMusicPeopleInvolved(oldAlbum.albumName, musicName, oldmt.getComposer());
+                      } else {
+                        // set off
+                        UpdateHelper.updateMusicTrackCrewOff(oldmt.getComposer(), musicName, oldAlbum.albumName, "iscomposer");
+                      }
+                      // check new composer
+                      if (checkHelper.checkMusicCrewExist(oldAlbum.albumName, musicName, composer)) {
+                        // set on
+                        UpdateHelper.updateMusicTrackCrewOn(composer, musicName, oldAlbum.albumName, "iscomposer");
+                      } else {
+                        // add musicCrew and set on
+                        InserterHelper.insertMusicPeopleInvolved(oldAlbum.albumName, oldAlbum.year, musicName, composer, 0, 1, 0);
+                      }
+                      oldmt.setComposer(composer);
+//                      UpdateHelper.updateMusicTrackCrew(composer, musicName, oldAlbum.getAlbumName(), "iscomposer");
+                    }
+                    if(!oldmt.compareSongWriter(songWriter)) {
+                      
+                      // update songWriter
+                      // check old songWriter
+                      if (checkHelper.checkNumRoleMusic(oldAlbum.albumName, musicName, oldmt.getSongWriter()) == 1) {
+                        // delete
+                        DeleteHelper.removeMusicPeopleInvolved(oldAlbum.albumName, musicName, oldmt.getSongWriter());
+                      } else {
+                        // set off
+                        UpdateHelper.updateMusicTrackCrewOff(oldmt.getSongWriter(), musicName, oldAlbum.albumName, "issongwriter");
+                      }
+                      // check new songWriter
+                      if (checkHelper.checkMusicCrewExist(oldAlbum.albumName, musicName, songWriter)) {
+                        // set on
+                        UpdateHelper.updateMusicTrackCrewOn(songWriter, musicName, oldAlbum.albumName, "issongwriter");
+                      } else {
+                        // add musicCrew and set on
+                        InserterHelper.insertMusicPeopleInvolved(oldAlbum.albumName, oldAlbum.year, musicName, songWriter, 1, 0, 0);
+                      }
+                      oldmt.setSongWriter(songWriter);
+//                      UpdateHelper.updateMusicTrackCrew(songWriter, musicName, oldAlbum.getAlbumName(), "issongwriter");
+                    }
+                    
+                    if(!oldmt.compareSingers(singerSet)) {
+                      List<String> dels = new ArrayList<String>();
+                      List<String> ins = new ArrayList<String>();
+    //                  UpdateHelper.updateMusicTrackString(singerSet, String musicName, "singers");
+                      if (!singerSet.contains(oldmt.singer1)) {
+                        // remove old s1
+                        dels.add(oldmt.singer1);
+                      }
+                      if (oldmt.singer2 != null && !singerSet.contains(oldmt.singer2)) {
+                        // remove old s2
+                        dels.add(oldmt.singer2); 
+                      }
+                      for (String s: dels) {
+                        DeleteHelper.removeMusicSinger(oldAlbum.albumName, musicName, s);
+                      }
+                      for (String s: singerSet) {
+                        if ((!s.equalsIgnoreCase(oldmt.singer1)) && (!s.equalsIgnoreCase(oldmt.singer2))) {
+                          // insert new s
+                          InserterHelper.insertMusicSinger(oldAlbum.albumName, oldAlbum.year, musicName, s);
+                        }
+                      }
+                      oldmt.setSingers(singer1, singer2);
+                    }
+                    
+                    JOptionPane.showMessageDialog(null, "Successfully update all this music tracks information.", "Update successfully", JOptionPane.INFORMATION_MESSAGE);
+                    frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+                  } catch (SQLException e1) {
+                    try {
+                      con.rollback();
+                    } catch (SQLException e2) {
+                      e2.printStackTrace();
+                    }
+                    System.out.println("rollback here");
+                    e1.printStackTrace();
+                  } finally {
+                    try {
+                      con.setAutoCommit(true);
+                    } catch (SQLException e1) {
+                      e1.printStackTrace();
+                    }
+                  }
+                }
                 
 //                if (update) {
 //                  // check if this music name appears in the model
@@ -5528,6 +5740,9 @@ public class MainFrame {
           diskTypeTx = new ButtonGroup();
           diskTypeTx.add(radioButton_cd);
           diskTypeTx.add(radioButton_vinyl);
+
+          model_cd = radioButton_cd.getModel();
+          model_vinyl = radioButton_vinyl.getModel();
           
           JLabel label_40 = new JLabel("Producer:");
           
@@ -5550,6 +5765,26 @@ public class MainFrame {
           
           insSingerTx1 = new JTextField();
           insSingerTx1.setColumns(10);
+          
+          // set text fields
+          insMusicTx.setText(oldmt.getMusicName());
+          insLangTx.setText(oldmt.getLanguage());
+          System.out.println(oldmt.getType());
+          if (oldmt.getType() == diskType.AUDIOCD) {
+            diskTypeTx.setSelected(model_cd, true);
+            System.out.println("cd");
+          } else {
+            diskTypeTx.setSelected(model_vinyl, true);
+            System.out.println("vinyl");
+          }
+          insSongWriterTx.setText(oldmt.getSongWriter());
+          insComposerTx.setText(oldmt.getComposer());
+          insArrangerTx.setText(oldmt.getArranger());
+          insSingerTx1.setText(oldmt.getSingers().get(0));
+          if (oldmt.getSingers().size() == 2) {
+            insSingerTx2.setText(oldmt.getSingers().get(1));
+          }
+          
           GroupLayout gl_AddMusicTrackPanel = new GroupLayout(AddMusicTrackPanel);
           gl_AddMusicTrackPanel.setHorizontalGroup(
             gl_AddMusicTrackPanel.createParallelGroup(Alignment.LEADING)
