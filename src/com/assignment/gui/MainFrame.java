@@ -1744,9 +1744,23 @@ public class MainFrame {
 
             try {
               con.setAutoCommit(false);
+              // if there are music tracks are added/deleted, do that
+//              if (newtracks)
               if (changedp) {
                 // only update the producer in table music
                 UpdateHelper.updateMusicProducer(albumName, producer);
+              }
+              if (changedn && changedy) {
+                // update all the music track for this album
+                // insert music tracks with new album data
+                for (MusicTrack t : tracks.values()) {
+                  InserterHelper.insertAlbum(newName, newYear, t.musicName, t.language, t.type, newProducer);
+                  // update all the album name in 2 other tables
+                  UpdateHelper.updateAlbumNameSinger(oldAlbumName, oldYear, newName, newYear, t.musicName);
+                  UpdateHelper.updateAlbumNameCrew(oldAlbumName, oldYear, newName, newYear, t.musicName);
+                  // remove all the music track for old album
+                  DeleteHelper.removeMusic(oldAlbumName, t.musicName);
+                }
               } else if (changedn) {
                 // update all the music track for this album
                 // insert music tracks with new album data
@@ -1758,7 +1772,19 @@ public class MainFrame {
                   // remove all the music track for old album
                   DeleteHelper.removeMusic(oldAlbumName, t.musicName);
                 }
-              } //else if year changed......
+              } else if (changedy){
+                for (MusicTrack t : tracks.values()) {
+                  InserterHelper.insertAlbum(newName, newYear, t.musicName, t.language, t.type, newProducer);
+                  // update all the album name in 2 other tables
+                  UpdateHelper.updateAlbumNameSinger(oldAlbumName, oldYear, newName, newYear, t.musicName);
+                  UpdateHelper.updateAlbumNameCrew(oldAlbumName, oldYear, newName, newYear, t.musicName);
+                  // remove all the music track for old album
+                  DeleteHelper.removeMusicByYear(oldAlbumName, oldYear, t.musicName);
+                }
+              }
+              JOptionPane.showMessageDialog(null, "Album has been updated", "Update album successfully", JOptionPane.INFORMATION_MESSAGE);
+              CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
+              c.show(frame.getContentPane(), "mainPage");
             } catch (SQLException e1) {
               try {
                 con.rollback();
@@ -2636,6 +2662,89 @@ public class MainFrame {
 	       ps.executeUpdate();
 	   }
 	   
+	   public static void insertMusicTrack(String musicName, Album album, MusicTrack mt) {
+	     try {
+        con.setAutoCommit(false);
+  	     int id = -1;
+  	     // insert music track
+  	     InserterHelper.insertAlbum(album.albumName, album.year, musicName, mt.language, mt.type, album.producer);
+  	     // insert singers
+  	     id = SelectHelper.getPeopleID(mt.singer1);
+  	     if (id < 0) {
+  	       id = InserterHelper.insertNewPeople(mt.singer1);
+  	       if (id < 0) {
+  	         throw new SQLException();
+  	       }
+  	     }
+  	     InserterHelper.insertMusicSinger(album.albumName, album.year, musicName, id);
+  	     if (mt.singer2 != null) {
+  	       id = SelectHelper.getPeopleID(mt.singer2);
+  	       if (id < 0) {
+  	         id = InserterHelper.insertNewPeople(mt.singer2);
+  	         if (id < 0) {
+  	           throw new SQLException();
+  	         }
+  	       }
+  	       InserterHelper.insertMusicSinger(album.albumName, album.year, musicName, id);
+  	     }
+  	     
+  	     // insert crews
+  //	     InserterHelper.insertMusicPeopleInvolved(albumName, year, musicName, ppl, sw, c, a);
+  	     
+  	     
+  	     Map<String, Integer> musicpeopleid = new HashMap<String, Integer>();
+         musicpeopleid = mt.getCastIDHashMap();
+         
+         // insert into PeopleInvolvedMusic
+           // check the role for each people
+  
+           Map<String, Integer> temprole = new HashMap<String, Integer>();
+           // for each people, serach their roles in music
+           for (int ppl : musicpeopleid.values()) {
+             // check if this people is inserted already
+             if (!SelectHelper.checkMusicCastExist(album.albumName, album.year, mt.getMusicName(), ppl)) {
+               for (String role : musicpeopleid.keySet()) {
+                 if (musicpeopleid.get(role).equals(ppl)) {
+                   temprole.put(role, ppl);
+                 }
+               }
+               // insert
+               int sw = 0, c=0, a=0;
+               if (temprole.containsKey("songWriter")) {
+                 sw = 1;
+               }
+               if (temprole.containsKey("composer")) {
+                 c = 1;
+               }
+               if (temprole.containsKey("arranger")) {
+                 a = 1;
+               }
+               // insert 
+               InserterHelper.insertMusicPeopleInvolved(album.albumName, album.year, mt.getMusicName(), ppl, sw, c, a);
+               // reset the hashmap
+               temprole.clear();
+               sw = 0; c = 0; a= 0;
+             }
+           }
+
+	      } catch (SQLException e) {
+	        try {
+            con.rollback();
+          } catch (SQLException e1) {
+            e1.printStackTrace();
+          }
+	        System.out.println("rollback ...");
+	        e.printStackTrace();
+	      } finally {
+	        try {
+            con.setAutoCommit(true);
+          } catch (SQLException e) {
+            e.printStackTrace();
+          }
+	      }
+         
+	   }
+	  
 	   public static void insertMusicSinger(String albumName, int year, String musicName, int id) throws SQLException {
 	     String sql = "insert into MusicSinger values (?,?,?,?);";
 	     PreparedStatement ps;
@@ -2964,6 +3073,16 @@ public class MainFrame {
         preparedStatement = con.prepareStatement(sql);
         preparedStatement.setString(1, albumName);
         preparedStatement.setString(2, musicName);
+        preparedStatement.executeUpdate();
+	    }
+	    
+	    public static void removeMusicByYear(String albumName, int oldYear, String musicName) throws SQLException {
+	      String sql = "delete from Music where AlbumName = ? and MusicName = ? and year = ?;";
+        PreparedStatement preparedStatement;
+        preparedStatement = con.prepareStatement(sql);
+        preparedStatement.setString(1, albumName);
+        preparedStatement.setString(2, musicName);
+        preparedStatement.setInt(3, oldYear);
         preparedStatement.executeUpdate();
 	    }
 	    
@@ -5274,8 +5393,9 @@ public class MainFrame {
                 if (valid) {
                   // store as music track
                   MusicTrack mt = new MusicTrack(musicName, lang, ((type == diskType.VINYL) ? diskType.VINYL : diskType.AUDIOCD), singer1, singer2, songWriter, composer, arranger);
-                  System.out.println(type + "yoyo");
                   if (update) {
+                    // insert new music track
+                    InserterHelper.insertMusicTrack(musicName, oldAlbum, mt);
                     model.addElement(musicName);
                     tracks.put(musicName, mt);
                   } else {
@@ -5670,38 +5790,7 @@ public class MainFrame {
                     }
                   }
                 }
-                
-//                if (update) {
-//                  // check if this music name appears in the model
-//                  if (model.contains(musicName)) {
-//                    JOptionPane.showMessageDialog(null, "Music track name already entered", "Insert music - duplicated music name", JOptionPane.ERROR_MESSAGE);
-//                    valid = false;
-//                  }
-//                } else {
-//               // check if the music track name already exist in the list
-//                  for (MusicTrack mutrack: musicTracks) {
-//                    String mName = mutrack.getMusicName();
-//                    if (mName.equalsIgnoreCase(musicName)) {
-//                      JOptionPane.showMessageDialog(null, "Music track name already entered", "Insert music - duplicated music name", JOptionPane.ERROR_MESSAGE);
-//                      valid = false;
-//                      break;
-//                    }
-//                  }
-//                }
-//                
-//                if (valid) {
-//                  // store as music track
-//                  MusicTrack mt = new MusicTrack(musicName, lang, type, singer1, singer2, songWriter, composer, arranger);
-//                  if (update) {
-//                    model.addElement(musicName);
-//                    tracks.put(musicName, mt);
-//                  } else {
-//                    musicTracks.add(mt);
-//                  }
-//                  JOptionPane.showMessageDialog(null, "submitted", "Insert music - submitted", JOptionPane.INFORMATION_MESSAGE);
-//                  // TODO: clear fields
-//                  clearInsertMusicTrack();
-//                }
+
               }
               
             }
@@ -5772,10 +5861,8 @@ public class MainFrame {
           System.out.println(oldmt.getType());
           if (oldmt.getType() == diskType.AUDIOCD) {
             diskTypeTx.setSelected(model_cd, true);
-            System.out.println("cd");
           } else {
             diskTypeTx.setSelected(model_vinyl, true);
-            System.out.println("vinyl");
           }
           insSongWriterTx.setText(oldmt.getSongWriter());
           insComposerTx.setText(oldmt.getComposer());
