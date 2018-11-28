@@ -1675,9 +1675,6 @@ public class MainFrame {
       }
     });
     
-    
-    JButton upRefreshBtn = new JButton("Refresh list");
-    
     JLabel label_27 = new JLabel("Album name:");
     
     JLabel label_28 = new JLabel("Year:");
@@ -1695,7 +1692,7 @@ public class MainFrame {
     
     JButton button_6 = new JButton("Cancel");
     
-    JButton button_7 = new JButton("Submit");
+    JButton button_7 = new JButton("Update");
     button_7.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         String albumName = null, producer = null;
@@ -1810,16 +1807,49 @@ public class MainFrame {
     upTrackList.addMouseListener(new MouseAdapter() {
     public void mouseClicked(MouseEvent evt) {
         JList list = (JList)evt.getSource();
-        if (evt.getClickCount() == 2) {
+        if (evt.getButton() == MouseEvent.BUTTON1 && evt.getClickCount() == 2) {
             // Double-click detected
           int index = list.locationToIndex(evt.getPoint());
           String musicName = model.getElementAt(index);
           MusicTrack mt = tracks.get(musicName);
           CreateFrameMusicTrack createFrame = new CreateFrameMusicTrack(mt);
         }
-      
+        if(evt.getButton() == MouseEvent.BUTTON3 && evt.getClickCount() == 2) {
+          int dialogButton = JOptionPane.YES_NO_OPTION;
+          int dialogResult = JOptionPane.showConfirmDialog (null, "Would You Like to delete this music track?","Comfirm",dialogButton);
+          if(dialogResult == JOptionPane.YES_OPTION){
+            // get the music track, delete it
+            int index = list.locationToIndex(evt.getPoint());
+            String musicName = model.getElementAt(index);
+            MusicTrack mt = tracks.get(musicName);
+            try {
+              con.setAutoCommit(false);
+              DeleteHelper.removeOneMusicTrack(oldAlbum, mt);
+            } catch (SQLException e) {
+              try {
+                con.rollback();
+              } catch (SQLException e1) {
+                e1.printStackTrace();
+              }
+              System.out.println("rollback");
+              e.printStackTrace();
+            } finally {
+              try {
+                con.setAutoCommit(true);
+              } catch (SQLException e) {
+                e.printStackTrace();
+              }
+            }
+            // update the tracks and album music tracks list
+            tracks.remove(mt.getMusicName());
+            model.removeElement(mt.getMusicName());
+            JOptionPane.showMessageDialog(null, "Music track has been removed", "Remove successfully", JOptionPane.INFORMATION_MESSAGE);
+          }
+        }
       }
     });
+    
+    JLabel lblDoubleRightClick = new JLabel("Double right click the music track can removed from this album.");
     GroupLayout gl_updateAlbum = new GroupLayout(updateAlbum);
     gl_updateAlbum.setHorizontalGroup(
       gl_updateAlbum.createParallelGroup(Alignment.LEADING)
@@ -1832,7 +1862,8 @@ public class MainFrame {
               .addGap(52)
               .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
                 .addComponent(label_23)
-                .addComponent(lblThereShouldBe_1)))
+                .addComponent(lblThereShouldBe_1)
+                .addComponent(lblDoubleRightClick)))
             .addGroup(gl_updateAlbum.createSequentialGroup()
               .addGap(289)
               .addComponent(label_25)
@@ -1840,30 +1871,25 @@ public class MainFrame {
               .addComponent(textField, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
             .addGroup(gl_updateAlbum.createSequentialGroup()
               .addGap(195)
-              .addGroup(gl_updateAlbum.createParallelGroup(Alignment.TRAILING, false)
-                .addGroup(gl_updateAlbum.createSequentialGroup()
-                  .addComponent(upAddBtn)
-                  .addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                  .addComponent(upRefreshBtn))
-                .addGroup(gl_updateAlbum.createSequentialGroup()
-                  .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING, false)
-                    .addComponent(label_27, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(label_28)
-                    .addComponent(label_29))
-                  .addPreferredGap(ComponentPlacement.UNRELATED)
-                  .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
-                    .addComponent(upAlbumTx, GroupLayout.PREFERRED_SIZE, 308, GroupLayout.PREFERRED_SIZE)
-                    .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
-                      .addComponent(upProducerTx, GroupLayout.PREFERRED_SIZE, 308, GroupLayout.PREFERRED_SIZE)
-                      .addComponent(upYearTx, GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE))))
-                .addGroup(gl_updateAlbum.createSequentialGroup()
-                  .addComponent(button_6)
-                  .addGap(18)
-                  .addComponent(button_7))
-                .addGroup(gl_updateAlbum.createSequentialGroup()
-                  .addComponent(label_26)
-                  .addGap(314))
-                .addComponent(upTrackList, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+              .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
+                .addComponent(upAddBtn)
+                .addComponent(label_26)
+                .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING, false)
+                  .addComponent(upTrackList, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                  .addGroup(gl_updateAlbum.createSequentialGroup()
+                    .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING, false)
+                      .addComponent(label_27, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                      .addComponent(label_28)
+                      .addComponent(label_29))
+                    .addPreferredGap(ComponentPlacement.UNRELATED)
+                    .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING, false)
+                      .addComponent(upProducerTx)
+                      .addComponent(upYearTx)
+                      .addComponent(upAlbumTx, GroupLayout.PREFERRED_SIZE, 311, GroupLayout.PREFERRED_SIZE)))
+                  .addGroup(Alignment.TRAILING, gl_updateAlbum.createSequentialGroup()
+                    .addComponent(button_6)
+                    .addGap(18)
+                    .addComponent(button_7))))))
           .addContainerGap(102, Short.MAX_VALUE))
     );
     gl_updateAlbum.setVerticalGroup(
@@ -1875,7 +1901,9 @@ public class MainFrame {
           .addComponent(lblThereShouldBe_1)
           .addPreferredGap(ComponentPlacement.UNRELATED)
           .addComponent(label_23)
-          .addGap(47)
+          .addGap(13)
+          .addComponent(lblDoubleRightClick)
+          .addGap(18)
           .addGroup(gl_updateAlbum.createParallelGroup(Alignment.BASELINE)
             .addComponent(label_27)
             .addComponent(upAlbumTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
@@ -1892,14 +1920,12 @@ public class MainFrame {
           .addGap(18)
           .addComponent(upTrackList, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE)
           .addGap(27)
-          .addGroup(gl_updateAlbum.createParallelGroup(Alignment.BASELINE)
-            .addComponent(upAddBtn)
-            .addComponent(upRefreshBtn))
-          .addGap(84)
+          .addComponent(upAddBtn)
+          .addGap(62)
           .addGroup(gl_updateAlbum.createParallelGroup(Alignment.BASELINE)
             .addComponent(button_7)
             .addComponent(button_6))
-          .addGap(55)
+          .addGap(77)
           .addGroup(gl_updateAlbum.createParallelGroup(Alignment.LEADING)
             .addGroup(gl_updateAlbum.createSequentialGroup()
               .addGap(376)
@@ -3124,6 +3150,12 @@ public class MainFrame {
         preparedStatement.setInt(3, id);
         preparedStatement.executeUpdate();
       }
+	    
+	    public static void removeOneMusicTrack(Album album, MusicTrack mt) throws SQLException {
+	      DeleteHelper.removeMusicSingers(album.albumName, mt.musicName);
+	      DeleteHelper.removeMusicPeopleInvolved(album.albumName, mt.musicName);
+	      DeleteHelper.removeMusic(album.albumName, mt.musicName);
+	    }
 	  
 	    public static void removeMovie(String movieName) throws SQLException {
 	      String sql = "delete from Movie where movieName = ?;";
@@ -5370,7 +5402,6 @@ public class MainFrame {
 //                  }
 //                }
                 type = checkHelper.checkDiskType(typeString);
-                System.out.println(type.getString());
                 
                 if (update) {
                   // check if this music name appears in the model
