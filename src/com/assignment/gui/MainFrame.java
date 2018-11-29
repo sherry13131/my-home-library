@@ -982,6 +982,12 @@ public class MainFrame {
 		        success = false;
 		      }
 		    }
+		    
+		    if(upAuthorTx1.getText().equals("")&&upAuthorTx2.getText().equals("")&&upAuthorTx3.getText().equals("")&&
+		        upAuthorTx4.getText().equals("")&&upAuthorTx5.getText().equals("")) {
+		      JOptionPane.showMessageDialog(null, "Should have at least one author", "fail update book", JOptionPane.ERROR_MESSAGE);
+          success = false;
+		    }
 
         try {
   		    con.setAutoCommit(false);
@@ -1005,7 +1011,7 @@ public class MainFrame {
   		        UpdateHelper.updateBookInt(newEdition, oldBook.isbn, "editionnumber");
   		      }
   		    }
-  		    if (!newAbstract.equals("") && !oldBook.compareAbstract(newAbstract)) {
+  		    if (!oldBook.compareAbstract(newAbstract)) {
   		      //update abstract
   		      UpdateHelper.updateBookString(newAbstract, oldBook.isbn, "abstract");
   		    }
@@ -3084,21 +3090,19 @@ public class MainFrame {
 	  
 	  public static void insertKeyword(String isbn, String[] keywords) throws SQLException {
 	    int keyID = -1, nextKeyID = -1;
-	    String sql = "insert into Keyword values (?,?);";
+	    String sql = "insert into Keyword (tag) values (?);";
 	    PreparedStatement preparedStatement;
 	    if (keywords != null) {
         for (String keyword : keywords) {
-          nextKeyID = SelectHelper.getNextKeywordID();
+//          nextKeyID = SelectHelper.getNextKeywordID();
           keyID = SelectHelper.getKeywordID(keyword);
-          if (nextKeyID == -1) {
-            System.out.println("sth wrong - keyword");
-            throw new SQLException();
-          } else if (keyID < 0){
+          if (keyID < 0){
             preparedStatement = con.prepareStatement(sql);
-            preparedStatement.setInt(1, nextKeyID);
-            preparedStatement.setString(2, keyword);
+//            preparedStatement.setInt(1, nextKeyID);
+            preparedStatement.setString(1, keyword);
             preparedStatement.executeUpdate();
-            keyID = nextKeyID;
+//            keyID = nextKeyID;
+            keyID = SelectHelper.getKeywordID(keyword);
           }
           insertBookKeyword(isbn, keyID);
         }
@@ -4475,6 +4479,7 @@ public class MainFrame {
           con.rollback();
           System.out.println("Something wrong when inserting data");
           System.out.println("Rolling back data...");
+          e.printStackTrace();
         } catch (SQLException e1) {
           e1.printStackTrace();
         }
@@ -5500,6 +5505,10 @@ public class MainFrame {
 	    this.keywords = keywords;
 	  }
 	  
+	  public String getAbstract() {
+	    return this.bookAbstract;
+	  }
+	  
 	  public boolean compareTitle(String newTitle) {
 	    if (title.equalsIgnoreCase(newTitle)) {
 	      return true;
@@ -5522,10 +5531,10 @@ public class MainFrame {
 	  }
 	  
 	  public boolean compareAbstract(String newAbstract) {
-	    if((bookAbstract == null && newAbstract != "") || (bookAbstract.equalsIgnoreCase(newAbstract))) {
-	      return true;
+	    if ((bookAbstract == null && newAbstract != "") || (!bookAbstract.equalsIgnoreCase(newAbstract))) {
+	      return false;
 	    }
-	    return false;
+	    return true;
 	  }
 	  
 	  public boolean compareYear(int newYear) {
