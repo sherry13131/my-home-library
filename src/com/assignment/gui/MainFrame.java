@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import java.awt.CardLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -66,6 +67,7 @@ import javax.swing.UIManager;
 
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.FlowLayout;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
@@ -93,8 +95,6 @@ public class MainFrame {
 	private JTextField insertauthor5;
 	private JTextField movieYearTx;
 	private JTextField movieNameTx;
-	private JTextField textField_30;
-	private JTextField textField_31;
 	private JTextField upBookYearTx;
 	private JTextField upEditionTx;
 	private JTextField upAbstractTx;
@@ -136,11 +136,16 @@ public class MainFrame {
       "composer", "editor", "costume designer"};
 	private Book oldBook;
 	private Album oldAlbum;
+	private Movie oldMovie;
+  private Map<String, List<MovieCrew>> tempcrew = new HashMap<String, List<MovieCrew>>();
 	private DefaultListModel<String> model = new DefaultListModel();
+	private DefaultListModel<String> model2 = new DefaultListModel();
 	private JTextField textField;
 	private JTextField upAlbumTx;
 	private JTextField upProducerTx;
 	private JTextField upYearTx;
+	private JTextField upMovieNameTx;
+	private JTextField upMovieYearTx;
 	/**
 	 * Launch the application.
 	 */
@@ -205,6 +210,9 @@ public class MainFrame {
 	private void initialize(Connection con) {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 885, 702);
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+//    frame.setBounds(100, 100, 1070, 669);
+    frame.setLocation(dim.width/2-frame.getSize().width/2, dim.height/2-frame.getSize().height/2);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		frame.getContentPane().setLayout(new CardLayout(0, 0));
@@ -717,7 +725,7 @@ public class MainFrame {
 		  public void actionPerformed(ActionEvent arg0) {
 //		    CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
 //        c.show(frame.getContentPane(), "AddMovieCrewPanel2");
-		    CreateFrameMovieCrew createFrameMovieCrew = new CreateFrameMovieCrew(crews);
+		    CreateFrameMovieCrew createFrameMovieCrew = new CreateFrameMovieCrew(crews, false);
 		  }
 		});
 		
@@ -1317,15 +1325,15 @@ public class MainFrame {
               // update
             }
 
+            // update album transaction --------------
             try {
               con.setAutoCommit(false);
               // if there are music tracks are added/deleted, do that
-//              if (newtracks)
               if (changedp) {
                 // only update the producer in table music
                 UpdateHelper.updateMusicProducer(albumName, producer);
               }
-              if (changedn && changedy) {
+              if (changedn && changedy) { // if album name and year is changed
                 // update all the music track for this album
                 // insert music tracks with new album data
                 for (MusicTrack t : tracks.values()) {
@@ -1336,7 +1344,7 @@ public class MainFrame {
                   // remove all the music track for old album
                   DeleteHelper.removeMusic(oldAlbumName, t.musicName);
                 }
-              } else if (changedn) {
+              } else if (changedn) { // if album name is changed
                 // update all the music track for this album
                 // insert music tracks with new album data
                 for (MusicTrack t : tracks.values()) {
@@ -1347,7 +1355,7 @@ public class MainFrame {
                   // remove all the music track for old album
                   DeleteHelper.removeMusic(oldAlbumName, t.musicName);
                 }
-              } else if (changedy){
+              } else if (changedy){ // if album year is changed
                 for (MusicTrack t : tracks.values()) {
                   InserterHelper.insertAlbum(newName, newYear, t.musicName, t.language, t.type, newProducer);
                   // update all the album name in 2 other tables
@@ -1518,59 +1526,216 @@ public class MainFrame {
     JPanel updateMovie = new JPanel();
     frame.getContentPane().add(updateMovie, "updateMovie");
     
-    JButton btnSearchMovie = new JButton("Search Movie");
+    JLabel label_12 = new JLabel("There should be at least one people for each role. At most 10 for cast, at most 3 otherwise.");
     
-    JLabel lblMovieName_2 = new JLabel("Movie name:");
+    JLabel label_13 = new JLabel("Please fill in all the madatory fields.");
     
-    textField_30 = new JTextField();
-    textField_30.setColumns(10);
+    JLabel label_14 = new JLabel("Crew:");
     
-    JLabel lblReleaseYear_2 = new JLabel("Release year:");
+    JLabel label_15 = new JLabel("Cast:");
     
-    textField_31 = new JTextField();
-    textField_31.setColumns(10);
+    JButton button_5 = new JButton("Update");
+    button_5.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent arg0) {
+        // check all the fields are filled in correctly
+        String movieName = null;
+        int year = checkHelper.checkIfNumerical(upMovieYearTx);
+        // validate input fields
+        if (upMovieNameTx.getText().equals("") || upMovieYearTx.getText().equals("") || checkHelper.checkIfEmptyCrew(crews)) {
+          JOptionPane.showMessageDialog(null, "Please fill in all the fields with at least one people in each role", "Insert movie - incomplete input", JOptionPane.ERROR_MESSAGE);
+        } else if (year < 0) {
+          JOptionPane.showMessageDialog(null, "Year in wrong range", "Insert movie - wrong range", JOptionPane.ERROR_MESSAGE);
+        } else {
+          // get all the input
+          movieName = upMovieNameTx.getText();
+          
+          // insert all the new crews and do all update from movie name and year
+          // if crews list changed, modify it
+//          for (List<MovieCrew> oldlist: crews.values()) {
+//              for (MovieCrew oldmc : oldlist) {
+//                // if tempcrew don't have oldmc, delete it from db
+//                if (!tempcrew.contains(oldmc)) {
+//                  DeleteHelper.removeMovieCrew(oldMovie, oldmc);
+//                }
+//                // if oldmc exist in tempcrew, remove from tempcrew
+//                
+//              }
+//          }
+          // insert the movie crew that remains in the temcrew list
+          // ---------------------------------------------------------------------------------
+          boolean changedn = false, changedy = false, valid = true;
+          // delete all the movieCrew, insert all the crew in tempcrew
+          try {
+            con.setAutoCommit(false);
+            // delete movie crew and award
+            DeleteHelper.removeMovieCrew(oldMovie.getMovieName());
+            DeleteHelper.removeMovieAward(oldMovie.getMovieName());
+            // if movie name / year is changed
+            if (!oldMovie.compareMovie(movieName)) {
+              changedn = true;
+            } if (!oldMovie.compareYear(year)) {
+              changedy = true;
+            }
+            // check if movie name already exist if changed
+            if (changedy && !changedn) {
+              // just update the year
+              UpdateHelper.updateMovieInfo(oldMovie.getMovieName(), movieName, year);
+            } else if (changedn) {
+              if (!checkHelper.movieExist(movieName)) {
+                UpdateHelper.updateMovieInfo(oldMovie.getMovieName(), movieName, year);
+              } else {
+                valid = false;
+                JOptionPane.showMessageDialog(null, "Movie already exist", "Update movie - movie exist", JOptionPane.ERROR_MESSAGE);
+              }
+            }
+            
+            if (valid) {
+              InserterHelper.insertCrewMember(movieName, year, tempcrew);
+              InserterHelper.insertAward(movieName, year, tempcrew);
+            }
+            
+            con.commit();
+            JOptionPane.showMessageDialog(null, "Movie updated", "Update movie successfully", JOptionPane.INFORMATION_MESSAGE);
+          } catch (SQLException e) {
+            try {
+              con.rollback();
+            } catch (SQLException e1) {
+              e1.printStackTrace();
+            }
+            System.out.println("rollback");
+            e.printStackTrace();
+          } finally {
+            try {
+              con.setAutoCommit(true);
+            } catch (SQLException e) {
+              e.printStackTrace();
+            }
+          }
+          
+          
+          
+          
+          
+          // if movie name changed
+          // if movie year changed
+          
+          // check if movie exist
+//          if (!checkHelper.movieExist(movieName)) {
+//            // inserting start
+//            TransactionHelper.insertMovieTransaction(movieName, year, crews);
+//            JOptionPane.showMessageDialog(null, "Movie inserted", "Insert movie - movie inserted", JOptionPane.INFORMATION_MESSAGE);
+//          } else {
+//            JOptionPane.showMessageDialog(null, "Movie already exist", "Insert movie - movie existed", JOptionPane.ERROR_MESSAGE);
+//          }
+        }
+      }
+    });
     
-    JLabel lblChangeTheValues_1 = new JLabel("Change the values and click update to update the information of this movie");
-    lblChangeTheValues_1.setFont(new Font("Tahoma", Font.PLAIN, 16));
+    JButton button_8 = new JButton("Cancel");
+    
+    JLabel label_16 = new JLabel("Release year:");
+    
+    JLabel label_17 = new JLabel("Movie name:");
+    
+    upMovieNameTx = new JTextField();
+    upMovieNameTx.setColumns(10);
+    
+    upMovieYearTx = new JTextField();
+    upMovieYearTx.setColumns(10);
+    
+    JButton button_10 = new JButton("Add new crew or cast");
+    button_10.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent arg0) {
+        CreateFrameMovieCrew createFrameMovieCrew = new CreateFrameMovieCrew(crews, true);
+      }
+    });
+    
+    JScrollPane scrollPane = new JScrollPane();
+    
+    JScrollPane scrollPane_2 = new JScrollPane();
     GroupLayout gl_updateMovie = new GroupLayout(updateMovie);
     gl_updateMovie.setHorizontalGroup(
       gl_updateMovie.createParallelGroup(Alignment.LEADING)
         .addGroup(gl_updateMovie.createSequentialGroup()
+          .addGap(68)
           .addGroup(gl_updateMovie.createParallelGroup(Alignment.LEADING)
             .addGroup(gl_updateMovie.createSequentialGroup()
-              .addGap(104)
-              .addGroup(gl_updateMovie.createParallelGroup(Alignment.TRAILING)
-                .addComponent(btnSearchMovie)
+              .addComponent(button_10, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE)
+              .addContainerGap())
+            .addGroup(gl_updateMovie.createSequentialGroup()
+              .addGroup(gl_updateMovie.createParallelGroup(Alignment.LEADING)
+                .addGroup(gl_updateMovie.createParallelGroup(Alignment.LEADING, false)
+                  .addGroup(gl_updateMovie.createSequentialGroup()
+                    .addComponent(label_16, GroupLayout.PREFERRED_SIZE, 79, GroupLayout.PREFERRED_SIZE)
+                    .addGap(18)
+                    .addComponent(upMovieYearTx))
+                  .addGroup(gl_updateMovie.createSequentialGroup()
+                    .addComponent(label_17, GroupLayout.PREFERRED_SIZE, 74, GroupLayout.PREFERRED_SIZE)
+                    .addGap(23)
+                    .addComponent(upMovieNameTx, GroupLayout.PREFERRED_SIZE, 203, GroupLayout.PREFERRED_SIZE)))
+                .addComponent(label_13, GroupLayout.PREFERRED_SIZE, 203, GroupLayout.PREFERRED_SIZE)
+                .addComponent(label_12, GroupLayout.PREFERRED_SIZE, 526, GroupLayout.PREFERRED_SIZE)
                 .addGroup(gl_updateMovie.createSequentialGroup()
                   .addGroup(gl_updateMovie.createParallelGroup(Alignment.LEADING)
-                    .addComponent(lblMovieName_2)
-                    .addComponent(lblReleaseYear_2))
-                  .addGap(18)
+                    .addComponent(label_14, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE))
+                  .addPreferredGap(ComponentPlacement.RELATED, 77, Short.MAX_VALUE)
                   .addGroup(gl_updateMovie.createParallelGroup(Alignment.LEADING)
-                    .addComponent(textField_30, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(textField_31, GroupLayout.PREFERRED_SIZE, 425, GroupLayout.PREFERRED_SIZE)))))
-            .addGroup(gl_updateMovie.createSequentialGroup()
-              .addGap(26)
-              .addComponent(lblChangeTheValues_1, GroupLayout.PREFERRED_SIZE, 553, GroupLayout.PREFERRED_SIZE)))
-          .addContainerGap(212, Short.MAX_VALUE))
+                    .addComponent(label_15, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)
+                    .addGroup(gl_updateMovie.createParallelGroup(Alignment.TRAILING)
+                      .addGroup(gl_updateMovie.createSequentialGroup()
+                        .addComponent(button_5, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(ComponentPlacement.RELATED)
+                        .addComponent(button_8, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE))
+                      .addComponent(scrollPane_2, GroupLayout.PREFERRED_SIZE, 312, GroupLayout.PREFERRED_SIZE)))
+                  .addPreferredGap(ComponentPlacement.RELATED)))
+              .addContainerGap(110, GroupLayout.PREFERRED_SIZE))))
     );
     gl_updateMovie.setVerticalGroup(
       gl_updateMovie.createParallelGroup(Alignment.LEADING)
         .addGroup(gl_updateMovie.createSequentialGroup()
-          .addGap(21)
-          .addComponent(lblChangeTheValues_1, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
-          .addGap(31)
-          .addGroup(gl_updateMovie.createParallelGroup(Alignment.BASELINE)
-            .addComponent(lblMovieName_2)
-            .addComponent(textField_30, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+          .addGap(40)
+          .addComponent(label_13)
           .addGap(18)
-          .addGroup(gl_updateMovie.createParallelGroup(Alignment.BASELINE)
-            .addComponent(lblReleaseYear_2)
-            .addComponent(textField_31, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+          .addComponent(label_12)
           .addGap(18)
-          .addComponent(btnSearchMovie)
-          .addContainerGap(439, Short.MAX_VALUE))
+          .addGroup(gl_updateMovie.createParallelGroup(Alignment.TRAILING)
+            .addGroup(gl_updateMovie.createSequentialGroup()
+              .addGroup(gl_updateMovie.createParallelGroup(Alignment.LEADING)
+                .addGroup(gl_updateMovie.createSequentialGroup()
+                  .addGap(3)
+                  .addComponent(label_17))
+                .addComponent(upMovieNameTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+              .addGroup(gl_updateMovie.createParallelGroup(Alignment.LEADING)
+                .addGroup(gl_updateMovie.createSequentialGroup()
+                  .addGap(30)
+                  .addComponent(label_16))
+                .addGroup(gl_updateMovie.createSequentialGroup()
+                  .addGap(27)
+                  .addComponent(upMovieYearTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+              .addGap(34)
+              .addComponent(label_14)
+              .addGap(18)
+              .addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 196, GroupLayout.PREFERRED_SIZE)
+              .addGap(18)
+              .addComponent(button_10)
+              .addGap(68)
+              .addGroup(gl_updateMovie.createParallelGroup(Alignment.BASELINE)
+                .addComponent(button_8)
+                .addComponent(button_5)))
+            .addGroup(gl_updateMovie.createSequentialGroup()
+              .addComponent(label_15)
+              .addGap(18)
+              .addComponent(scrollPane_2, GroupLayout.PREFERRED_SIZE, 196, GroupLayout.PREFERRED_SIZE)
+              .addGap(136)))
+          .addContainerGap(50, Short.MAX_VALUE))
     );
+    
+    JList upCastList = new JList();
+    scrollPane_2.setViewportView(upCastList);
+    
+    JList upCrewList = new JList();
+    scrollPane.setViewportView(upCrewList);
     updateMovie.setLayout(gl_updateMovie);
     
     JPanel view = new JPanel();
@@ -1991,6 +2156,16 @@ public class MainFrame {
 		JMenuItem menuUpdate = new JMenuItem("Update");
 		menuUpdate.addActionListener(new ActionListener() {
 		  public void actionPerformed(ActionEvent e) {
+		    // init global values
+		    tempcrew.clear();
+		    model.clear();
+		    model2.clear();
+		    crews.clear();
+        for (String role: movieCastRoles) {
+          crews.put(role, new ArrayList<MovieCrew>());
+          tempcrew.put(role, new ArrayList<MovieCrew>());
+        }
+        
 		    String name = JOptionPane.showInputDialog(null, "What do you want to update?", "Update dialog", JOptionPane.QUESTION_MESSAGE);
         // validate input field
         if (name == "") {
@@ -2120,6 +2295,61 @@ public class MainFrame {
           } else if (checkHelper.movieExist(name)) {
             CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
             c.show(frame.getContentPane(), "updateMovie");
+//            clearUpdateMovie();
+            // get data set
+            ResultSet movieResult = null, crewIdsResult = null, crewResult = null;
+            String movieName = null;
+            int year = -1;
+//            Map<String, MusicTrack> tracks = new HashMap<String, MusicTrack>();
+            movieResult = SelectHelper.getMovieInfo(name);
+            crewIdsResult = SelectHelper.getMovieCrewIds(name);
+            movieName = name;
+            
+            String role = null;
+            MovieCrew mc = null;
+            String crewname = null;
+            Boolean gender = false, award = false;
+            int roleid = -1, pid = -1;
+            try {
+              year = movieResult.getInt("year");
+              // get crew objects
+              while(crewIdsResult.next()) {
+                // get the pid and roleid and the crewInfo
+                pid = crewIdsResult.getInt("id");
+                roleid = crewIdsResult.getInt("role_id");
+                crewResult = SelectHelper.getMovieCrewInfo(name, pid);
+                // get the crew actual info
+                crewname = SelectHelper.getPeopleName(pid);
+                gender = crewResult.getBoolean("gender");
+                award = crewResult.getBoolean("award");
+                mc = new MovieCrew(crewname, gender, award, roleid);
+                // add moviecrew object to corresponding list of the role
+                role = SelectHelper.getMovieRoleName(roleid);
+                crews.get(role).add(mc);
+                tempcrew.get(role).add(mc);
+              }
+              
+              // set textfield values
+              upMovieNameTx.setText(movieName);
+              upMovieYearTx.setText(String.valueOf(year));
+              for (String r: crews.keySet()) {
+                for (MovieCrew m: crews.get(r)) {
+                  if (r.equals("cast")) {
+                    model2.addElement(m.getCrewName() + " " + r);
+                  } else {
+                    model.addElement(m.getCrewName() + " " + r);
+                  }
+                }
+              }
+              upCrewList.setModel(model);
+              upCastList.setModel(model2);
+              
+              // create a new movie object
+              oldMovie = new Movie(movieName, year, crews);
+              
+            } catch (SQLException e1) {
+              e1.printStackTrace();
+            }
           } else {
             JOptionPane.showMessageDialog(null, "Product not found", "Product not found", JOptionPane.INFORMATION_MESSAGE);
           }
@@ -2465,7 +2695,33 @@ public class MainFrame {
 	}
 	
 	
-	public enum diskType {
+	public static DefaultTableModel buildTableModel(ResultSet rs)
+      throws SQLException {
+  
+      ResultSetMetaData metaData = rs.getMetaData();
+  
+      // names of columns
+      Vector<String> columnNames = new Vector<String>();
+      int columnCount = metaData.getColumnCount();
+      for (int column = 1; column <= columnCount; column++) {
+          columnNames.add(metaData.getColumnName(column));
+      }
+  
+      // data of the table
+      Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+      while (rs.next()) {
+          Vector<Object> vector = new Vector<Object>();
+          for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+              vector.add(rs.getObject(columnIndex));
+          }
+          data.add(vector);
+      }
+  
+      return new DefaultTableModel(data, columnNames);
+  }
+
+
+  public enum diskType {
     AUDIOCD {
       public String getString() {
         return "audioCD";
@@ -2503,6 +2759,133 @@ public class MainFrame {
     public abstract String getString();
     public abstract diskType getEnum();
     public abstract int getEnumValue();
+  }
+	
+	public enum MovieRole {
+    DIRECTOR {
+
+      @Override
+      public String getString() {
+        return "director";
+      }
+
+      @Override
+      public MovieRole getEnum() {
+        return DIRECTOR;
+      }
+
+      @Override
+      public int getRoleId() {
+        return SelectHelper.getRoleID("director");
+      }
+      
+    }, SCRIPTWRITER {
+
+      @Override
+      public String getString() {
+        return "script writer";
+      }
+
+      @Override
+      public MovieRole getEnum() {
+        return SCRIPTWRITER;
+      }
+
+      @Override
+      public int getRoleId() {
+        return SelectHelper.getRoleID("script writer");
+      }
+      
+    }, CAST {
+
+      @Override
+      public String getString() {
+        return "cast";
+      }
+
+      @Override
+      public MovieRole getEnum() {
+        return CAST;
+      }
+
+      @Override
+      public int getRoleId() {
+        return SelectHelper.getRoleID("cast");
+      }
+      
+    }, PRODUCER {
+
+      @Override
+      public String getString() {
+        return "producer";
+      }
+
+      @Override
+      public MovieRole getEnum() {
+        return PRODUCER;
+      }
+
+      @Override
+      public int getRoleId() {
+        return SelectHelper.getRoleID("producer");
+      }
+      
+    }, COMPOSER {
+
+      @Override
+      public String getString() {
+        return "composer";
+      }
+
+      @Override
+      public MovieRole getEnum() {
+        return COMPOSER;
+      }
+
+      @Override
+      public int getRoleId() {
+        return SelectHelper.getRoleID("composer");
+      }
+      
+    }, EDITOR {
+
+      @Override
+      public String getString() {
+        return "editor";
+      }
+
+      @Override
+      public MovieRole getEnum() {
+        return EDITOR;
+      }
+
+      @Override
+      public int getRoleId() {
+        return SelectHelper.getRoleID("editor");
+      }
+      
+    }, COSTUMEDESIGNER {
+
+      @Override
+      public String getString() {
+        return "costume designer";
+      }
+
+      @Override
+      public MovieRole getEnum() {
+        return COSTUMEDESIGNER;
+      }
+
+      @Override
+      public int getRoleId() {
+        return SelectHelper.getRoleID("costume designer");
+      }
+      
+    };
+    
+    public abstract String getString();
+    public abstract MovieRole getEnum();
+    public abstract int getRoleId();
   }
 	
 	public static class InserterHelper {
@@ -2709,89 +3092,6 @@ public class MainFrame {
 	       ps.executeUpdate();
 	   }
 	   
-	   public static void insertMusicTrack(String musicName, Album album, MusicTrack mt) {
-	     try {
-        con.setAutoCommit(false);
-  	     int id = -1;
-  	     // insert music track
-  	     InserterHelper.insertAlbum(album.albumName, album.year, musicName, mt.language, mt.type, album.producer);
-  	     // insert singers
-  	     id = SelectHelper.getPeopleID(mt.singer1);
-  	     if (id < 0) {
-  	       id = InserterHelper.insertNewPeople(mt.singer1);
-  	       if (id < 0) {
-  	         throw new SQLException();
-  	       }
-  	     }
-  	     InserterHelper.insertMusicSinger(album.albumName, album.year, musicName, id);
-  	     if (mt.singer2 != null) {
-  	       id = SelectHelper.getPeopleID(mt.singer2);
-  	       if (id < 0) {
-  	         id = InserterHelper.insertNewPeople(mt.singer2);
-  	         if (id < 0) {
-  	           throw new SQLException();
-  	         }
-  	       }
-  	       InserterHelper.insertMusicSinger(album.albumName, album.year, musicName, id);
-  	     }
-  	     
-  	     // insert crews
-  //	     InserterHelper.insertMusicPeopleInvolved(albumName, year, musicName, ppl, sw, c, a);
-  	     
-  	     
-  	     Map<String, Integer> musicpeopleid = new HashMap<String, Integer>();
-         musicpeopleid = mt.getCastIDHashMap();
-         
-         // insert into PeopleInvolvedMusic
-           // check the role for each people
-  
-           Map<String, Integer> temprole = new HashMap<String, Integer>();
-           // for each people, serach their roles in music
-           for (int ppl : musicpeopleid.values()) {
-             // check if this people is inserted already
-             if (!SelectHelper.checkMusicCastExist(album.albumName, album.year, mt.getMusicName(), ppl)) {
-               for (String role : musicpeopleid.keySet()) {
-                 if (musicpeopleid.get(role).equals(ppl)) {
-                   temprole.put(role, ppl);
-                 }
-               }
-               // insert
-               int sw = 0, c=0, a=0;
-               if (temprole.containsKey("songWriter")) {
-                 sw = 1;
-               }
-               if (temprole.containsKey("composer")) {
-                 c = 1;
-               }
-               if (temprole.containsKey("arranger")) {
-                 a = 1;
-               }
-               // insert 
-               InserterHelper.insertMusicPeopleInvolved(album.albumName, album.year, mt.getMusicName(), ppl, sw, c, a);
-               // reset the hashmap
-               temprole.clear();
-               sw = 0; c = 0; a= 0;
-             }
-           }
-
-	      } catch (SQLException e) {
-	        try {
-            con.rollback();
-          } catch (SQLException e1) {
-            e1.printStackTrace();
-          }
-	        System.out.println("rollback ...");
-	        e.printStackTrace();
-	      } finally {
-	        try {
-            con.setAutoCommit(true);
-          } catch (SQLException e) {
-            e.printStackTrace();
-          }
-	      }
-         
-	   }
-	  
 	   public static void insertMusicSinger(String albumName, int year, String musicName, int id) throws SQLException {
 	     String sql = "insert into MusicSinger values (?,?,?,?);";
 	     PreparedStatement ps;
@@ -2878,6 +3178,17 @@ public class MainFrame {
        }
 	   }
 	   
+	   public static void insertAward(String movieName, int movieYear, MovieCrew mc) throws SQLException {
+       String sql = "insert ignore into award values (?,?,?,?);";
+       PreparedStatement ps;
+       ps = con.prepareStatement(sql);
+       ps.setString(2, movieName);
+       ps.setInt(3, movieYear);
+       ps.setInt(1, mc.getPeopleID());
+       ps.setBoolean(4, mc.getAward());
+       ps.executeUpdate();
+     }
+	   
 	  public static void insertCrewMember(String movieName, int movieYear, Map<String, List<MovieCrew>> crews) throws SQLException {
 	    String sql = "insert into CrewMember values (?,?,?,?);";  
 	    PreparedStatement ps;
@@ -2894,6 +3205,19 @@ public class MainFrame {
         }
       }
 	  }
+	  
+	  public static void insertCrewMember(String movieName, int movieYear, MovieCrew mc) throws SQLException {
+      String sql = "insert into CrewMember values (?,?,?,?);";  
+      PreparedStatement ps;
+      ps = con.prepareStatement(sql);
+      // get peopleID for people
+      ps.setInt(1, mc.getPeopleID());
+      ps.setString(2, movieName);
+      ps.setInt(3, movieYear); 
+      ps.setInt(4, mc.getRoleID());
+      ps.executeUpdate();
+    }
+	  
 	}
 	
 	public static class checkHelper {
@@ -3214,7 +3538,17 @@ public class MainFrame {
       ps.executeUpdate();
 	  }
 	  
-	  public static void updateBookInt(int data, String isbn, String type) throws SQLException {
+	  public static void updateMovieInfo(String oldName, String newName, int year) throws SQLException {
+      String sql = "Update movie set moviename = ?, year = ? where moviename = ?;";
+      PreparedStatement ps;
+      ps = con.prepareStatement(sql);
+      ps.setString(1, newName);
+      ps.setInt(2, year);
+      ps.setString(3, oldName);
+      ps.executeUpdate();
+    }
+
+    public static void updateBookInt(int data, String isbn, String type) throws SQLException {
 	    String sql = "Update Book set " + type + " = ? where isbn = ?;";
       PreparedStatement ps;
       ps = con.prepareStatement(sql);
@@ -3366,7 +3700,89 @@ public class MainFrame {
 	    
 	  }
 	  
-	  public static String getBookIsbn(String bookTitle) {
+	  public static int getPeopleID(String fullname) {
+       String sql = "Select ID from PeopleInvolved where concat(FirstName,' ',FamilyName) = ?;";
+       String sql2 = "Select ID from PeopleInvolved where concat(FirstName,' ', MiddleName, ' ', FamilyName) = ?;";
+       String[] name = fullname.split(" ");
+       PreparedStatement preparedStatement = null;
+       try {
+         if (name.length == 2) {
+           preparedStatement = con.prepareStatement(sql);
+         } else if (name.length > 2) {
+           preparedStatement = con.prepareStatement(sql2);
+         } else {
+           return -1;
+         }
+         preparedStatement.setString(1, fullname);
+         ResultSet rs = preparedStatement.executeQuery();
+         if (rs.next()) {
+           return (rs.getInt("ID"));
+         }
+       } catch (Exception e){
+         e.printStackTrace();
+       }
+       return -1;
+     }
+
+    public static int getNextPeopleID() {
+       String sql = "Select count(*) from PeopleInvolved;";
+       try {
+         PreparedStatement preparedStatement = con.prepareStatement(sql);
+         ResultSet rs = preparedStatement.executeQuery();
+         if (rs.next()) {
+           int id = rs.getInt("count(*)");
+           return id + 1;
+         }
+       } catch (SQLException e) {
+         e.printStackTrace();
+       }
+       return -1;
+     }
+
+    public static List<String> getPeopleNames() {
+      String sql = "Select concat(FirstName,' ',FamilyName) fullname from PeopleInvolved;";
+      List<String> names = new ArrayList<String>();
+      PreparedStatement preparedStatement;
+      try {
+        preparedStatement = con.prepareStatement(sql);
+        ResultSet rs = preparedStatement.executeQuery();
+        if (rs.next()) {
+          names.add(rs.getString("fullname"));
+        }
+      } catch (Exception e){
+        e.printStackTrace();
+      }
+      return names;
+    }
+
+    private static ResultSet getPeopleGenderHelper(int id) {
+      String sql = "select gender from peopleinvolved where id = ?;";
+      ResultSet rs = null;
+      PreparedStatement ps;
+      try {
+        ps = con.prepareStatement(sql);
+        ps.setInt(1, id);
+        rs = ps.executeQuery();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return rs;
+    }
+
+    public static Boolean getPeopleGender(int id) {
+      ResultSet rs = getPeopleGenderHelper(id);
+      try {
+        if (rs != null) {
+          rs.next();
+          return rs.getBoolean("gender");
+        }
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return null;
+    }
+
+    public static String getBookIsbn(String bookTitle) {
 	    String sql = "Select isbn from Book where Title = ?;";
 	    ResultSet rs = null;
       PreparedStatement ps;
@@ -3398,7 +3814,107 @@ public class MainFrame {
       return -1;
 	  }
 	  
-	  public static ResultSet getAlbumInfo(String albumName) {
+	  public static ResultSet getBookInfo(String isbn) {
+      String sql = "Select * from book where ISBN = ?;";
+      ResultSet rs = null;
+      PreparedStatement ps;
+      try {
+        ps = con.prepareStatement(sql);
+        ps.setString(1, isbn);
+        rs = ps.executeQuery();
+        rs.next();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return rs;
+    }
+
+    public static ResultSet getBookAuthorName(String isbn) {
+      String sql = "SELECT CASE WHEN ISNULL(p.MiddleName) " + 
+          "THEN concat(p.firstName, ' ', p.familyname) " + 
+          "ELSE concat(p.firstName, ' ',p.middlename, ' ', p.familyname) " + 
+          "END FullName " + 
+          "FROM peopleinvolved p, bookauthor a where p.ID = a.author_id and a.isbn = ?;";
+      ResultSet rs = null;
+      PreparedStatement ps;
+      try {
+        ps = con.prepareStatement(sql);
+        ps.setString(1, isbn);
+        rs = ps.executeQuery();
+        rs.next();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return rs;
+    }
+
+    public static ResultSet getBookKeyword(String isbn) {
+      String sql = "select k.tag from bookkeyword bk, keyword k " + 
+          "where bk.keyword_id = k.id and bk.isbn = ?;";
+      ResultSet rs = null;
+      PreparedStatement ps;
+      try {
+        ps = con.prepareStatement(sql);
+        ps.setString(1, isbn);
+        rs = ps.executeQuery();
+        rs.next();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return rs;
+    }
+
+    public static int getNextKeywordID() {
+       String sql = "Select count(*) from keyword;";
+       try {
+         PreparedStatement preparedStatement = con.prepareStatement(sql);
+         ResultSet rs = preparedStatement.executeQuery();
+         if (rs.next()) {
+           int id = rs.getInt("count(*)");
+           return id + 1;
+         }
+       } catch (SQLException e) {
+         e.printStackTrace();
+       }
+       return -1;
+     }
+
+    public static int getKeywordID(String keyword) {
+       String sql = "Select ID from keyword where Tag = ?;";
+       try {
+         PreparedStatement preparedStatement = con.prepareStatement(sql);
+         preparedStatement.setString(1, keyword);
+         ResultSet rs = preparedStatement.executeQuery();
+         if (rs.next()) {
+           int id = rs.getInt("ID");
+           return id;
+         }
+       } catch (SQLException e) {
+         e.printStackTrace();
+       }
+       return -1;
+     }
+
+    public static boolean bookexist(String isbn) {
+       String sql = "select count(*) from Book where ISBN = ?;";
+       try {
+         PreparedStatement preparedStatement;
+         preparedStatement = con.prepareStatement(sql);
+         preparedStatement.setString(1, isbn);
+         ResultSet rs = preparedStatement.executeQuery();
+         if (rs.next()) {
+           if (rs.getInt("count(*)") > 0) {
+             return true;
+           }
+         }
+         return false;
+       } catch (SQLException e) {
+         e.printStackTrace();
+       }
+       return true;
+     }
+
+    public static ResultSet getAlbumInfo(String albumName) {
 	    String sql = "Select albumName, year, producer_id from music where albumName = ? group by albumName;";
 	    ResultSet rs = null;
 	    PreparedStatement ps;
@@ -3413,7 +3929,21 @@ public class MainFrame {
       return rs;
 	  }
 	  
-	  public static int getAlbumMusicsCount(String albumName) {
+	  public static ResultSet getAlbums() {
+       String sql = "Select AlbumName, Year, MusicName, Producer_ID from Music;";
+       ResultSet albumsInfo = null;
+       PreparedStatement preparedStatement;
+       try {
+         preparedStatement = con.prepareStatement(sql);
+         albumsInfo = preparedStatement.executeQuery();
+       } catch (Exception e){
+         e.printStackTrace();
+       }
+       return albumsInfo;
+    
+     }
+
+    public static int getAlbumMusicsCount(String albumName) {
 	    String sql = "Select count(*) from music where albumName=?;";
 	    ResultSet rs = null;
       PreparedStatement ps;
@@ -3430,23 +3960,7 @@ public class MainFrame {
       return count;
 	  }
 	  
-	  public static int getMovieCount(String movieName) {
-	    String sql = "Select count(*) from Movie where MovieName = ?;";
-      ResultSet rs = null;
-      PreparedStatement ps;
-      try {
-        ps = con.prepareStatement(sql);
-        ps.setString(1, movieName);
-        rs = ps.executeQuery();
-        rs.next();
-        return rs.getInt("count(*)");
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return -1;
-	  }
-
-    public static ResultSet getAlbumMusics(String albumName) {
+	  public static ResultSet getAlbumMusics(String albumName) {
       String sql = "Select MusicName, language, disktype from music where AlbumName=?;";
       ResultSet rs = null;
       PreparedStatement ps;
@@ -3565,13 +4079,29 @@ public class MainFrame {
       return singers;
     }
     
-	  public static ResultSet getBookInfo(String isbn) {
-	    String sql = "Select * from book where ISBN = ?;";
+	  public static int getMovieCount(String movieName) {
+      String sql = "Select count(*) from Movie where MovieName = ?;";
       ResultSet rs = null;
-	    PreparedStatement ps;
+      PreparedStatement ps;
       try {
         ps = con.prepareStatement(sql);
-        ps.setString(1, isbn);
+        ps.setString(1, movieName);
+        rs = ps.executeQuery();
+        rs.next();
+        return rs.getInt("count(*)");
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return -1;
+    }
+
+    public static ResultSet getMovieInfo(String movieName) {
+	    String sql = "select moviename, year from movie where movieName = ?;";
+	    ResultSet rs = null;
+	    PreparedStatement ps;
+	    try {
+        ps = con.prepareStatement(sql);
+        ps.setString(1, movieName);
         rs = ps.executeQuery();
         rs.next();
       } catch (SQLException e) {
@@ -3579,32 +4109,41 @@ public class MainFrame {
       }
 	    return rs;
 	  }
-	  public static ResultSet getBookAuthorName(String isbn) {
-	    String sql = "SELECT CASE WHEN ISNULL(p.MiddleName) " + 
-	        "THEN concat(p.firstName, ' ', p.familyname) " + 
-	        "ELSE concat(p.firstName, ' ',p.middlename, ' ', p.familyname) " + 
-	        "END FullName " + 
-	        "FROM peopleinvolved p, bookauthor a where p.ID = a.author_id and a.isbn = ?;";
-	    ResultSet rs = null;
-	    PreparedStatement ps;
-	    try {
-	      ps = con.prepareStatement(sql);
-	      ps.setString(1, isbn);
-	      rs = ps.executeQuery();
-	      rs.next();
-	    } catch (SQLException e) {
-	      e.printStackTrace();
-	    }
-	    return rs;
-	  }
-	  public static ResultSet getBookKeyword(String isbn) {
-	    String sql = "select k.tag from bookkeyword bk, keyword k " + 
-	        "where bk.keyword_id = k.id and bk.isbn = ?;";
+	  
+    /**
+     * get all crews in that movie (pid and roleid)
+     * @param movieName
+     * @return rs
+     */
+	  public static ResultSet getMovieCrewIds(String movieName) {
+	    String sql = "select peopleinvolved_id id, role_id from crewmember where moviename = ?;";
 	    ResultSet rs = null;
       PreparedStatement ps;
       try {
         ps = con.prepareStatement(sql);
-        ps.setString(1, isbn);
+        ps.setString(1, movieName);
+        rs = ps.executeQuery();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return rs;
+	  }
+	  
+	  /**
+	   * get one movie crew info (id, gender and award)
+	   * @param movieName
+	   * @param id
+	   * @return rs
+	   */
+	  public static ResultSet getMovieCrewInfo(String movieName, int id) {
+	    String sql = "select a.peopleinvolved_id, a.award, p.gender from peopleinvolved p, award a where "
+	        + "p.id = a.peopleinvolved_id and a.moviename = ? and p.id = ?;";
+	    ResultSet rs = null;
+      PreparedStatement ps;
+      try {
+        ps = con.prepareStatement(sql);
+        ps.setString(1, movieName);
+        ps.setInt(2, id);
         rs = ps.executeQuery();
         rs.next();
       } catch (SQLException e) {
@@ -3613,126 +4152,24 @@ public class MainFrame {
       return rs;
 	  }
 	  
-	   public static int getPeopleID(String fullname) {
-	     String sql = "Select ID from PeopleInvolved where concat(FirstName,' ',FamilyName) = ?;";
-	     String sql2 = "Select ID from PeopleInvolved where concat(FirstName,' ', MiddleName, ' ', FamilyName) = ?;";
-       String[] name = fullname.split(" ");
-	     PreparedStatement preparedStatement = null;
-	     try {
-	       if (name.length == 2) {
-  	       preparedStatement = con.prepareStatement(sql);
-	       } else if (name.length > 2) {
-	         preparedStatement = con.prepareStatement(sql2);
-	       } else {
-	         return -1;
-	       }
-	       preparedStatement.setString(1, fullname);
-         ResultSet rs = preparedStatement.executeQuery();
-         if (rs.next()) {
-           return (rs.getInt("ID"));
-         }
-	     } catch (Exception e){
-	       e.printStackTrace();
-	     }
-	     return -1;
-	   }
-	   
-	   public static int getNextKeywordID() {
-	     String sql = "Select count(*) from keyword;";
-	     try {
-	       PreparedStatement preparedStatement = con.prepareStatement(sql);
-	       ResultSet rs = preparedStatement.executeQuery();
-	       if (rs.next()) {
-	         int id = rs.getInt("count(*)");
-	         return id + 1;
-	       }
-	     } catch (SQLException e) {
-	       e.printStackTrace();
-	     }
-	     return -1;
-	   }
-
-	   public static int getKeywordID(String keyword) {
-	     String sql = "Select ID from keyword where Tag = ?;";
-	     try {
-	       PreparedStatement preparedStatement = con.prepareStatement(sql);
-	       preparedStatement.setString(1, keyword);
-	       ResultSet rs = preparedStatement.executeQuery();
-	       if (rs.next()) {
-	         int id = rs.getInt("ID");
-	         return id;
-	       }
-	     } catch (SQLException e) {
-	       e.printStackTrace();
-	     }
-	     return -1;
-	   }
-	   
-	   public static int getNextPeopleID() {
-	     String sql = "Select count(*) from PeopleInvolved;";
-	     try {
-	       PreparedStatement preparedStatement = con.prepareStatement(sql);
-	       ResultSet rs = preparedStatement.executeQuery();
-	       if (rs.next()) {
-	         int id = rs.getInt("count(*)");
-	         return id + 1;
-	       }
-	     } catch (SQLException e) {
-	       e.printStackTrace();
-	     }
-	     return -1;
-	   }
-	   
-	   public static boolean bookexist(String isbn) {
-	     String sql = "select count(*) from Book where ISBN = ?;";
-	     try {
-	       PreparedStatement preparedStatement;
-	       preparedStatement = con.prepareStatement(sql);
-	       preparedStatement.setString(1, isbn);
-	       ResultSet rs = preparedStatement.executeQuery();
-	       if (rs.next()) {
-	         if (rs.getInt("count(*)") > 0) {
-	           return true;
-	         }
-	       }
-	       return false;
-	     } catch (SQLException e) {
-	       e.printStackTrace();
-	     }
-	     return true;
-	   }
-	   
-	   public static List<String> getPeopleNames() {
-	      String sql = "Select concat(FirstName,' ',FamilyName) fullname from PeopleInvolved;";
-	      List<String> names = new ArrayList<String>();
-	      PreparedStatement preparedStatement;
-	      try {
-	        preparedStatement = con.prepareStatement(sql);
-	        ResultSet rs = preparedStatement.executeQuery();
-	        if (rs.next()) {
-	          names.add(rs.getString("fullname"));
-	        }
-	      } catch (Exception e){
-	        e.printStackTrace();
-	      }
-	      return names;
-	    }
-	   
-	   public static ResultSet getAlbums() {
-	     String sql = "Select AlbumName, Year, MusicName, Producer_ID from Music;";
-	     ResultSet albumsInfo = null;
-	     PreparedStatement preparedStatement;
-	     try {
-	       preparedStatement = con.prepareStatement(sql);
-	       albumsInfo = preparedStatement.executeQuery();
-	     } catch (Exception e){
-	       e.printStackTrace();
-	     }
-	     return albumsInfo;
-
-	   }
-	   
-	   public static int getRoleID(String role) {
+	  public static String getMovieRoleName(int roleid) {
+	    String sql = "select description from role where id = ?;";
+	    String role = null;
+	    ResultSet rs = null;
+      PreparedStatement ps;
+      try {
+        ps = con.prepareStatement(sql);
+        ps.setInt(1, roleid);
+        rs = ps.executeQuery();
+        rs.next();
+        role = rs.getString("description");
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return role;
+	  }
+	  
+	  public static int getRoleID(String role) {
 	     String sql = "select ID from role where Description = ?;";
 	     PreparedStatement ps;
 	     try {
@@ -3748,29 +4185,7 @@ public class MainFrame {
 	     return -1;
 	   }
 	   
-	   public static boolean checkMovieExist(String movieName, int movieYear) {
-       String sql = "select count(*) from Movie where MovieName = ? and Year = ?;";
-       int found = -1;
-       PreparedStatement ps;
-       try {
-         ps = con.prepareStatement(sql);
-         ps.setString(1, movieName);
-         ps.setInt(2, movieYear);
-         ResultSet rs = null;
-         rs = ps.executeQuery();
-         if (rs.next()) {
-           found = rs.getInt("count(*)");
-         }
-         if (found == 0) {
-           return false;
-         }
-       } catch (SQLException e) {
-         e.printStackTrace();
-       }
-       return true;
-     }
-   
-     public static boolean checkMusicCastExist(String albumName, int year, String musicName, int ppl) {
+	   public static boolean checkMusicCastExist(String albumName, int year, String musicName, int ppl) {
        String sql = "Select count(*) from PeopleInvolvedMusic " + 
            "group by AlbumName, Year, MusicName, PeopleInvolved_ID " + 
            "having AlbumName = ? and Year = ? and MusicName = ? and PeopleInvolved_ID = ?;";
@@ -3795,8 +4210,8 @@ public class MainFrame {
        }
        return false;
      }
-     
-     public static boolean checkMusicCastExist(String albumName, String musicName, String name) {
+
+    public static boolean checkMusicCastExist(String albumName, String musicName, String name) {
        String sql = "Select count(*) from PeopleInvolvedMusic " + 
            "group by AlbumName, MusicName, PeopleInvolved_ID " + 
            "having AlbumName = ? and MusicName = ? and PeopleInvolved_ID = ?;";
@@ -3821,7 +4236,29 @@ public class MainFrame {
        }
        return false;
      }
-     
+
+    public static boolean checkMovieExist(String movieName, int movieYear) {
+       String sql = "select count(*) from Movie where MovieName = ? and Year = ?;";
+       int found = -1;
+       PreparedStatement ps;
+       try {
+         ps = con.prepareStatement(sql);
+         ps.setString(1, movieName);
+         ps.setInt(2, movieYear);
+         ResultSet rs = null;
+         rs = ps.executeQuery();
+         if (rs.next()) {
+           found = rs.getInt("count(*)");
+         }
+         if (found == 0) {
+           return false;
+         }
+       } catch (SQLException e) {
+         e.printStackTrace();
+       }
+       return true;
+     }
+   
      public static ResultSet getResultByQuery(String name, int year, String sql, int count) {
        PreparedStatement ps;
        ResultSet rs = null;
@@ -3949,44 +4386,6 @@ public class MainFrame {
       return false;
 	  }
 	  
-	  public static boolean insertMovieTransaction(String movieName, int movieYear, Map<String, List<MovieCrew>> crews) {
-      try {
-	      con.setAutoCommit(false);
-	      // check if the people involved exist, insert if not
-	      for (List<MovieCrew> list: crews.values()) {
-	        for (MovieCrew crew: list) {
-	          if (SelectHelper.getPeopleID(crew.getCrewName()) < 0) {
-	            InserterHelper.insertNewPeople(crew);
-	          }
-	        }
-	      }
-	      // insert movie
-	      InserterHelper.insertMovie(movieName, movieYear);
-	      // insert crew into crewMember
-	      InserterHelper.insertCrewMember(movieName, movieYear, crews);
-        // insert award
-        InserterHelper.insertAward(movieName, movieYear, crews);
-	      con.commit();
-	      return true;
-	    } catch (SQLException e) {
-	      try {
-	        con.rollback();
-	        System.out.println("all crew roles should have at least one valid input");
-	        System.out.println("Rolling back data...");
-	      } catch (SQLException e1) {
-	        e1.printStackTrace();
-	      }
-	      e.printStackTrace();
-	    } finally {
-	      try {
-	        con.setAutoCommit(true);
-	      } catch (SQLException e) {
-	        e.printStackTrace();
-	      }
-	    }
-      return false;
-	   }	    
-	   
 	  public static boolean insertMusicTransaction(String albumName, int year, String producer, List<MusicTrack> musicTracks) {
        int pplID = -1;
        try {
@@ -4094,8 +4493,166 @@ public class MainFrame {
        }
        return false;
      }
+	  	  
+	  public static void insertOneMusicTrack(String musicName, Album album, MusicTrack mt) {
+         try {
+          con.setAutoCommit(false);
+    	     int id = -1;
+    	     // insert music track
+    	     InserterHelper.insertAlbum(album.albumName, album.year, musicName, mt.language, mt.type, album.producer);
+    	     // insert singers
+    	     id = SelectHelper.getPeopleID(mt.singer1);
+    	     if (id < 0) {
+    	       id = InserterHelper.insertNewPeople(mt.singer1);
+    	       if (id < 0) {
+    	         throw new SQLException();
+    	       }
+    	     }
+    	     InserterHelper.insertMusicSinger(album.albumName, album.year, musicName, id);
+    	     if (mt.singer2 != null) {
+    	       id = SelectHelper.getPeopleID(mt.singer2);
+    	       if (id < 0) {
+    	         id = InserterHelper.insertNewPeople(mt.singer2);
+    	         if (id < 0) {
+    	           throw new SQLException();
+    	         }
+    	       }
+    	       InserterHelper.insertMusicSinger(album.albumName, album.year, musicName, id);
+    	     }
+    	     
+    	     // insert crews
+    //	     InserterHelper.insertMusicPeopleInvolved(albumName, year, musicName, ppl, sw, c, a);
+    	     
+    	     
+    	     Map<String, Integer> musicpeopleid = new HashMap<String, Integer>();
+           musicpeopleid = mt.getCastIDHashMap();
+           
+           // insert into PeopleInvolvedMusic
+             // check the role for each people
+    
+             Map<String, Integer> temprole = new HashMap<String, Integer>();
+             // for each people, serach their roles in music
+             for (int ppl : musicpeopleid.values()) {
+               // check if this people is inserted already
+               if (!SelectHelper.checkMusicCastExist(album.albumName, album.year, mt.getMusicName(), ppl)) {
+                 for (String role : musicpeopleid.keySet()) {
+                   if (musicpeopleid.get(role).equals(ppl)) {
+                     temprole.put(role, ppl);
+                   }
+                 }
+                 // insert
+                 int sw = 0, c=0, a=0;
+                 if (temprole.containsKey("songWriter")) {
+                   sw = 1;
+                 }
+                 if (temprole.containsKey("composer")) {
+                   c = 1;
+                 }
+                 if (temprole.containsKey("arranger")) {
+                   a = 1;
+                 }
+                 // insert 
+                 InserterHelper.insertMusicPeopleInvolved(album.albumName, album.year, mt.getMusicName(), ppl, sw, c, a);
+                 // reset the hashmap
+                 temprole.clear();
+                 sw = 0; c = 0; a= 0;
+               }
+             }
+    
+          } catch (SQLException e) {
+            try {
+              con.rollback();
+            } catch (SQLException e1) {
+              e1.printStackTrace();
+            }
+            System.out.println("rollback ...");
+            e.printStackTrace();
+          } finally {
+            try {
+              con.setAutoCommit(true);
+            } catch (SQLException e) {
+              e.printStackTrace();
+            }
+          }
+           
+       }
+
+	  public static boolean insertOneCrewMember(Movie mv, MovieCrew mc) {
+	    int id = -1;
+	    try {
+        con.setAutoCommit(false);
+        // check if the people involved exist, insert if not
+        id = SelectHelper.getPeopleID(mc.getCrewName()); 
+        if (id < 0) {
+          id = InserterHelper.insertNewPeople(mc.getCrewName());
+          if (id < 0) {
+            throw new SQLException();
+          }
+        }
+        // insert crew into crewMember
+        InserterHelper.insertCrewMember(mv.name, mv.year, mc);
+        // insert award
+        InserterHelper.insertAward(mv.name, mv.year, mc);
+        con.commit();
+        return true;
+      } catch (SQLException e) {
+        try {
+          con.rollback();
+          System.out.println("all crew roles should have at least one valid input");
+          System.out.println("Rolling back data...");
+        } catch (SQLException e1) {
+          e1.printStackTrace();
+        }
+        e.printStackTrace();
+      } finally {
+        try {
+          con.setAutoCommit(true);
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
+      }
+      return false;
+	  }
 	  
-	  public static void deleteBookTransaction(String bookTitle) {
+    public static boolean insertMovieTransaction(String movieName, int movieYear, Map<String, List<MovieCrew>> crews) {
+      try {
+        con.setAutoCommit(false);
+        // check if the people involved exist, insert if not
+        for (List<MovieCrew> list: crews.values()) {
+          for (MovieCrew crew: list) {
+            if (SelectHelper.getPeopleID(crew.getCrewName()) < 0) {
+              InserterHelper.insertNewPeople(crew);
+            }
+          }
+        }
+        // insert movie
+        InserterHelper.insertMovie(movieName, movieYear);
+        // insert crew into crewMember
+        InserterHelper.insertCrewMember(movieName, movieYear, crews);
+        // insert award
+        InserterHelper.insertAward(movieName, movieYear, crews);
+        con.commit();
+        return true;
+      } catch (SQLException e) {
+        try {
+          con.rollback();
+          System.out.println("all crew roles should have at least one valid input");
+          System.out.println("Rolling back data...");
+        } catch (SQLException e1) {
+          e1.printStackTrace();
+        }
+        e.printStackTrace();
+      } finally {
+        try {
+          con.setAutoCommit(true);
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
+      }
+      return false;
+     }
+
+    public static void deleteBookTransaction(String bookTitle) {
 	    try {
 	      con.setAutoCommit(false);
 	      String isbn = SelectHelper.getBookIsbn(bookTitle);
@@ -4509,10 +5066,10 @@ public class MainFrame {
             "where c.peopleinvolved_id = p.id and d.familyname = p.familyname and r.id = c.role_id " + 
             "group by d.familyname) result " + 
             "order by familyname;";
-        Statement statement;
+        PreparedStatement ps;
         try {
-          statement = con.createStatement();
-          rs = statement.executeQuery(sql);
+          ps = con.prepareStatement(sql);
+          rs = ps.executeQuery(sql);
         } catch (SQLException e) {
           e.printStackTrace();
         }
@@ -4534,10 +5091,10 @@ public class MainFrame {
 	        "from book b, bookauthor ba, peopleInvolved p " + 
 	        "where b.isbn = ba.isbn and ba.author_id = p.id " + 
 	        "group by ProductName;";
-      Statement statement;
+	    PreparedStatement ps;
       try {
-        statement = con.createStatement();
-        statement.executeUpdate(sql);
+        ps = con.prepareStatement(sql);
+        ps.executeUpdate(sql);
         return true;
       } catch (SQLException e) {
         e.printStackTrace();
@@ -4554,10 +5111,10 @@ public class MainFrame {
           "from music mu, musicsinger mus, peopleinvolved p " + 
           "where (mu.albumName,mu.year,mu.musicName) = (mus.albumName,mus.year,mus.musicName) and mus.peopleInvolved_id = p.id " + 
           "group by ProductName;";
-      Statement statement;
+      PreparedStatement ps;
       try {
-        statement = con.createStatement();
-        statement.executeUpdate(sql);
+        ps = con.prepareStatement(sql);
+        ps.executeUpdate(sql);
         return true;
       } catch (SQLException e) {
         e.printStackTrace();
@@ -4574,10 +5131,10 @@ public class MainFrame {
           "from movie mv, crewmember cm, peopleinvolved p, role r " + 
           "where (mv.MovieName, mv.year) = (cm.MovieName, cm.ReleaseYear) and cm.PeopleInvolved_id = p.id and cm.role_id = r.id " + 
           "group by ProductName;";
-      Statement statement;
+      PreparedStatement ps;
       try {
-        statement = con.createStatement();
-        statement.executeUpdate(sql);
+        ps = con.prepareStatement(sql);
+        ps.executeUpdate(sql);
         return true;
       } catch (SQLException e) {
         e.printStackTrace();
@@ -4591,10 +5148,10 @@ public class MainFrame {
 	        "from book b2, bookauthor ba " + 
 	        "where b2.isbn = ba.isbn " + 
 	        "order by yearofpublication;";
-	    Statement statement;
+	    PreparedStatement ps;
       try {
-        statement = con.createStatement();
-        statement.executeUpdate(sql);
+        ps = con.prepareStatement(sql);
+        ps.executeUpdate(sql);
         return true;
       } catch (SQLException e) {
         e.printStackTrace();
@@ -4608,10 +5165,10 @@ public class MainFrame {
 	        "from bookAuthorWritten a, bookAuthorWritten b " + 
 	        "where a.author_id = b.author_id and a.year = b.year-1 " + 
 	        "order by a.year, b.year;";
-      Statement statement;
+	    PreparedStatement ps;
       try {
-        statement = con.createStatement();
-        statement.executeUpdate(sql);
+        ps = con.prepareStatement(sql);
+        ps.executeUpdate(sql);
         return true;
       } catch (SQLException e) {
         e.printStackTrace();
@@ -4624,10 +5181,10 @@ public class MainFrame {
 	        "select k.tag, count(*) frequency from bookkeyword bk, keyword k " + 
 	        "where bk.keyword_id = k.id " + 
 	        "group by k.tag;";
-	    Statement statement;
+	    PreparedStatement ps;
       try {
-        statement = con.createStatement();
-        statement.executeUpdate(sql);
+        ps = con.prepareStatement(sql);
+        ps.executeUpdate(sql);
         return true;
       } catch (SQLException e) {
         e.printStackTrace();
@@ -4640,10 +5197,10 @@ public class MainFrame {
           "select cm.peopleinvolved_id, cm.moviename, count(*) numroles " + 
           "from crewmember cm " + 
           "group by peopleinvolved_id, moviename;";
-      Statement statement;
+      PreparedStatement ps;
       try {
-        statement = con.createStatement();
-        statement.executeUpdate(sql);
+        ps = con.prepareStatement(sql);
+        ps.executeUpdate(sql);
         return true;
       } catch (SQLException e) {
         e.printStackTrace();
@@ -4657,10 +5214,10 @@ public class MainFrame {
 	        "from award " + 
 	        "group by moviename " + 
 	        "having numAward > 0;";
-      Statement statement;
+	    PreparedStatement ps;
       try {
-        statement = con.createStatement();
-        statement.executeUpdate(sql);
+        ps = con.prepareStatement(sql);
+        ps.executeUpdate(sql);
         return true;
       } catch (SQLException e) {
         e.printStackTrace();
@@ -4676,10 +5233,10 @@ public class MainFrame {
 	        "END 'Director_name', p.familyname " + 
 	        "from crewmember cm, role r, peopleinvolved p " + 
 	        "where cm.Role_ID = r.id and cm.peopleinvolved_id = p.id;";
-      Statement statement;
+	    PreparedStatement ps;
       try {
-        statement = con.createStatement();
-        statement.executeUpdate(sql);
+        ps = con.prepareStatement(sql);
+        ps.executeUpdate(sql);
         return true;
       } catch (SQLException e) {
         e.printStackTrace();
@@ -4693,10 +5250,10 @@ public class MainFrame {
           "from music " + 
           "group by musicname " + 
           "having numberDup > 1;";
-      Statement statement;
+      PreparedStatement ps;
       try {
-        statement = con.createStatement();
-        statement.executeUpdate(sql);
+        ps = con.prepareStatement(sql);
+        ps.executeUpdate(sql);
         return true;
       } catch (SQLException e) {
         e.printStackTrace();
@@ -4709,10 +5266,10 @@ public class MainFrame {
           "select albumname, year, musicname, peopleinvolved_id " + 
           "from peopleinvolvedmusic " + 
           "where isSongwriter = 1 and iscomposer = 1 and isarranger = 0;";
-      Statement statement;
+      PreparedStatement ps;
       try {
-        statement = con.createStatement();
-        statement.executeUpdate(sql);
+        ps = con.prepareStatement(sql);
+        ps.executeUpdate(sql);
         return true;
       } catch (SQLException e) {
         e.printStackTrace();
@@ -4726,10 +5283,10 @@ public class MainFrame {
 	        "from peopleinvolved p, bookauthor b " + 
 	        "where p.id = b.author_id " + 
 	        "group by p.familyname;";
-      Statement statement;
+	    PreparedStatement ps;
       try {
-        statement = con.createStatement();
-        statement.executeUpdate(sql);
+        ps = con.prepareStatement(sql);
+        ps.executeUpdate(sql);
         return true;
       } catch (SQLException e) {
         e.printStackTrace();
@@ -4742,10 +5299,10 @@ public class MainFrame {
           "select p.id, p.familyname, 1 'IsSinger' " + 
           "from peopleinvolved p, musicsinger m " + 
           "where p.id = m.peopleinvolved_id;";
-      Statement statement;
+      PreparedStatement ps;
       try {
-        statement = con.createStatement();
-        statement.executeUpdate(sql);
+        ps = con.prepareStatement(sql);
+        ps.executeUpdate(sql);
         return true;
       } catch (SQLException e) {
         e.printStackTrace();
@@ -4758,10 +5315,10 @@ public class MainFrame {
           "select p.id, p.familyname, pm.IsArranger, pm.IsComposer, pm.IsSongwriter " + 
           "from peopleinvolved p, peopleinvolvedmusic pm " + 
           "where p.id = pm.peopleinvolved_id;";
-      Statement statement;
+      PreparedStatement ps;
       try {
-        statement = con.createStatement();
-        statement.executeUpdate(sql);
+        ps = con.prepareStatement(sql);
+        ps.executeUpdate(sql);
         return true;
       } catch (SQLException e) {
         e.printStackTrace();
@@ -4775,10 +5332,10 @@ public class MainFrame {
           "from lnameofmusicsinger p " + 
           "left outer join lnameofmusiccrews pm " + 
           "on p.id = pm.id;";
-      Statement statement;
+      PreparedStatement ps;
       try {
-        statement = con.createStatement();
-        statement.executeUpdate(sql);
+        ps = con.prepareStatement(sql);
+        ps.executeUpdate(sql);
         return true;
       } catch (SQLException e) {
         e.printStackTrace();
@@ -4792,10 +5349,10 @@ public class MainFrame {
           "from peopleinvolved p, crewmember c " + 
           "where p.id = c.peopleinvolved_id " + 
           "group by p.familyname;";
-      Statement statement;
+      PreparedStatement ps;
       try {
-        statement = con.createStatement();
-        statement.executeUpdate(sql);
+        ps = con.prepareStatement(sql);
+        ps.executeUpdate(sql);
         return true;
       } catch (SQLException e) {
         e.printStackTrace();
@@ -4810,10 +5367,10 @@ public class MainFrame {
           "where (p.familyname in (select familyname from lnameofbook) and p.familyname in (select familyname from lnameofmusicallpeople)) " + 
           "or (p.familyname in (select familyname from lnameofbook) and p.familyname in (select familyname from lnameofmovie)) " + 
           "or (p.familyname in (select familyname from lnameofmusicallpeople) and p.familyname in (select familyname from lnameofmovie));";
-      Statement statement;
+      PreparedStatement ps;
       try {
-        statement = con.createStatement();
-        statement.executeUpdate(sql);
+        ps = con.prepareStatement(sql);
+        ps.executeUpdate(sql);
         return true;
       } catch (SQLException e) {
         e.printStackTrace();
@@ -4823,31 +5380,6 @@ public class MainFrame {
 	}
 	
 	
-	
-	public static DefaultTableModel buildTableModel(ResultSet rs)
-      throws SQLException {
-
-      ResultSetMetaData metaData = rs.getMetaData();
-
-      // names of columns
-      Vector<String> columnNames = new Vector<String>();
-      int columnCount = metaData.getColumnCount();
-      for (int column = 1; column <= columnCount; column++) {
-          columnNames.add(metaData.getColumnName(column));
-      }
-
-      // data of the table
-      Vector<Vector<Object>> data = new Vector<Vector<Object>>();
-      while (rs.next()) {
-          Vector<Object> vector = new Vector<Object>();
-          for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
-              vector.add(rs.getObject(columnIndex));
-          }
-          data.add(vector);
-      }
-
-      return new DefaultTableModel(data, columnNames);
-	}
 	
 	public static class Book {
 	  private String title, isbn, publisher, bookAbstract;
@@ -5015,7 +5547,6 @@ public class MainFrame {
 	    this.songWriter = songWriter;
 	    this.composer = composer;
 	    this.arranger = arranger;
-//	    System.out.println(this.type + " " + this.type.getString() + " xD");
 	  }
 	  
 	  public MusicTrack get() {
@@ -5186,6 +5717,64 @@ public class MainFrame {
 	    return success;
 	  }
 	}
+	
+	public static class Movie {
+	  private String name;
+	  private int year;
+	  private Map<String, List<MovieCrew>> crews = new HashMap<String, List<MovieCrew>>();
+	  public Movie(String name, int year, Map<String, List<MovieCrew>> crews) {
+	    this.name = name;
+	    this.year = year;
+	    this.crews = crews;
+	  }
+	  
+	  public String getMovieName() {
+	    return this.name;
+	  }
+	  
+	  public int getYear() {
+	    return this.year;
+	  }
+	  
+	  public Map<String, List<MovieCrew>> getCrewsMap() {
+	    return this.crews;
+	  }
+	  
+	  public List<MovieCrew> getCrewList(String crewRole) {
+	    return crews.get(crewRole);
+	  }
+	  
+	  public boolean compareMovie(String name) {
+	    if (this.getMovieName().equalsIgnoreCase(name)) {
+	      return true;
+	    }
+	    return false;
+	  }
+	  
+	  public boolean compareYear(int year) {
+	    if (this.getYear() == year) {
+	      return true;
+	    }
+	    return false;
+	  }
+	  
+//	  public boolean compareCrewList(String crewRole, List<MovieCrew> crewlist) {
+//	    List<MovieCrew> thisList = this.getCrewList(crewRole);
+//	    MovieCrew curr = null;
+//	    boolean same = true;
+//	    for (MovieCrew crew : crewlist) {
+//	      if (crewlist.contains(crew)) {
+//	        
+////	        same = crew.compareAward(crew.)? 
+//	      } else {
+//	        same = false;
+//	        break;
+//	      }
+//	    }
+//	  }
+	  
+//	  publi 
+	}
 
   public static class MovieCrew {
     private String name;
@@ -5218,6 +5807,10 @@ public class MainFrame {
       return this.roleid;
     }
     
+    public String getRoleName() {
+      return SelectHelper.getMovieRoleName(this.roleid);
+    }
+    
     public int getPeopleID() {
       return SelectHelper.getPeopleID(this.name);
     }
@@ -5226,11 +5819,47 @@ public class MainFrame {
     public String toString() {
       return this.name + ' ' + this.roleid;
     }
+    
+    public boolean compareName(String name) {
+      if (this.name.equalsIgnoreCase(name)) {
+        return true;
+      }
+      return false;
+    }
+    
+    public boolean compareGender(boolean gender) {
+      if (this.gender && !gender) {
+        return false;
+      }
+      return true;
+    }
+    
+    public boolean compareAward(boolean award) {
+      if (this.award && !award) {
+        return false;
+      }
+      return true;
+    }
+    
+    public boolean compareCrew(MovieCrew newCrew) {
+      boolean same = true;
+      same = same && this.compareAward(newCrew.getAward());
+      same = same && this.compareGender(newCrew.getGender());
+      same = same && this.compareName(newCrew.getCrewName());
+      return same;
+    }
+    
   }
 	
 	
 	public class CreateFrameMovieCrew {
-	   public CreateFrameMovieCrew(Map<String, List<MovieCrew>> crews)
+	  
+	   /**
+	    * for inserting a new movie crew, click through the add crew button 
+	    * @param crews
+	    * @param update (true if from update page, false if from insert page)
+	    */
+	   public CreateFrameMovieCrew(Map<String, List<MovieCrew>> crews, boolean update)
      {
        JFrame frame = new JFrame("Add movie crews");
 	     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -5297,30 +5926,71 @@ public class MainFrame {
              ///... unique name so skip?
 
              // check if there are still space for entering this people
-             for (String crewRole: crews.keySet()) {
-               if (crewRole.equalsIgnoreCase("cast")) {
-                 // check if there are already 10 people
-                 if (crews.get(crewRole).size() >= 10 && role.equalsIgnoreCase(crewRole)) {
-                   valid = false;
-                   JOptionPane.showMessageDialog(null, "You have already entered 10 Casts", "Insert movie crew - too many cast entered", JOptionPane.ERROR_MESSAGE);
-                   break;
+
+             if (update) {
+               // check if this music name appears in the model
+               if (model.contains(name + " " + role) || model2.contains(name + " " + role)) {
+                 JOptionPane.showMessageDialog(null, "You have entered a duplicated crew-role", "Insert movie crew - duplicated crew-role", JOptionPane.ERROR_MESSAGE);
+                 valid = false;
+               }
+               for (String crewRole: tempcrew.keySet()) {
+                 if (crewRole.equalsIgnoreCase("cast")) {
+                   // check if there are already 10 people
+                   if (tempcrew.get(crewRole).size() >= 10 && role.equalsIgnoreCase(crewRole)) {
+                     valid = false;
+                     JOptionPane.showMessageDialog(null, "You have already entered 10 Casts", "Insert movie crew - too many cast entered", JOptionPane.ERROR_MESSAGE);
+                     break;
+                   }
+                 } else {
+                   // check if there are already 3 people
+                   if (tempcrew.get(crewRole).size() >= 3 && role.equalsIgnoreCase(crewRole)) {
+                     valid = false;
+                     JOptionPane.showMessageDialog(null, "You have already entered 3 " + crewRole, "Insert movie crew - too many crews entered", JOptionPane.ERROR_MESSAGE);
+                     break;
+                   }
                  }
-               } else {
-                 // check if there are already 3 people
-                 if (crews.get(crewRole).size() >= 3 && role.equalsIgnoreCase(crewRole)) {
-                   valid = false;
-                   JOptionPane.showMessageDialog(null, "You have already entered 3 " + crewRole, "Insert movie crew - too many crews entered", JOptionPane.ERROR_MESSAGE);
-                   break;
+               }
+             } else {
+               for (String crewRole: crews.keySet()) {
+                 if (crewRole.equalsIgnoreCase("cast")) {
+                   // check if there are already 10 people
+                   if (crews.get(crewRole).size() >= 10 && role.equalsIgnoreCase(crewRole)) {
+                     valid = false;
+                     JOptionPane.showMessageDialog(null, "You have already entered 10 Casts", "Insert movie crew - too many cast entered", JOptionPane.ERROR_MESSAGE);
+                     break;
+                   }
+                 } else {
+                   // check if there are already 3 people
+                   if (crews.get(crewRole).size() >= 3 && role.equalsIgnoreCase(crewRole)) {
+                     valid = false;
+                     JOptionPane.showMessageDialog(null, "You have already entered 3 " + crewRole, "Insert movie crew - too many crews entered", JOptionPane.ERROR_MESSAGE);
+                     break;
+                   }
                  }
                }
              }
              
+             
              if (valid) {
                // make a new MovieCrew object
                MovieCrew mc = new MovieCrew(name, male, award, SelectHelper.getRoleID(role));
-               crews.get(role).add(mc);
+               if (update) {
+                 // insert new music track
+                 // may have to think how to insert them when finally submit button is click on the main page
+//                 TODO:TransactionHelper.insertOneCrewMember(oldMovie, mc); // insert those in tempcrew at the main menu
+                 if (role.equalsIgnoreCase("cast")) {
+                   model2.addElement(name + " " + role);
+                 } else {
+                   model.addElement(name + " " + role);
+                 }
+                 tempcrew.get(role).add(mc);
+               } else {
+                 crews.get(role).add(mc);
+               }
                JOptionPane.showMessageDialog(null, "submitted", "Insert movie crew - submitted", JOptionPane.INFORMATION_MESSAGE);
-             }           
+               // TODO: clear fields
+               
+             }
            }
          }
        });
@@ -5417,6 +6087,11 @@ public class MainFrame {
         private ButtonModel model_cd;
         private ButtonModel model_vinyl;
         
+      /**
+       * for inserting a new music track, click throught the add music track button
+       * @param musicTracks
+       * @param update (true if from update page, false if from insert page)
+       */
       public CreateFrameMusicTrack(List<MusicTrack> musicTracks, boolean update)
       {
           JFrame frame = new JFrame("Test");
@@ -5513,7 +6188,7 @@ public class MainFrame {
                   MusicTrack mt = new MusicTrack(musicName, lang, ((type == diskType.VINYL) ? diskType.VINYL : diskType.AUDIOCD), singer1, singer2, songWriter, composer, arranger);
                   if (update) {
                     // insert new music track
-                    InserterHelper.insertMusicTrack(musicName, oldAlbum, mt);
+                    TransactionHelper.insertOneMusicTrack(musicName, oldAlbum, mt);
                     model.addElement(musicName);
                     tracks.put(musicName, mt);
                   } else {
@@ -5701,6 +6376,10 @@ public class MainFrame {
       }
 
       
+      /**
+       * for update a musictrack (clicked through the JList)
+       * @param oldmt
+       */
       public CreateFrameMusicTrack(MusicTrack oldmt)
       {
           JFrame frame = new JFrame("Test");
