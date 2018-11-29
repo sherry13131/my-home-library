@@ -1548,21 +1548,6 @@ public class MainFrame {
         } else {
           // get all the input
           movieName = upMovieNameTx.getText();
-          
-          // insert all the new crews and do all update from movie name and year
-          // if crews list changed, modify it
-//          for (List<MovieCrew> oldlist: crews.values()) {
-//              for (MovieCrew oldmc : oldlist) {
-//                // if tempcrew don't have oldmc, delete it from db
-//                if (!tempcrew.contains(oldmc)) {
-//                  DeleteHelper.removeMovieCrew(oldMovie, oldmc);
-//                }
-//                // if oldmc exist in tempcrew, remove from tempcrew
-//                
-//              }
-//          }
-          // insert the movie crew that remains in the temcrew list
-          // ---------------------------------------------------------------------------------
           boolean changedn = false, changedy = false, valid = true;
           // delete all the movieCrew, insert all the crew in tempcrew
           try {
@@ -1612,26 +1597,20 @@ public class MainFrame {
             }
           }
           
-          
-          
-          
-          
-          // if movie name changed
-          // if movie year changed
-          
-          // check if movie exist
-//          if (!checkHelper.movieExist(movieName)) {
-//            // inserting start
-//            TransactionHelper.insertMovieTransaction(movieName, year, crews);
-//            JOptionPane.showMessageDialog(null, "Movie inserted", "Insert movie - movie inserted", JOptionPane.INFORMATION_MESSAGE);
-//          } else {
-//            JOptionPane.showMessageDialog(null, "Movie already exist", "Insert movie - movie existed", JOptionPane.ERROR_MESSAGE);
-//          }
+          CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
+          c.show(frame.getContentPane(), "mainPage");
+        
         }
       }
     });
     
     JButton button_8 = new JButton("Cancel");
+    button_8.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent arg0) {
+        CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
+        c.show(frame.getContentPane(), "mainPage");
+      }
+    });
     
     JLabel label_16 = new JLabel("Release year:");
     
@@ -1751,9 +1730,49 @@ public class MainFrame {
           }
           if(evt.getButton() == MouseEvent.BUTTON3 && evt.getClickCount() == 2) {
             int dialogButton = JOptionPane.YES_NO_OPTION;
-            int dialogResult = JOptionPane.showConfirmDialog (null, "Would You Like to delete this music track?","Comfirm",dialogButton);
+            int dialogResult = JOptionPane.showConfirmDialog (null, "Would You Like to delete this movie crew?","Comfirm",dialogButton);
             if(dialogResult == JOptionPane.YES_OPTION){
-              // get the music track, delete it
+              // get the movie crew, delete it
+              int index = list.locationToIndex(evt.getPoint());
+              String movieCrew = model2.getElementAt(index);
+              String[] temp = movieCrew.split("---");
+              String crewname = temp[0];
+              String crewrole = temp[1];
+              
+              if (tempcrew.get("cast").size() > 1) {
+                for (MovieCrew mc : tempcrew.get("cast")) {
+                  if (mc.getCrewName().equalsIgnoreCase(crewname)) {
+                    // remove from tempcrew list
+                    tempcrew.get("cast").remove(mc);
+                    model2.removeElement(mc.getCrewName() + "---cast");
+                    JOptionPane.showMessageDialog(null, "Movie cast has been removed", "Remove successfully", JOptionPane.INFORMATION_MESSAGE);
+                    break;
+                  }
+                }
+              } else {
+                JOptionPane.showMessageDialog(null, "You should have at least one cast for each movie", "Remove fail", JOptionPane.ERROR_MESSAGE);
+              }
+              
+//              try {
+//                con.setAutoCommit(false);
+//                DeleteHelper.removeOneMusicTrack(oldAlbum, mt);
+//              } catch (SQLException e) {
+//                try {
+//                  con.rollback();
+//                } catch (SQLException e1) {
+//                  e1.printStackTrace();
+//                }
+//                System.out.println("rollback");
+//                e.printStackTrace();
+//              } finally {
+//                try {
+//                  con.setAutoCommit(true);
+//                } catch (SQLException e) {
+//                  e.printStackTrace();
+//                }
+//              }
+              // update the tracks and album music tracks list
+              
             }
           }
       }
@@ -1782,9 +1801,29 @@ public class MainFrame {
           }
           if(evt.getButton() == MouseEvent.BUTTON3 && evt.getClickCount() == 2) {
             int dialogButton = JOptionPane.YES_NO_OPTION;
-            int dialogResult = JOptionPane.showConfirmDialog (null, "Would You Like to delete this music track?","Comfirm",dialogButton);
+            int dialogResult = JOptionPane.showConfirmDialog (null, "Would You Like to delete this crew?","Comfirm",dialogButton);
             if(dialogResult == JOptionPane.YES_OPTION){
-              // get the music track, delete it
+              // get the movie crew, delete it from the tempcrew list
+              int index = list.locationToIndex(evt.getPoint());
+              String movieCrew = model.getElementAt(index);
+              String[] temp = movieCrew.split("---");
+              String crewname = temp[0];
+              String crewrole = temp[1];
+
+              if (tempcrew.get(crewrole).size() > 1) {
+                for (MovieCrew mc : tempcrew.get(crewrole)) {
+                  if (mc.getCrewName().equalsIgnoreCase(crewname)) {
+                    // remove from tempcrew list
+                    tempcrew.get(crewrole).remove(mc);
+                    model.removeElement(mc.getCrewName() + "---" + crewrole);
+                    JOptionPane.showMessageDialog(null, "Movie cast has been removed", "Remove successfully", JOptionPane.INFORMATION_MESSAGE);
+                    break;
+                  }
+                }
+              } else {
+                JOptionPane.showMessageDialog(null, "You should have at least one cast for each movie", "Remove fail", JOptionPane.ERROR_MESSAGE);
+              }
+              
             }
           }
       }
@@ -6061,15 +6100,17 @@ public class MainFrame {
                  // may have to think how to insert them when finally submit button is click on the main page
 //                 TODO:TransactionHelper.insertOneCrewMember(oldMovie, mc); // insert those in tempcrew at the main menu
                  if (role.equalsIgnoreCase("cast")) {
-                   model2.addElement(name + " " + role);
+                   model2.addElement(name + "---" + role);
                  } else {
-                   model.addElement(name + " " + role);
+                   model.addElement(name + "---" + role);
                  }
                  tempcrew.get(role).add(mc);
+                 JOptionPane.showMessageDialog(null, "submitted", "Update movie crew - added a new crew", JOptionPane.INFORMATION_MESSAGE);
                } else {
                  crews.get(role).add(mc);
+                 JOptionPane.showMessageDialog(null, "submitted", "Insert movie crew - submitted", JOptionPane.INFORMATION_MESSAGE);
                }
-               JOptionPane.showMessageDialog(null, "submitted", "Insert movie crew - submitted", JOptionPane.INFORMATION_MESSAGE);
+               
                // TODO: clear fields
                
              }
@@ -6206,15 +6247,15 @@ public class MainFrame {
        } else {
          castGenderGroup.setSelected(model_female, true);
        }
-       String role = mc.getRoleName();
-       insRoleTx.setSelectedValue(role, true);
+       String oldRole = mc.getRoleName();
+       insRoleTx.setSelectedValue(oldRole, true);
        if (mc.getAward()) {
          chckbxTickIfYes.setSelected(true);
        }
        
        
        
-       JButton button = new JButton("Submit");
+       JButton button = new JButton("Update");
        button.addActionListener(new ActionListener() {
          public void actionPerformed(ActionEvent arg0) {
         // validate all input fields
@@ -6242,12 +6283,13 @@ public class MainFrame {
 
              // check if there are still space for entering this people
 
-             if (update) {
+//             if (update) {
                // check if this music name appears in the model
 //               if (model.contains(name + " " + role) || model2.contains(name + " " + role)) {
 //                 JOptionPane.showMessageDialog(null, "You have entered a duplicated crew-role", "Insert movie crew - duplicated crew-role", JOptionPane.ERROR_MESSAGE);
 //                 valid = false;
 //               }
+             if (!mc.compareName(name)) {
                for (List<MovieCrew> list: tempcrew.values()) {
                  for (MovieCrew c: list) {
                    if (c.compareName(name)) {
@@ -6256,70 +6298,115 @@ public class MainFrame {
                    }
                  }
                }
-               for (String crewRole: tempcrew.keySet()) {
-                 if (crewRole.equalsIgnoreCase("cast")) {
-                   // check if there are already 10 people
-                   if (tempcrew.get(crewRole).size() >= 10 && role.equalsIgnoreCase(crewRole)) {
-                     valid = false;
-                     JOptionPane.showMessageDialog(null, "You have already entered 10 Casts", "Insert movie crew - too many cast entered", JOptionPane.ERROR_MESSAGE);
-                     break;
-                   }
-                 } else {
-                   // check if there are already 3 people
-                   if (tempcrew.get(crewRole).size() >= 3 && role.equalsIgnoreCase(crewRole)) {
-                     valid = false;
-                     JOptionPane.showMessageDialog(null, "You have already entered 3 " + crewRole, "Insert movie crew - too many crews entered", JOptionPane.ERROR_MESSAGE);
-                     break;
-                   }
-                 }
-               }
-             } else {
-               for (List<MovieCrew> list: crews.values()) {
-                 for (MovieCrew c: list) {
-                   if (c.compareName(name)) {
-                     JOptionPane.showMessageDialog(null, "You have entered a duplicated crew", "Insert movie crew - duplicated crew", JOptionPane.ERROR_MESSAGE);
-                     valid = false;
-                   }
-                 }
-               }
-               for (String crewRole: crews.keySet()) {
-                 if (crewRole.equalsIgnoreCase("cast")) {
-                   // check if there are already 10 people
-                   if (crews.get(crewRole).size() >= 10 && role.equalsIgnoreCase(crewRole)) {
-                     valid = false;
-                     JOptionPane.showMessageDialog(null, "You have already entered 10 Casts", "Insert movie crew - too many cast entered", JOptionPane.ERROR_MESSAGE);
-                     break;
-                   }
-                 } else {
-                   // check if there are already 3 people
-                   if (crews.get(crewRole).size() >= 3 && role.equalsIgnoreCase(crewRole)) {
-                     valid = false;
-                     JOptionPane.showMessageDialog(null, "You have already entered 3 " + crewRole, "Insert movie crew - too many crews entered", JOptionPane.ERROR_MESSAGE);
-                     break;
-                   }
-                 }
-               }
              }
+               if (!oldRole.equalsIgnoreCase(role)) {
+                 if (tempcrew.get(oldRole).size() <= 1) {
+                   valid = false;
+                   JOptionPane.showMessageDialog(null, "You need at least 1 people for that role", "Insert movie crew - too few cast entered", JOptionPane.ERROR_MESSAGE);
+                 }
+                 if (role.equalsIgnoreCase("cast")) {
+                   if (tempcrew.get(role).size() >= 10) {
+                     valid = false;
+                     JOptionPane.showMessageDialog(null, "You have already entered 10 Casts", "Insert movie crew - too many cast entered", JOptionPane.ERROR_MESSAGE);
+                   }
+                 } else {
+                   if (tempcrew.get(role).size() >= 3) {
+                     valid = false;
+                     JOptionPane.showMessageDialog(null, "You have already entered 3 Casts", "Insert movie crew - too many cast entered", JOptionPane.ERROR_MESSAGE);
+                   }
+                 }
+               }
+//                 for (String crewRole: tempcrew.keySet()) {
+//                   if (crewRole.equalsIgnoreCase("cast")) {
+//                     // check if there are already 10 people
+//                     if (tempcrew.get(crewRole).size() >= 10 && crewRole.equalsIgnoreCase(role)) {
+//                       valid = false;
+//                       JOptionPane.showMessageDialog(null, "You have already entered 10 Casts", "Insert movie crew - too many cast entered", JOptionPane.ERROR_MESSAGE);
+//                       break;
+//                     }
+//                     if (tempcrew.get(crewRole).size() <= 1 && crewRole.equalsIgnoreCase(oldRole)) {
+//                       valid = false;
+//                       JOptionPane.showMessageDialog(null, "You need at least 1 Casts", "Insert movie crew - too few cast entered", JOptionPane.ERROR_MESSAGE);
+//                       break;
+//                     }
+//                   } else {
+//                     // check if there are already 3 people
+//                     if (crews.get(crewRole).size() >= 3 && role.equalsIgnoreCase(crewRole)) {
+//                       valid = false;
+//                       JOptionPane.showMessageDialog(null, "You have already entered 3 " + crewRole, "Insert movie crew - too many crews entered", JOptionPane.ERROR_MESSAGE);
+//                       break;
+//                     }
+//                   }
+//                 }
+                 
+//                 } else {
+//                   // check if there are already 3 people
+//                   if (tempcrew.get(crewRole).size() >= 3 && role.equalsIgnoreCase(crewRole)) {
+//                     valid = false;
+//                     JOptionPane.showMessageDialog(null, "You have already entered 3 " + crewRole, "Insert movie crew - too many crews entered", JOptionPane.ERROR_MESSAGE);
+//                     break;
+//                   }
+//                 }
+//               }
+//             } else {
+//               for (List<MovieCrew> list: crews.values()) {
+//                 for (MovieCrew c: list) {
+//                   if (c.compareName(name)) {
+//                     JOptionPane.showMessageDialog(null, "You have entered a duplicated crew", "Insert movie crew - duplicated crew", JOptionPane.ERROR_MESSAGE);
+//                     valid = false;
+//                   }
+//                 }
+//               }
+//               for (String crewRole: crews.keySet()) {
+//                 if (crewRole.equalsIgnoreCase("cast")) {
+//                   // check if there are already 10 people
+//                   if (crews.get(crewRole).size() >= 10 && role.equalsIgnoreCase(crewRole)) {
+//                     valid = false;
+//                     JOptionPane.showMessageDialog(null, "You have already entered 10 Casts", "Insert movie crew - too many cast entered", JOptionPane.ERROR_MESSAGE);
+//                     break;
+//                   }
+//                 } else {
+//                   // check if there are already 3 people
+//                   if (crews.get(crewRole).size() >= 3 && role.equalsIgnoreCase(crewRole)) {
+//                     valid = false;
+//                     JOptionPane.showMessageDialog(null, "You have already entered 3 " + crewRole, "Insert movie crew - too many crews entered", JOptionPane.ERROR_MESSAGE);
+//                     break;
+//                   }
+//                 }
+//               }
+//             }
              
              
              if (valid) {
                // make a new MovieCrew object
-               MovieCrew mc = new MovieCrew(name, male, award, SelectHelper.getRoleID(role));
-               if (update) {
-                 // insert new music track
-                 // may have to think how to insert them when finally submit button is click on the main page
-//                 TODO:TransactionHelper.insertOneCrewMember(oldMovie, mc); // insert those in tempcrew at the main menu
-                 if (role.equalsIgnoreCase("cast")) {
-                   model2.addElement(name + " " + role);
-                 } else {
-                   model.addElement(name + " " + role);
-                 }
-                 tempcrew.get(role).add(mc);
+               MovieCrew newmc = new MovieCrew(name, male, award, SelectHelper.getRoleID(role));
+               tempcrew.get(oldRole).remove(mc);
+               tempcrew.get(role).add(newmc);
+               if (oldRole.equalsIgnoreCase("cast")) {
+                 model2.removeElement(mc.getCrewName() + "---" + oldRole);  
                } else {
-                 crews.get(role).add(mc);
+                 model.removeElement(mc.getCrewName() + "---" + oldRole);
                }
+               if (role.equalsIgnoreCase("cast")) {
+                 model2.addElement(newmc.getCrewName() + "---" + role);
+               } else {
+                 model.addElement(newmc.getCrewName() + "---" + role);
+               }
+//               if (update) {
+//                 // insert new music track
+//                 // may have to think how to insert them when finally submit button is click on the main page
+////                 TODO:TransactionHelper.insertOneCrewMember(oldMovie, mc); // insert those in tempcrew at the main menu
+//                 if (role.equalsIgnoreCase("cast")) {
+//                   model2.addElement(name + " " + role);
+//                 } else {
+//                   model.addElement(name + " " + role);
+//                 }
+//                 tempcrew.get(role).add(mc);
+//               } else {
+//                 crews.get(role).add(mc);
+//               }
                JOptionPane.showMessageDialog(null, "submitted", "Insert movie crew - submitted", JOptionPane.INFORMATION_MESSAGE);
-               // TODO: clear fields
+//               // TODO: clear fields
                
              }
            }
