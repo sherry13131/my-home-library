@@ -1093,7 +1093,7 @@ public class MainFrame {
           } catch (SQLException e1) {
             e1.printStackTrace();
           }
-//          e.printStackTrace();
+          e.printStackTrace();
         } finally {
           try {
             con.setAutoCommit(true);
@@ -2324,7 +2324,7 @@ public class MainFrame {
                 award = crewResult.getBoolean("award");
                 mc = new MovieCrew(crewname, gender, award, roleid);
                 // add moviecrew object to corresponding list of the role
-                role = SelectHelper.getMovieRoleName(roleid);
+                role = SelectHelper.getMovieRoleName(roleid).toLowerCase();
                 crews.get(role).add(mc);
                 tempcrew.get(role).add(mc);
               }
@@ -3012,10 +3012,10 @@ public class MainFrame {
 	  }
 	  
 	  public static int insertNewPeople(String fullname) throws SQLException {
-	    int nextID = SelectHelper.getNextPeopleID();
+//	    int nextID = SelectHelper.getNextPeopleID();
 	    String first=null, mid=null, last = null;
 	    String[] name = fullname.split(" ");
-	    if (nextID > 0) {
+//	    if (nextID > 0) {
 	      if (name.length == 2) {
 	        first = name[0];
 	        last = name[1];
@@ -3026,54 +3026,54 @@ public class MainFrame {
 	      }
 	      if (name.length >= 2) {
 	        // insert new author
-	        String sql = "insert into PeopleInvolved values (?,?,?,?,?);";
+	        String sql = "insert into PeopleInvolved (firstname, middlename, familyname, gender) values (?,?,?,?);";
 	        try {
 	          PreparedStatement preparedStatement;
 	          preparedStatement = con.prepareStatement(sql);
-	          preparedStatement.setInt(1, nextID);
-	          preparedStatement.setString(2, first);
-	          preparedStatement.setString(3, mid);
-	          preparedStatement.setString(4, last);
-	          preparedStatement.setString(5, null);
+	          preparedStatement.setString(1, first);
+	          preparedStatement.setString(2, mid);
+	          preparedStatement.setString(3, last);
+	          preparedStatement.setString(4, null);
 	          preparedStatement.executeUpdate();
-	          return nextID;
+	          return SelectHelper.getPeopleID(fullname);
 	        } catch (SQLException e) {
 	          e.printStackTrace();
 	        }
 	      }
-	    }
+//	    }
 	    return -1;
 	  }
 	  
 	  public static int insertNewPeople(MovieCrew crew) throws SQLException {
-      int nextID = SelectHelper.getNextPeopleID();
-      String first=null, mid=null, last = null;
+//      int nextID = SelectHelper.getNextPeopleID();
+      String first=null, mid=null, last = null, fullname = null;
       String[] name = crew.getCrewName().split(" ");
-      if (nextID > 0) {
-        if (name.length == 2) {
-          first = name[0];
-          last = name[1];
-        } else if (name.length >= 3) {
-          first = name[0];
-          mid = name[1];
-          last = name[2];
-        }
-        if (name.length >= 2) {
-          // insert new author
-          String sql = "insert into PeopleInvolved values (?,?,?,?,?);";
-          try {
-            PreparedStatement preparedStatement;
-            preparedStatement = con.prepareStatement(sql);
-            preparedStatement.setInt(1, nextID);
-            preparedStatement.setString(2, first);
-            preparedStatement.setString(3, mid);
-            preparedStatement.setString(4, last);
-            preparedStatement.setBoolean(5, crew.getGender());
-            preparedStatement.executeUpdate();
-            return nextID;
-          } catch (SQLException e) {
-            e.printStackTrace();
-          }
+    
+      if (name.length == 2) {
+        first = name[0];
+        last = name[1];
+        fullname = first + " " + last;
+      } else if (name.length >= 3) {
+        first = name[0];
+        mid = name[1];
+        last = name[2];
+        fullname = first + " " + mid + " " + last;
+      }
+      if (name.length >= 2) {
+        // insert new author
+        String sql = "insert into PeopleInvolved (firstname, middlename, familyname, gender) values (?,?,?,?);";
+        try {
+          PreparedStatement preparedStatement;
+          preparedStatement = con.prepareStatement(sql);
+//            preparedStatement.setInt(1, nextID);
+          preparedStatement.setString(1, first);
+          preparedStatement.setString(2, mid);
+          preparedStatement.setString(3, last);
+          preparedStatement.setBoolean(4, crew.getGender());
+          preparedStatement.executeUpdate();
+          return SelectHelper.getPeopleID(fullname);
+        } catch (SQLException e) {
+          e.printStackTrace();
         }
       }
       return -1;
@@ -3192,13 +3192,21 @@ public class MainFrame {
 	  public static void insertCrewMember(String movieName, int movieYear, Map<String, List<MovieCrew>> crews) throws SQLException {
 	    String sql = "insert into CrewMember values (?,?,?,?);";  
 	    PreparedStatement ps;
+	    int id = -1;
       ps = con.prepareStatement(sql);
       ps.setString(2, movieName);
       ps.setInt(3, movieYear);
       for (List<MovieCrew> list : crews.values()) {
         for (MovieCrew crew: list) {
           // get peopleID for people
-          ps.setInt(1, crew.getPeopleID());
+          id = crew.getPeopleID();
+          if (id < 0) {
+            id = InserterHelper.insertNewPeople(crew);
+            if (id < 0) {
+              throw new SQLException();
+            }
+          }
+          ps.setInt(1, id);
           // for each role the person has 
           ps.setInt(4, crew.getRoleID());
           ps.executeUpdate();
@@ -5808,7 +5816,7 @@ public class MainFrame {
     }
     
     public String getRoleName() {
-      return SelectHelper.getMovieRoleName(this.roleid);
+      return SelectHelper.getMovieRoleName(this.roleid).toLowerCase();
     }
     
     public int getPeopleID() {
@@ -5889,7 +5897,10 @@ public class MainFrame {
        
        JRadioButton rdbtnMale = new JRadioButton("male");
        rdbtnMale.setSelected(true);
+       rdbtnMale.setActionCommand("male");
+       
        JRadioButton rdbtnFemale = new JRadioButton("female");
+       rdbtnFemale.setActionCommand("female");
        
        ButtonGroup castGenderGroup = new ButtonGroup();
        castGenderGroup.add(rdbtnMale);
@@ -5915,7 +5926,7 @@ public class MainFrame {
            } else {
              // get all the inputs
              role = insRoleTx.getSelectedValue().toString();
-             if (castGenderGroup.getSelection().toString().equalsIgnoreCase("male")) {
+             if (castGenderGroup.getSelection().getActionCommand().equalsIgnoreCase("male")) {
                male = true;
              }
              if (chckbxTickIfYes.isSelected()) {
@@ -5929,9 +5940,17 @@ public class MainFrame {
 
              if (update) {
                // check if this music name appears in the model
-               if (model.contains(name + " " + role) || model2.contains(name + " " + role)) {
-                 JOptionPane.showMessageDialog(null, "You have entered a duplicated crew-role", "Insert movie crew - duplicated crew-role", JOptionPane.ERROR_MESSAGE);
-                 valid = false;
+//               if (model.contains(name + " " + role) || model2.contains(name + " " + role)) {
+//                 JOptionPane.showMessageDialog(null, "You have entered a duplicated crew-role", "Insert movie crew - duplicated crew-role", JOptionPane.ERROR_MESSAGE);
+//                 valid = false;
+//               }
+               for (List<MovieCrew> list: tempcrew.values()) {
+                 for (MovieCrew c: list) {
+                   if (c.compareName(name)) {
+                     JOptionPane.showMessageDialog(null, "You have entered a duplicated crew", "Insert movie crew - duplicated crew", JOptionPane.ERROR_MESSAGE);
+                     valid = false;
+                   }
+                 }
                }
                for (String crewRole: tempcrew.keySet()) {
                  if (crewRole.equalsIgnoreCase("cast")) {
@@ -5951,6 +5970,14 @@ public class MainFrame {
                  }
                }
              } else {
+               for (List<MovieCrew> list: crews.values()) {
+                 for (MovieCrew c: list) {
+                   if (c.compareName(name)) {
+                     JOptionPane.showMessageDialog(null, "You have entered a duplicated crew", "Insert movie crew - duplicated crew", JOptionPane.ERROR_MESSAGE);
+                     valid = false;
+                   }
+                 }
+               }
                for (String crewRole: crews.keySet()) {
                  if (crewRole.equalsIgnoreCase("cast")) {
                    // check if there are already 10 people
@@ -6152,12 +6179,15 @@ public class MainFrame {
                 
                 // get diskType
                 String typeString = null;
-                for (Enumeration<AbstractButton> buttons = diskTypeTx.getElements(); buttons.hasMoreElements();) {
-                  AbstractButton button = buttons.nextElement();
-                  if (button.isSelected()) {
-                    typeString = button.getText();
-                  }
+//                for (Enumeration<AbstractButton> buttons = diskTypeTx.getElements(); buttons.hasMoreElements();) {
+//                  AbstractButton button = buttons.nextElement();
+//                  if (button.isSelected()) {
+//                    typeString = diskTypeTx.getSelection().getActionCommand();
+//                  }
+                if (diskTypeTx.getSelection().getActionCommand().equalsIgnoreCase("vinyl")) {
+                  typeString = diskTypeTx.getSelection().getActionCommand();
                 }
+//                }
 //                for (diskType d : type.getIteration()) {
 //                  if (d.getString().equalsIgnoreCase(typeString)) {
 //                    type = d.getEnum();
@@ -6230,14 +6260,17 @@ public class MainFrame {
           
           JRadioButton radioButton_cd = new JRadioButton("audioCD");
           radioButton_cd.setSelected(true);
+          radioButton_cd.setActionCommand("audioCD");
           
           JRadioButton radioButton_vinyl = new JRadioButton("vinyl");
+          radioButton_vinyl.setActionCommand("vinyl");
 
           model_cd = radioButton_cd.getModel();
           model_vinyl = radioButton_vinyl.getModel();
           diskTypeTx = new ButtonGroup();
           diskTypeTx.add(radioButton_cd);
           diskTypeTx.add(radioButton_vinyl);
+          
           
           JLabel label_40 = new JLabel("Producer:");
           
