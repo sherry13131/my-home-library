@@ -160,34 +160,6 @@ public class MainFrame {
 				}
 			}
 		});
-//	  MusicTrack a = new MusicTrack("song1", "eng", diskType.AUDIOCD, "sherry", null,
-//        "songWriter", "composer", "arranger");
-//	  MusicTrack b = new MusicTrack("song1", "eng", diskType.AUDIOCD, "sherry", null,
-//        "songWriter", "composer", "arranger");
-//	  System.out.println(a.equals(b));
-//	  MusicTrack c = new MusicTrack("song1", "eng", diskType.AUDIOCD, "sherry", null,
-//        "songWriter2", "composer", "arranger");
-//	  MusicTrack d = ;
-//	  d.arranger = "arr";
-//	  System.out.println(c.equals(d));
-//	  System.out.println(d.arranger + " " +c.arranger);
-	  
-//		Set<String> firstSet = new HashSet<String>();
-//    firstSet.add("123");
-//    firstSet.add("sunny");
-//    
-//		Set<String> secondSet = new HashSet<String>();
-//    secondSet.add("sunny");
-//    secondSet.add("123");
-//    boolean success = true;
-//		if (!firstSet.containsAll(secondSet)) {
-//		  success = false;
-//		}
-//		if (!secondSet.containsAll(firstSet)) {
-//		   success = false;
-//		}
-//		System.out.println(firstSet.equals(secondSet));
-//		System.out.println(success);
 	}
 
 	/**
@@ -938,6 +910,7 @@ public class MainFrame {
 		    List<String> newAuthors = new ArrayList<String>();
 		    List<String> newKeywordsArr = new ArrayList<String>();
 		    String[] newKeywords = {};
+		    Set<String> newAuthorsSet = new HashSet<String>();
 		    
 		    if (!newAllKeywords.equals("")) {
 		      if (newAllKeywords.contains(",")) {
@@ -956,23 +929,31 @@ public class MainFrame {
         }
 		    if (!upAuthorTx2.getText().equals("")) {
 		      success = (success && checkHelper.checkNameFormat(upAuthorTx2.getText()));
+          success = (success && !checkHelper.duplicateAuthor(upAuthorTx2.getText(), newAuthors));
 		      newAuthors.add(upAuthorTx2.getText());
 		    }
 		    if (!upAuthorTx3.getText().equals("")) {
 		      success = (success && checkHelper.checkNameFormat(upAuthorTx3.getText()));
+          success = (success && !checkHelper.duplicateAuthor(upAuthorTx3.getText(), newAuthors));
           newAuthors.add(upAuthorTx3.getText());
         }
 		    if (!upAuthorTx4.getText().equals("")) {
 		      success = (success && checkHelper.checkNameFormat(upAuthorTx4.getText()));
+          success = (success && !checkHelper.duplicateAuthor(upAuthorTx4.getText(), newAuthors));
           newAuthors.add(upAuthorTx4.getText());
         }
 		    if (!upAuthorTx5.getText().equals("")) {
 		      success = (success && checkHelper.checkNameFormat(upAuthorTx5.getText()));
+          success = (success && !checkHelper.duplicateAuthor(upAuthorTx5.getText(), newAuthors));
           newAuthors.add(upAuthorTx5.getText());
         }
 		    if (!success) {
-		      JOptionPane.showMessageDialog(null, "Wrong name format", "fail update book", JOptionPane.ERROR_MESSAGE);
+		      JOptionPane.showMessageDialog(null, "Wrong name format or duplicate author name entered", "fail update book", JOptionPane.ERROR_MESSAGE);
 		    }
+		    if (newEdition < 0 && !upEditionTx.getText().equals("")) {
+		      success = false;
+		      JOptionPane.showMessageDialog(null, "Wrong format for edition", "fail update book", JOptionPane.ERROR_MESSAGE);
+	      }
 		    // check if all the mandatory fields are filled in
 		    // if mandatory field is empty, do nothing
 		    // if isbn changed, pop up said cannot changed
@@ -989,129 +970,123 @@ public class MainFrame {
           success = false;
 		    }
 
-        try {
-  		    con.setAutoCommit(false);
-  		    if (!newTitle.equals("") && !oldBook.compareTitle(newTitle)) {
-  		      // update title
-  		      UpdateHelper.updateBookString(newTitle, oldBook.isbn, "title");
-  		    }
-  		    if (!newPublisher.equals("") && !oldBook.comparePublisher(newPublisher)) {
-  		      // update publisher
-  		      UpdateHelper.updateBookString(newPublisher, oldBook.isbn, "publisher");
-  		    }
-  		    if (!upPagesTx.getText().equals("") && !oldBook.comparePages(newPage)) {
-  		      // update page with check
-  		      if (newPage >= 0) {
-  		        UpdateHelper.updateBookInt(newPage, oldBook.isbn, "Numberofpages");
-  		      }
-  		    }
-  		    if (!upEditionTx.getText().equals("") && !oldBook.compareEdition(newEdition)) {
-  		      // update edition with check
-  		      if (newEdition >= 0) {
-  		        UpdateHelper.updateBookInt(newEdition, oldBook.isbn, "editionnumber");
-  		      }
-  		    }
-  		    if (!oldBook.compareAbstract(newAbstract)) {
-  		      //update abstract
-  		      UpdateHelper.updateBookString(newAbstract, oldBook.isbn, "abstract");
-  		    }
-  		    if (!upBookYearTx.getText().equals("") && !oldBook.compareYear(newYear)) {
-  		      // update year with check
-  		      if (newYear > 0) {
-  		        UpdateHelper.updateBookInt(newYear, oldBook.isbn, "yearofpublication");
-  		      }
-  		    }
-  		    List<String> delAuthor = new ArrayList<String>();
-  		    List<String> insertAuthor = new ArrayList<String>(newAuthors);
-  		    
-//  		    for (int i = 0 ; i<newAuthors.size() || i < oldBook.authors.size() ; i++) {
-//  		      if (newAuthors.size() >= i && newAuthors.size() < oldBook.authors.size()) {
-//  		        // insert author
-//  		        DeleteHelper.deleteOneBookAuthor(oldBook.isbn, oldBook.authors.get(i));
-//  		      } else if (oldBook.authors.size() >= i && newAuthors.size() > oldBook.authors.size()) {
-//  		        InserterHelper.insertOneBookAuthor(oldBook.isbn, newAuthors.get(i));
-//  		      } else if (!oldBook.authors.get(i).equalsIgnoreCase(newAuthors.get(i))) {
-//  		        // update author
-//  		        UpdateHelper.updateBookAuthor(oldBook.authors.get(i), newAuthors.get(i), oldBook.isbn);
-//  		      }
-//  		    }
-//  		     check author list
-  		    if (!oldBook.compareAuthor(newAuthors)) {
-  		      if (newAuthors.size() == 0) {
-  		        // do nothing, remain old data
-  		      } else {
-  		        // get the list for update
-  		        for (String authorName : oldBook.authors) {
-  		          if (!newAuthors.contains(authorName)) {
-  		            delAuthor.add(authorName);
-  		          } else {
-  		            insertAuthor.remove(authorName);
-  		          }
-  		        }
-  		      }
-  		    }
-  		    // do update for authors
-  		    if (delAuthor.size() > 0) {
-  		      // delete author
-  		      DeleteHelper.deleteBookAuthors(oldBook.isbn, delAuthor);
-  		    }
-  		    if (insertAuthor.size() > 0) {
-  		      InserterHelper.insertBookAuthor(oldBook.isbn, insertAuthor);
-  		    }
-  		    
-  		    List<String> delkey = new ArrayList<String>();
-          List<String> insertkey = new ArrayList<String>(newKeywordsArr);
-  		    // check keyword list
-  		    if (!oldBook.compareKeywords(newKeywordsArr)) {
-            if (newKeywordsArr.size() == 0) {
-              // do nothing, remain old data
-            } else {
-              // get the list for update
-              for (String k : oldBook.keywords) {
-                if (!newKeywordsArr.contains(k)) {
-                  delkey.add(k);
-                } else {
-                  insertkey.remove(k);
-                }
-              }
-            }
-          }
-  		    // do update for keywords
-  		    if (delkey.size() > 0) {
-  		      DeleteHelper.deleteBookKeywords(oldBook.isbn, delkey);
-  		    }
-  		    if (upKeywordsTx.getText().equals("")) {
-  		      DeleteHelper.removeBookKeyword(oldBook.isbn);
-  		    }
-  		    if (insertkey.size() > 0) {
-  		      InserterHelper.insertBookKeyword(oldBook.isbn, insertkey);
-  		    }
-  		    
-  		    if (success) {
-    		    JOptionPane.showMessageDialog(null, "Successfully updated", "Successfully updated", JOptionPane.INFORMATION_MESSAGE);
-  		    }
+		    if (success) {
+          try {
+    		    con.setAutoCommit(false);
+    		    if (!newTitle.equals("") && !oldBook.compareTitle(newTitle)) {
+    		      // update title
+    		      UpdateHelper.updateBookString(newTitle, oldBook.isbn, "title");
+    		    }
+    		    if (!newPublisher.equals("") && !oldBook.comparePublisher(newPublisher)) {
+    		      // update publisher
+    		      UpdateHelper.updateBookString(newPublisher, oldBook.isbn, "publisher");
+    		    }
+    		    if (!upPagesTx.getText().equals("") && !oldBook.comparePages(newPage)) {
+    		      // update page with check
+    		      if (newPage >= 0) {
+    		        UpdateHelper.updateBookInt(newPage, oldBook.isbn, "Numberofpages");
+    		      }
+    		    }
+    		    if (upEditionTx.getText().equals("")) {
+    		      // remove edition
+    		      UpdateHelper.updateBookInt(-1, oldBook.isbn, "editionnumber");
+    		    } else if (!upEditionTx.getText().equals("") && !oldBook.compareEdition(newEdition)) {
+    		      // update edition with check
+    		      if (newEdition >= 0) {
+    		        UpdateHelper.updateBookInt(newEdition, oldBook.isbn, "editionnumber");
+    		      }
+    		    }
+    		    if (!oldBook.compareAbstract(newAbstract)) {
+    		      //update abstract
+    		      UpdateHelper.updateBookString(newAbstract, oldBook.isbn, "abstract");
+    		    }
+    		    if (!upBookYearTx.getText().equals("") && !oldBook.compareYear(newYear)) {
+    		      // update year with check
+    		      if (newYear > 0) {
+    		        UpdateHelper.updateBookInt(newYear, oldBook.isbn, "yearofpublication");
+    		      }
+    		    }
+    		    List<String> delAuthor = new ArrayList<String>();
+    		    List<String> insertAuthor = new ArrayList<String>(newAuthors);
+    		    
+  //  		     check author list
+    		    if (!oldBook.compareAuthor(newAuthors)) {
+    		      if (newAuthors.size() == 0) {
+    		        // do nothing, remain old data
+    		        JOptionPane.showMessageDialog(null, "Must have at least one author", "updated failed", JOptionPane.ERROR_MESSAGE);
+    		        success = false;
+    		      } else {
+    		        // get the list for update
+    		        for (String authorName : oldBook.authors) {
+    		          if (!newAuthors.contains(authorName)) {
+    		            delAuthor.add(authorName);
+    		          } else {
+    		            insertAuthor.remove(authorName);
+    		          }
+    		        }
+    		      }
+    		    }
+    		    // do update for authors
+    		    if (delAuthor.size() > 0) {
+    		      // delete author
+    		      DeleteHelper.deleteBookAuthors(oldBook.isbn, delAuthor);
+    		    }
+    		    if (insertAuthor.size() > 0) {
+    		      InserterHelper.insertBookAuthor(oldBook.isbn, insertAuthor);
+    		    }
+    		    
+    		    List<String> delkey = new ArrayList<String>();
+            List<String> insertkey = new ArrayList<String>(newKeywordsArr);
+    		    // check keyword list
+    		    // do update for keywords
+    		    if (delkey.size() > 0) {
+    		      DeleteHelper.deleteBookKeywords(oldBook.isbn, delkey);
+    		    }
+    		    if (upKeywordsTx.getText().equals("")) {
+    		      DeleteHelper.removeBookKeyword(oldBook.isbn);
+    		    }
+    		    if (insertkey.size() > 0) {
+    		      DeleteHelper.removeBookKeyword(oldBook.isbn);
+    		      InserterHelper.insertBookKeyword(oldBook.isbn, insertkey);
+    		    }
+    		    
+    		    
+    		    con.commit();
+    		    if (success) {
+    		      JOptionPane.showMessageDialog(null, "Successfully updated", "Successfully updated", JOptionPane.INFORMATION_MESSAGE);
+    		    }
     		    CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
             c.show(frame.getContentPane(), "mainPage");
-        } catch (SQLException e) {
-          try {
-            System.out.println("rollback");
-            con.rollback();
-          } catch (SQLException e1) {
-            e1.printStackTrace();
-          }
-          e.printStackTrace();
-        } finally {
-          try {
-            con.setAutoCommit(true);
           } catch (SQLException e) {
+            try {
+              System.out.println("rollback");
+              con.rollback();
+            } catch (SQLException e1) {
+              e1.printStackTrace();
+            }
             e.printStackTrace();
+          } finally {
+            try {
+              con.setAutoCommit(true);
+            } catch (SQLException e) {
+              e.printStackTrace();
+            }
           }
-        }
+		    }
+        
 		  }
 		});
 		
 		JLabel lblChangeTheValues = new JLabel("Change the values and click update to update the information of this book");
 		lblChangeTheValues.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		
+		JButton btnCancel_3 = new JButton("Cancel");
+		btnCancel_3.addActionListener(new ActionListener() {
+		  public void actionPerformed(ActionEvent arg0) {
+		    CardLayout c = (CardLayout)(frame.getContentPane().getLayout());
+        c.show(frame.getContentPane(), "mainPage");
+		  }
+		});
 		GroupLayout gl_updateBook = new GroupLayout(updateBook);
 		gl_updateBook.setHorizontalGroup(
 		  gl_updateBook.createParallelGroup(Alignment.LEADING)
@@ -1133,7 +1108,7 @@ public class MainFrame {
 		                .addComponent(upPublisherTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
 		                .addComponent(upISBN, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)
 		                .addComponent(upBookTitleTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))
-		            .addGroup(gl_updateBook.createParallelGroup(Alignment.TRAILING)
+		            .addGroup(gl_updateBook.createSequentialGroup()
 		              .addGroup(gl_updateBook.createParallelGroup(Alignment.LEADING)
 		                .addGroup(gl_updateBook.createSequentialGroup()
 		                  .addComponent(label_8, GroupLayout.PREFERRED_SIZE, 91, GroupLayout.PREFERRED_SIZE)
@@ -1155,24 +1130,27 @@ public class MainFrame {
 		                  .addComponent(upAuthorTx2, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE))
 		                .addGroup(gl_updateBook.createSequentialGroup()
 		                  .addGap(116)
-		                  .addComponent(upAuthorTx3, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
-		                  .addGap(23)
-		                  .addComponent(upAuthorTx4, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE))
-		                .addGroup(gl_updateBook.createSequentialGroup()
-		                  .addGap(116)
 		                  .addComponent(upAuthorTx5, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE))
 		                .addGroup(gl_updateBook.createSequentialGroup()
 		                  .addComponent(label_7, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
 		                  .addGap(5)
-		                  .addComponent(upBookYearTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))
-		              .addGroup(gl_updateBook.createSequentialGroup()
-		                .addComponent(lblNumberOfPages)
-		                .addPreferredGap(ComponentPlacement.UNRELATED)
-		                .addComponent(upPagesTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))
-		            .addGroup(gl_updateBook.createSequentialGroup()
-		              .addGap(427)
-		              .addComponent(btnNewButton_3)))))
-		      .addContainerGap(213, Short.MAX_VALUE))
+		                  .addComponent(upBookYearTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+		                .addGroup(gl_updateBook.createParallelGroup(Alignment.LEADING)
+		                  .addGroup(Alignment.TRAILING, gl_updateBook.createSequentialGroup()
+		                    .addComponent(btnNewButton_3)
+		                    .addGap(18)
+		                    .addComponent(btnCancel_3))
+		                  .addGroup(gl_updateBook.createSequentialGroup()
+		                    .addGap(116)
+		                    .addComponent(upAuthorTx3, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
+		                    .addGap(23)
+		                    .addComponent(upAuthorTx4, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)))
+		                .addGroup(gl_updateBook.createSequentialGroup()
+		                  .addComponent(lblNumberOfPages)
+		                  .addPreferredGap(ComponentPlacement.UNRELATED)
+		                  .addComponent(upPagesTx, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))
+		              .addGap(13)))))
+		      .addContainerGap(295, Short.MAX_VALUE))
 		);
 		gl_updateBook.setVerticalGroup(
 		  gl_updateBook.createParallelGroup(Alignment.LEADING)
@@ -1190,13 +1168,13 @@ public class MainFrame {
 		          .addGap(18)
 		          .addGroup(gl_updateBook.createParallelGroup(Alignment.BASELINE)
 		            .addComponent(lblPublisher)
-		            .addComponent(upPublisherTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		          .addGap(18)
-		          .addGroup(gl_updateBook.createParallelGroup(Alignment.BASELINE)
-		            .addComponent(lblNumberOfPages)
-		            .addComponent(upPagesTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+		            .addComponent(upPublisherTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
 		        .addComponent(upBookTitleTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 		      .addPreferredGap(ComponentPlacement.UNRELATED)
+		      .addGroup(gl_updateBook.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(lblNumberOfPages)
+		        .addComponent(upPagesTx, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		      .addGap(18)
 		      .addGroup(gl_updateBook.createParallelGroup(Alignment.LEADING)
 		        .addGroup(gl_updateBook.createSequentialGroup()
 		          .addGap(3)
@@ -1231,9 +1209,11 @@ public class MainFrame {
 		        .addComponent(upAuthorTx4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 		      .addGap(7)
 		      .addComponent(upAuthorTx5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-		      .addPreferredGap(ComponentPlacement.RELATED)
-		      .addComponent(btnNewButton_3)
-		      .addContainerGap(128, Short.MAX_VALUE))
+		      .addGap(40)
+		      .addGroup(gl_updateBook.createParallelGroup(Alignment.BASELINE)
+		        .addComponent(btnCancel_3)
+		        .addComponent(btnNewButton_3))
+		      .addContainerGap(108, Short.MAX_VALUE))
 		);
 		updateBook.setLayout(gl_updateBook);
 		
@@ -2283,6 +2263,13 @@ public class MainFrame {
             List<String> oldKeywords = new ArrayList<String>();
             String isbn = SelectHelper.getBookIsbn(name);
             bookResult = SelectHelper.getBookInfo(isbn);
+//            try {
+//              System.out.println(bookResult.getObject("EditionNumber") + " hi");
+//              System.out.println(bookResult.getObject("EditionNumber") == null);
+//            } catch (SQLException e2) {
+//              // TODO Auto-generated catch block
+//              e2.printStackTrace();
+//            }
             bookKeyword = SelectHelper.getBookKeyword(isbn);
             bookAuthors = SelectHelper.getBookAuthorName(isbn);
             // show data textfield
@@ -2292,7 +2279,9 @@ public class MainFrame {
               upPublisherTx.setText(bookResult.getString("Publisher"));
               upPagesTx.setText(String.valueOf(bookResult.getInt("NumberOfPages")));
               upBookYearTx.setText(String.valueOf(bookResult.getInt("YearOfPublication")));
-              upEditionTx.setText(String.valueOf(bookResult.getInt("EditionNumber")));
+              if (!(bookResult.getObject("EditionNumber") == null)) {
+                upEditionTx.setText(String.valueOf(bookResult.getInt("EditionNumber")));
+              }
               upAbstractTx.setText(bookResult.getString("Abstract"));
               upKeywordsTx.setText(keywords);
               try {
@@ -2363,12 +2352,13 @@ public class MainFrame {
                 // get language
                 language = tracksResult.getString("language");
                 // get disktype
-                diskType type1 = checkHelper.checkDiskType(tracksResult.getString("diskType"));
+                boolean tempbool = tracksResult.getBoolean("diskType");
+                diskType type1 = checkHelper.checkDiskType(tracksResult.getBoolean("diskType"));
                 // get singers name
                 singers = SelectHelper.getSingersList(albumName, musicName);
                 // get crews name
                 trackCrews = SelectHelper.getTrackCrewName(name, tracksResult.getString("MusicName"));
-                
+                diskType temptype = type1;
                 // make a new MusicTrack object
                 MusicTrack mt = new MusicTrack(musicName, language, ((type1 == diskType.AUDIOCD) ? diskType.AUDIOCD:diskType.VINYL), singers.get(0), ((singers.size() == 2) ? singers.get(1) : null),
                     trackCrews.get("songwriter"), trackCrews.get("composer"), trackCrews.get("arranger"));
@@ -3052,6 +3042,32 @@ public class MainFrame {
       }
 	  }
 	  
+	  public static void insertBookAuthor(String isbn, Set<String> authors) throws SQLException {
+      String sql = "insert into Bookauthor values (?,?);";
+      int count = 0;
+      PreparedStatement preparedStatement;
+      int pplID = -1;
+      for (String author : authors) {
+        pplID = SelectHelper.getPeopleID(author);
+        if (pplID == -1) {
+          // add new author
+          pplID = InserterHelper.insertNewPeople(author);
+          if (pplID == -1) {
+            continue;
+          }
+        }
+        // insert author after found/added
+        preparedStatement = con.prepareStatement(sql);
+        preparedStatement.setString(1, isbn);
+        preparedStatement.setInt(2, pplID);
+        preparedStatement.executeUpdate();
+        count++;
+      }
+      if (count <= 0) {
+        throw new SQLException();
+      }
+    }
+	  
 	  public static void insertBookKeyword(String isbn, int keyID) throws SQLException {
       String sql = "insert into BookKeyword values (?,?);";
       PreparedStatement preparedStatement;
@@ -3075,12 +3091,22 @@ public class MainFrame {
           newKeywords.add(key);
         }
       }
-      stringArray = newKeywords.toArray(new String[0]);
+      stringArray = newKeywords.toArray(new String[newKeywords.size()]);
+
+      // insert all the new keywords to keyword table
+      InserterHelper.insertKeyword(isbn, stringArray);
+      // insert all the keywords to bookkeyword table
+      for (String key: keywords) {
+        id = SelectHelper.getKeywordID(key);
+        preparedStatement.setInt(2,id);
+        preparedStatement.executeUpdate();        
+      }
+      
+      
 //      if (stringArray.length > 0) {
 //        InserterHelper.insertKeyword(isbn, stringArray);
 //      }
 //      for (String key : keywords) {
-        InserterHelper.insertKeyword(isbn, stringArray);
 //        id = SelectHelper.getKeywordID(key);
 //        preparedStatement.setInt(2, id);
 //        preparedStatement.executeUpdate(); 
@@ -3089,7 +3115,7 @@ public class MainFrame {
     }
 	  
 	  public static void insertKeyword(String isbn, String[] keywords) throws SQLException {
-	    int keyID = -1, nextKeyID = -1;
+	    int keyID = -1;
 	    String sql = "insert into Keyword (tag) values (?);";
 	    PreparedStatement preparedStatement;
 	    if (keywords != null) {
@@ -3104,7 +3130,7 @@ public class MainFrame {
 //            keyID = nextKeyID;
             keyID = SelectHelper.getKeywordID(keyword);
           }
-          insertBookKeyword(isbn, keyID);
+//          insertBookKeyword(isbn, keyID);
         }
 	    }
 	  }
@@ -3336,7 +3362,15 @@ public class MainFrame {
 	    }
 	    return false;
 	  }
-	  public static boolean checkNameFormat(String name) {
+	  public static boolean duplicateAuthor(String name, List<String> newAuthors) {
+	    for (String a: newAuthors) {
+        if (a.equalsIgnoreCase(name)) {
+          return true;
+        }
+	    }
+      return false;
+    }
+    public static boolean checkNameFormat(String name) {
 	    String[] temp = name.split(" ");
       if ((temp.length < 2) || (temp.length>3)) {
         JOptionPane.showMessageDialog(null, "Some of the names are in wrong format.", "Insert music - wrong name format", JOptionPane.ERROR_MESSAGE);
@@ -3450,14 +3484,13 @@ public class MainFrame {
 	     return false;
 	   }
 	   
-	   public static diskType checkDiskType(String typeString) {
-	     diskType type = null;
-	     for (diskType d : diskType.getIteration()) {
-         if (d.getString().equalsIgnoreCase(typeString)) {
-           type = d.getEnum();
-         }
-       }
-	     return type;
+	   public static diskType checkDiskType(Boolean type) {
+	     // 0-> CD, 1 -> vinyl
+	     if (type) {
+	       return diskType.VINYL;
+	     } else {
+	       return diskType.AUDIOCD;
+	     }
 	   }
 	   
 	   public static int checkNumRoleMusic(String albumName, String musicName, String name) {
@@ -3658,7 +3691,11 @@ public class MainFrame {
 	    String sql = "Update Book set " + type + " = ? where isbn = ?;";
       PreparedStatement ps;
       ps = con.prepareStatement(sql);
-      ps.setInt(1, data);
+      if (data == -1) {
+        ps.setNull(1, java.sql.Types.NULL);
+      } else {
+        ps.setInt(1, data);
+      }
       ps.setString(2, isbn);
       ps.executeUpdate();
 	  }
@@ -5573,7 +5610,10 @@ public class MainFrame {
 	    // if keyword not in newKeywords, delete keyword
 	    // if new keyword not in keywords, insert keyword
 	    for (String keyword: keywords) {
-	      if (!keywords.contains(newKeywords)) {
+//	      if (!keywords.contains(newKeywords)) {
+//	        return false;
+//	      }
+	      if (!keywords.containsAll(newKeywords)) {
 	        return false;
 	      }
 	    }
@@ -5646,13 +5686,18 @@ public class MainFrame {
 	  }
 	}
 	public static class MusicTrack {
-	  private String musicName, language, singer1, singer2, songWriter, composer, arranger;
+	  private String musicName, language, singer1, singer2, songWriter, composer, arranger, typeString;
 	  private diskType type;
 	  public MusicTrack(String musicName, String language, diskType typet, String singer1, String singer2,
 	      String songWriter, String composer, String arranger) {
 	    this.musicName = musicName;
 	    this.language = language;
 	    this.type = typet;
+	    if (typet.getString().equalsIgnoreCase("audioCD")) {
+	      this.typeString = "audioCD";
+	    } else {
+	      this.typeString = "vinyl";
+	    }
 	    this.singer1 = singer1;
 	    this.singer2 = singer2;
 	    this.songWriter = songWriter;
@@ -5708,6 +5753,10 @@ public class MainFrame {
 	  
 	  public diskType getType() {
 	    return this.type;
+	  }
+	  
+	  public String getTypeString() {
+	    return this.typeString;
 	  }
 	  
 	  public List<String> getSingers() {
@@ -6578,14 +6627,14 @@ public class MainFrame {
                 }
                 
                 // get diskType
-                String typeString = null;
+                boolean typeBool = false;
 //                for (Enumeration<AbstractButton> buttons = diskTypeTx.getElements(); buttons.hasMoreElements();) {
 //                  AbstractButton button = buttons.nextElement();
 //                  if (button.isSelected()) {
 //                    typeString = diskTypeTx.getSelection().getActionCommand();
 //                  }
                 if (diskTypeTx.getSelection().getActionCommand().equalsIgnoreCase("vinyl")) {
-                  typeString = diskTypeTx.getSelection().getActionCommand();
+                  typeBool = true;
                 }
 //                }
 //                for (diskType d : type.getIteration()) {
@@ -6593,7 +6642,7 @@ public class MainFrame {
 //                    type = d.getEnum();
 //                  }
 //                }
-                type = checkHelper.checkDiskType(typeString);
+//                type = checkHelper.checkDiskType(typeString);
                 
                 if (update) {
                   // check if this music name appears in the model
@@ -6615,7 +6664,7 @@ public class MainFrame {
                 
                 if (valid) {
                   // store as music track
-                  MusicTrack mt = new MusicTrack(musicName, lang, ((type == diskType.VINYL) ? diskType.VINYL : diskType.AUDIOCD), singer1, singer2, songWriter, composer, arranger);
+                  MusicTrack mt = new MusicTrack(musicName, lang, ((typeBool) ? diskType.VINYL : diskType.AUDIOCD), singer1, singer2, songWriter, composer, arranger);
                   if (update) {
                     // insert new music track
                     TransactionHelper.insertOneMusicTrack(musicName, oldAlbum, mt);
@@ -6876,11 +6925,13 @@ public class MainFrame {
                 }
                 
                 // get diskType
-                String typeString = null;
+                
                 for (Enumeration<AbstractButton> buttons = diskTypeTx.getElements(); buttons.hasMoreElements();) {
                   AbstractButton button = buttons.nextElement();
                   if (button.isSelected()) {
-                    typeString = button.getText();
+                    if (button.getText().equalsIgnoreCase("vinyl")) {
+                      type = diskType.VINYL;
+                    }
                   }
                 }
 //                for (diskType d : type.getIteration()) {
@@ -6888,7 +6939,7 @@ public class MainFrame {
 //                    type = d.getEnum();
 //                  }
 //                }
-                type = checkHelper.checkDiskType(typeString);
+//                type = checkHelper.checkDiskType(typeString);
                 
                 // if valid
                 if (valid) {
@@ -7090,7 +7141,7 @@ public class MainFrame {
           // set text fields
           insMusicTx.setText(oldmt.getMusicName());
           insLangTx.setText(oldmt.getLanguage());
-          if (oldmt.getType() == diskType.AUDIOCD) {
+          if (oldmt.getTypeString().equalsIgnoreCase(diskType.AUDIOCD.getString())) {
             diskTypeTx.setSelected(model_cd, true);
           } else {
             diskTypeTx.setSelected(model_vinyl, true);
