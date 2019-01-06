@@ -47,15 +47,18 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.table.DefaultTableModel;
 
+import com.mylibrary.buildhelper.ReportHelper;
 import com.mylibrary.dbhelper.DeleteHelper;
 import com.mylibrary.dbhelper.InserterHelper;
 import com.mylibrary.dbhelper.SelectHelper;
 import com.mylibrary.dbhelper.UpdateHelper;
+import com.mylibrary.helper.checkHelper;
 import com.mylibrary.objects.Album;
 import com.mylibrary.objects.Book;
 import com.mylibrary.objects.Movie;
 import com.mylibrary.objects.MovieCrew;
 import com.mylibrary.objects.MusicTrack;
+import com.mylibrary.type.DiskType;
 
 import javax.swing.JButton;
 import javax.swing.JRadioButton;
@@ -76,71 +79,28 @@ public class MainFrame {
   public static Connection con;
 
   private JFrame frame;
-  private JTextField insertbooktitle;
-  private JTextField insertbookisbn;
-  private JTextField insertbookpub;
-  private JTextField insertpages;
-  private JTextField insertpubyear;
-  private JTextField insertedition;
-  private JTextField insertabstract;
-  private JTextField insertkeyword;
-  private JTextField insertauthor2;
-  private JTextField insertauthor1;
-  private JTextField insertauthor4;
-  private JTextField insertauthor3;
-  private JTextField insertauthor5;
-  private JTextField movieYearTx;
-  private JTextField movieNameTx;
-  private JTextField upBookYearTx;
-  private JTextField upEditionTx;
-  private JTextField upAbstractTx;
-  private JTextField upKeywordsTx;
-  private JTextField upAuthorTx1;
-  private JTextField upAuthorTx3;
-  private JTextField upAuthorTx5;
-  private JTextField upAuthorTx4;
-  private JTextField upAuthorTx2;
-  private JTextField upBookTitleTx;
-  private JTextField upISBN;
-  private JTextField upPublisherTx;
-  private JTextField upPagesTx;
-  private Map<String, MusicTrack> tracks = new HashMap<String, MusicTrack>();
-  private JTextField searchNameTx;
-  private JTextField searchYearTx;
-  private JCheckBox chckbxBook;
-  private JCheckBox chckbxAlbum;
-  private JCheckBox chckbxMovie;
-  private JTextField insYearTx;
-  private JTextField textField_17;
-  private JTextField insSingerTx2;
-  private JTextField insMusicTx;
-  private JTextField insLangTx;
-  private JTextField insSongWriterTx;
-  private JTextField insComposerTx;
-  private JTextField insArrangerTx;
-  private JTextField insSingerTx1;
+  private JTextField insertbooktitle, insertbookisbn, insertbookpub, insertpages, insertpubyear, insertedition;
+  private JTextField insertabstract, insertkeyword, insertauthor1, insertauthor2, insertauthor3, insertauthor4, insertauthor5;
+  private JTextField movieYearTx, movieNameTx, upBookYearTx, upEditionTx, upAbstractTx, upKeywordsTx;
+  private JTextField upAuthorTx1, upAuthorTx2, upAuthorTx3, upAuthorTx4, upAuthorTx5;
+  private JTextField upBookTitleTx, upISBN, upPublisherTx, upPagesTx;
+  private JTextField searchNameTx, searchYearTx;
+  private JCheckBox chckbxBook, chckbxAlbum, chckbxMovie;
+  private JTextField insYearTx, insSingerTx1, insSingerTx2, insMusicTx, insLangTx, insSongWriterTx, insComposerTx;
+  private JTextField insArrangerTx, textField_17, insProducerTx, insAlbumTx, insCastNameTx;
   private List<MusicTrack> musicTracks;
-  private JTextField insProducerTx;
-  private JTextField insAlbumTx;
-  private JTextField insCastNameTx;
-  private JTextArea textAreaMusicTrack;
-  private JTextArea textArea;
-  private JTextArea textArea_1;
-  private Map<String, List<MovieCrew>> crews = new HashMap<String, List<MovieCrew>>();
+  private JTextArea textAreaMusicTrack, textArea, textArea_1;
+  private JTextField textField, upAlbumTx, upProducerTx, upYearTx, upMovieNameTx, upMovieYearTx;
   private String[] movieCastRoles = { "director", "script writer", "cast", "producer", "composer", "editor",
       "costume designer" };
   private Book oldBook;
   private Album oldAlbum;
   private Movie oldMovie;
+  private Map<String, MusicTrack> tracks = new HashMap<String, MusicTrack>();
+  private Map<String, List<MovieCrew>> crews = new HashMap<String, List<MovieCrew>>();
   private Map<String, List<MovieCrew>> tempcrew = new HashMap<String, List<MovieCrew>>();
   private DefaultListModel<String> model = new DefaultListModel();
   private DefaultListModel<String> model2 = new DefaultListModel();
-  private JTextField textField;
-  private JTextField upAlbumTx;
-  private JTextField upProducerTx;
-  private JTextField upYearTx;
-  private JTextField upMovieNameTx;
-  private JTextField upMovieYearTx;
 
   /**
    * Launch the application.
@@ -552,7 +512,7 @@ public class MainFrame {
           } else {
 
             // check if the music album exist in Music, insert if not
-            if (!checkHelper.albumExist(albumName)) {
+            if (!checkHelper.albumExist(albumName, con)) {
               // insert music
               boolean success = TransactionHelper.insertMusicTransaction(albumName, year, producer, musicTracks);
               if (success) {
@@ -701,7 +661,7 @@ public class MainFrame {
           movieName = movieNameTx.getText();
 
           // check if movie exist
-          if (!checkHelper.movieExist(movieName)) {
+          if (!checkHelper.movieExist(movieName, con)) {
             // inserting start
             TransactionHelper.insertMovieTransaction(movieName, year, crews);
             JOptionPane.showMessageDialog(null, "Movie inserted", "Insert movie - movie inserted",
@@ -1254,7 +1214,7 @@ public class MainFrame {
             // check if the album name the same
             if (!oldAlbum.compareAlbumName(albumName)) {
               // check if the music album exist in Music
-              if (!checkHelper.albumExist(albumName)) {
+              if (!checkHelper.albumExist(albumName, con)) {
                 // update the album name for all music tracks
                 changedn = true;
               } else {
@@ -1482,7 +1442,7 @@ public class MainFrame {
               // just update the year
               UpdateHelper.updateMovieInfo(oldMovie.getMovieName(), movieName, year, con);
             } else if (changedn) {
-              if (!checkHelper.movieExist(movieName)) {
+              if (!checkHelper.movieExist(movieName, con)) {
                 UpdateHelper.updateMovieInfo(oldMovie.getMovieName(), movieName, year, con);
               } else {
                 valid = false;
@@ -2084,7 +2044,7 @@ public class MainFrame {
               JOptionPane.ERROR_MESSAGE);
         } else {
           // search the product and redirect them to corresponding panel
-          if (checkHelper.bookExist(name)) {
+          if (checkHelper.bookExist(name, con)) {
             CardLayout c = (CardLayout) (frame.getContentPane().getLayout());
             c.show(frame.getContentPane(), "updateBook");
             clearUpdateBook();
@@ -2151,7 +2111,7 @@ public class MainFrame {
             } catch (SQLException e1) {
               e1.printStackTrace();
             }
-          } else if (checkHelper.albumExist(name)) {
+          } else if (checkHelper.albumExist(name, con)) {
             CardLayout c = (CardLayout) (frame.getContentPane().getLayout());
             c.show(frame.getContentPane(), "updateAlbum");
             clearUpdateAlbum();// clear the album object
@@ -2176,16 +2136,16 @@ public class MainFrame {
                 musicName = tracksResult.getString("MusicName");
                 // get language
                 language = tracksResult.getString("language");
-                // get disktype
-                boolean tempbool = tracksResult.getBoolean("diskType");
-                diskType type1 = checkHelper.checkDiskType(tracksResult.getBoolean("diskType"));
+                // get DiskType
+                boolean tempbool = tracksResult.getBoolean("DiskType");
+                DiskType type1 = checkHelper.checkDiskType(tracksResult.getBoolean("DiskType"));
                 // get singers name
                 singers = SelectHelper.getSingersList(albumName, musicName, con);
                 // get crews name
                 trackCrews = SelectHelper.getTrackCrewName(name, tracksResult.getString("MusicName"), con);
                 // make a new MusicTrack object
                 MusicTrack mt = new MusicTrack(musicName, language,
-                    ((type1 == diskType.AUDIOCD) ? diskType.AUDIOCD : diskType.VINYL), singers.get(0),
+                    ((type1 == DiskType.AUDIOCD) ? DiskType.AUDIOCD : DiskType.VINYL), singers.get(0),
                     ((singers.size() == 2) ? singers.get(1) : null), trackCrews.get("songwriter"),
                     trackCrews.get("composer"), trackCrews.get("arranger"));
                 // add it to an arraylist for showing in the JList
@@ -2207,7 +2167,7 @@ public class MainFrame {
               e1.printStackTrace();
             }
 
-          } else if (checkHelper.movieExist(name)) {
+          } else if (checkHelper.movieExist(name, con)) {
             CardLayout c = (CardLayout) (frame.getContentPane().getLayout());
             c.show(frame.getContentPane(), "updateMovie");
 //            clearUpdateMovie();
@@ -2285,15 +2245,15 @@ public class MainFrame {
               JOptionPane.ERROR_MESSAGE);
         } else {
           // search the name in each category, if found, delete it
-          if (checkHelper.bookExist(name)) {
+          if (checkHelper.bookExist(name, con)) {
             TransactionHelper.deleteBookTransaction(name);
             JOptionPane.showMessageDialog(null, "Successfully deleted this book", "Remove successfully",
                 JOptionPane.INFORMATION_MESSAGE);
-          } else if (checkHelper.albumExist(name)) {
+          } else if (checkHelper.albumExist(name, con)) {
             TransactionHelper.deleteAlbumTransaction(name);
             JOptionPane.showMessageDialog(null, "Successfully deleted all music tracks in this album",
                 "Remove successfully", JOptionPane.INFORMATION_MESSAGE);
-          } else if (checkHelper.movieExist(name)) {
+          } else if (checkHelper.movieExist(name, con)) {
             TransactionHelper.deleteMovieTransaction(name);
             JOptionPane.showMessageDialog(null, "Successfully deleted this movie", "Remove successfully",
                 JOptionPane.INFORMATION_MESSAGE);
@@ -2331,7 +2291,7 @@ public class MainFrame {
           JOptionPane.showMessageDialog(null, "Please enter a name", "No name is inserted", JOptionPane.ERROR_MESSAGE);
         } else {
           ResultSet rs = null;
-          rs = ReportHelper.createR1Report(name);
+          rs = ReportHelper.createR1Report(name, con);
           try {
             if (rs != null) {
               JTable table;
@@ -2366,7 +2326,7 @@ public class MainFrame {
               JOptionPane.ERROR_MESSAGE);
         } else {
           ResultSet rs = null;
-          rs = ReportHelper.createR2Report(year);
+          rs = ReportHelper.createR2Report(year, con);
           try {
             if (rs != null) {
               JTable table;
@@ -2396,7 +2356,7 @@ public class MainFrame {
               JOptionPane.ERROR_MESSAGE);
         } else {
           ResultSet rs = null;
-          rs = ReportHelper.createR3Report(keyword);
+          rs = ReportHelper.createR3Report(keyword, con);
           try {
             if (rs != null) {
               JTable table;
@@ -2421,7 +2381,7 @@ public class MainFrame {
       public void actionPerformed(ActionEvent e) {
 
         ResultSet rs = null;
-        rs = ReportHelper.createR4Report();
+        rs = ReportHelper.createR4Report(con);
         try {
           if (rs != null) {
             JTable table;
@@ -2443,7 +2403,7 @@ public class MainFrame {
       public void actionPerformed(ActionEvent e) {
 
         ResultSet rs = null;
-        rs = ReportHelper.createR5Report();
+        rs = ReportHelper.createR5Report(con);
         try {
           if (rs != null) {
             JTable table;
@@ -2464,7 +2424,7 @@ public class MainFrame {
     mntmRMulti.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         ResultSet rs = null;
-        rs = ReportHelper.createR6Report();
+        rs = ReportHelper.createR6Report(con);
         try {
           if (rs != null) {
             JTable table;
@@ -2484,7 +2444,7 @@ public class MainFrame {
     mntmRAward.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         ResultSet rs = null;
-        rs = ReportHelper.createR7Report();
+        rs = ReportHelper.createR7Report(con);
         try {
           if (rs != null) {
             JTable table;
@@ -2504,7 +2464,7 @@ public class MainFrame {
     mntmRMusic.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         ResultSet rs = null;
-        rs = ReportHelper.createR8Report();
+        rs = ReportHelper.createR8Report(con);
         try {
           if (rs != null) {
             JTable table;
@@ -2524,7 +2484,7 @@ public class MainFrame {
     mntmRMulti_1.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         ResultSet rs = null;
-        rs = ReportHelper.createR9Report();
+        rs = ReportHelper.createR9Report(con);
         try {
           if (rs != null) {
             JTable table;
@@ -2544,7 +2504,7 @@ public class MainFrame {
     mntmRSimilar.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         ResultSet rs = null;
-        rs = ReportHelper.createR10Report();
+        rs = ReportHelper.createR10Report(con);
         try {
           if (rs != null) {
             JTable table;
@@ -2655,1642 +2615,6 @@ public class MainFrame {
     }
 
     return new DefaultTableModel(data, columnNames);
-  }
-
-  public enum diskType {
-    AUDIOCD {
-      public String getString() {
-        return "audioCD";
-      }
-
-      public diskType getEnum() {
-        return AUDIOCD;
-      }
-
-      @Override
-      public int getEnumValue() {
-        return 0;
-      }
-    },
-    VINYL {
-      public String getString() {
-        return "vinyl";
-      }
-
-      public diskType getEnum() {
-        return VINYL;
-      }
-
-      @Override
-      public int getEnumValue() {
-        return 1;
-      }
-    };
-    public static List<diskType> getIteration() {
-      List<diskType> diskTypes = new ArrayList<diskType>();
-      for (diskType t : diskType.values()) {
-        diskTypes.add(t.getEnum());
-      }
-      return diskTypes;
-    }
-
-    public abstract String getString();
-
-    public abstract diskType getEnum();
-
-    public abstract int getEnumValue();
-  }
-  
-  public static class checkHelper {
-
-    public static boolean checkIfEmptyCrew(Map<String, List<MovieCrew>> crews) {
-      for (List<MovieCrew> list : crews.values()) {
-        if (list.isEmpty()) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    public static boolean duplicateAuthor(String name, List<String> newAuthors) {
-      for (String a : newAuthors) {
-        if (a.equalsIgnoreCase(name)) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    public static boolean checkNameFormat(String name) {
-      String[] temp = name.split(" ");
-      if ((temp.length < 2) || (temp.length > 3)) {
-        JOptionPane.showMessageDialog(null, "Some of the names are in wrong format.",
-            "Insert music - wrong name format", JOptionPane.ERROR_MESSAGE);
-        return false;
-      }
-      return true;
-    }
-
-    public static boolean bookExist(String bookTitle) {
-      if (SelectHelper.getBookCount(bookTitle, con) > 0) {
-        return true;
-      }
-      return false;
-    }
-
-    public static boolean albumExist(String albumName) {
-      if (SelectHelper.getAlbumMusicsCount(albumName, con) > 0) {
-        return true;
-      }
-      return false;
-    }
-
-    public static boolean movieExist(String movieName) {
-      if (SelectHelper.getMovieCount(movieName, con) > 0) {
-        return true;
-      }
-      return false;
-    }
-
-    public static boolean checkIsbnFormat(String isbn) {
-      String pattern = "^\\d{13}$";
-      Pattern r = Pattern.compile(pattern);
-      Matcher m = r.matcher(isbn);
-      if (m.find()) {
-        return true;
-      }
-      return false;
-    }
-
-    public static boolean musicExist(String albumName, int year, String musicName) {
-      ResultSet rs = SelectHelper.getAlbums(con);
-      try {
-        while (rs.next()) {
-          if (rs.getString("AlbumName").equalsIgnoreCase(albumName)) {
-            if (rs.getInt("Year") == year) {
-              if (rs.getString("MusicName").equalsIgnoreCase(musicName)) {
-                return true;
-              }
-            }
-          }
-        }
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return false;
-    }
-
-    public static boolean musicExistNoYear(String albumName, String musicName) {
-      ResultSet rs = SelectHelper.getAlbums(con);
-      try {
-        while (rs.next()) {
-          if (rs.getString("AlbumName").equalsIgnoreCase(albumName)) {
-            if (rs.getString("MusicName").equalsIgnoreCase(musicName)) {
-              return true;
-            }
-          }
-        }
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return false;
-    }
-
-    public static int checkIfNumerical(JTextField text) {
-      int result = -1;
-      try {
-        result = Integer.parseInt(text.getText());
-      } catch (NumberFormatException nfe) {
-        // Not a number
-        result = -1;
-      }
-      return result;
-    }
-
-    public static int checkIfNumerical(String str) {
-      int result = -1;
-      try {
-        result = Integer.parseInt(str);
-      } catch (NumberFormatException nfe) {
-        // Not a number
-        result = -1;
-      }
-      return result;
-    }
-
-    public static boolean checkIfTableExist(String tableName) {
-      DatabaseMetaData meta;
-      try {
-        meta = con.getMetaData();
-        ResultSet res = meta.getTables(null, null, null, new String[] { "TABLE", "VIEW" });
-        while (res.next()) {
-          if (res.getString("TABLE_NAME").equalsIgnoreCase(tableName)) {
-            return true;
-          }
-        }
-        res.close();
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return false;
-    }
-
-    public static diskType checkDiskType(Boolean type) {
-      // 0-> CD, 1 -> vinyl
-      if (type) {
-        return diskType.VINYL;
-      } else {
-        return diskType.AUDIOCD;
-      }
-    }
-
-    public static int checkNumRoleMusic(String albumName, String musicName, String name) {
-      int num = SelectHelper.getNumRoleMusic(albumName, musicName, name, con);
-      return num;
-    }
-
-    public static boolean checkMusicCrewExist(String albumName, String musicName, String name) {
-      int id = SelectHelper.getPeopleID(name, con);
-      if (id < 0) {
-        return false;
-      }
-      boolean exist = SelectHelper.checkMusicCastExist(albumName, musicName, name, con);
-      return exist;
-    }
-  }
-//
-//  public static class SelectHelper {
-//
-//    public static String getPeopleName(int id) {
-//      String sql = "SELECT CASE WHEN ISNULL(MiddleName) " + "THEN concat(firstName, ' ', familyname) "
-//          + "ELSE concat(firstName, ' ',middlename, ' ', familyname) " + "END FullName "
-//          + "FROM peopleinvolved where id = ?;";
-//      ResultSet rs = null;
-//      PreparedStatement ps;
-//      String name = null;
-//      try {
-//        ps = con.prepareStatement(sql);
-//        ps.setInt(1, id);
-//        rs = ps.executeQuery();
-//        rs.next();
-//        name = rs.getString("FullName");
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return name;
-//
-//    }
-//
-//    public static int getPeopleID(String fullname) {
-//      String sql = "Select ID from PeopleInvolved where concat(FirstName,' ',FamilyName) = ?;";
-//      String sql2 = "Select ID from PeopleInvolved where concat(FirstName,' ', MiddleName, ' ', FamilyName) = ?;";
-//      String[] name = fullname.split(" ");
-//      PreparedStatement preparedStatement = null;
-//      try {
-//        if (name.length == 2) {
-//          preparedStatement = con.prepareStatement(sql);
-//        } else if (name.length > 2) {
-//          preparedStatement = con.prepareStatement(sql2);
-//        } else {
-//          return -1;
-//        }
-//        preparedStatement.setString(1, fullname);
-//        ResultSet rs = preparedStatement.executeQuery();
-//        if (rs.next()) {
-//          return (rs.getInt("ID"));
-//        }
-//      } catch (Exception e) {
-//        e.printStackTrace();
-//      }
-//      return -1;
-//    }
-//
-//    public static int getNextPeopleID() {
-//      String sql = "Select count(*) from PeopleInvolved;";
-//      try {
-//        PreparedStatement preparedStatement = con.prepareStatement(sql);
-//        ResultSet rs = preparedStatement.executeQuery();
-//        if (rs.next()) {
-//          int id = rs.getInt("count(*)");
-//          return id + 1;
-//        }
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return -1;
-//    }
-//
-//    public static List<String> getPeopleNames() {
-//      String sql = "Select concat(FirstName,' ',FamilyName) fullname from PeopleInvolved;";
-//      List<String> names = new ArrayList<String>();
-//      PreparedStatement preparedStatement;
-//      try {
-//        preparedStatement = con.prepareStatement(sql);
-//        ResultSet rs = preparedStatement.executeQuery();
-//        if (rs.next()) {
-//          names.add(rs.getString("fullname"));
-//        }
-//      } catch (Exception e) {
-//        e.printStackTrace();
-//      }
-//      return names;
-//    }
-//
-//    private static ResultSet getPeopleGenderHelper(int id) {
-//      String sql = "select gender from peopleinvolved where id = ?;";
-//      ResultSet rs = null;
-//      PreparedStatement ps;
-//      try {
-//        ps = con.prepareStatement(sql);
-//        ps.setInt(1, id);
-//        rs = ps.executeQuery();
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return rs;
-//    }
-//
-//    public static Boolean getPeopleGender(int id) {
-//      ResultSet rs = getPeopleGenderHelper(id);
-//      try {
-//        if (rs != null) {
-//          rs.next();
-//          return rs.getBoolean("gender");
-//        }
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return null;
-//    }
-//
-//    public static String getBookIsbn(String bookTitle) {
-//      String sql = "Select isbn from Book where Title = ?;";
-//      ResultSet rs = null;
-//      PreparedStatement ps;
-//      try {
-//        ps = con.prepareStatement(sql);
-//        ps.setString(1, bookTitle);
-//        rs = ps.executeQuery();
-//        rs.next();
-//        return rs.getString("ISBN");
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return null;
-//    }
-//
-//    public static int getBookCount(String bookTitle) {
-//      String sql = "Select count(*) from Book where Title = ?;";
-//      ResultSet rs = null;
-//      PreparedStatement ps;
-//      try {
-//        ps = con.prepareStatement(sql);
-//        ps.setString(1, bookTitle);
-//        rs = ps.executeQuery();
-//        rs.next();
-//        return rs.getInt("count(*)");
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return -1;
-//    }
-//
-//    public static ResultSet getBookInfo(String isbn) {
-//      String sql = "Select * from book where ISBN = ?;";
-//      ResultSet rs = null;
-//      PreparedStatement ps;
-//      try {
-//        ps = con.prepareStatement(sql);
-//        ps.setString(1, isbn);
-//        rs = ps.executeQuery();
-//        rs.next();
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return rs;
-//    }
-//
-//    public static ResultSet getBookAuthorName(String isbn) {
-//      String sql = "SELECT CASE WHEN ISNULL(p.MiddleName) " + "THEN concat(p.firstName, ' ', p.familyname) "
-//          + "ELSE concat(p.firstName, ' ',p.middlename, ' ', p.familyname) " + "END FullName "
-//          + "FROM peopleinvolved p, bookauthor a where p.ID = a.author_id and a.isbn = ?;";
-//      ResultSet rs = null;
-//      PreparedStatement ps;
-//      try {
-//        ps = con.prepareStatement(sql);
-//        ps.setString(1, isbn);
-//        rs = ps.executeQuery();
-//        rs.next();
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return rs;
-//    }
-//
-//    public static ResultSet getBookKeyword(String isbn) {
-//      String sql = "select k.tag from bookkeyword bk, keyword k " + "where bk.keyword_id = k.id and bk.isbn = ?;";
-//      ResultSet rs = null;
-//      PreparedStatement ps;
-//      try {
-//        ps = con.prepareStatement(sql);
-//        ps.setString(1, isbn);
-//        rs = ps.executeQuery();
-//        rs.next();
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return rs;
-//    }
-//
-//    public static int getNextKeywordID() {
-//      String sql = "Select count(*) from keyword;";
-//      try {
-//        PreparedStatement preparedStatement = con.prepareStatement(sql);
-//        ResultSet rs = preparedStatement.executeQuery();
-//        if (rs.next()) {
-//          int id = rs.getInt("count(*)");
-//          return id + 1;
-//        }
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return -1;
-//    }
-//
-//    public static int getKeywordID(String keyword) {
-//      String sql = "Select ID from keyword where Tag = ?;";
-//      try {
-//        PreparedStatement preparedStatement = con.prepareStatement(sql);
-//        preparedStatement.setString(1, keyword);
-//        ResultSet rs = preparedStatement.executeQuery();
-//        if (rs.next()) {
-//          int id = rs.getInt("ID");
-//          return id;
-//        }
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return -1;
-//    }
-//
-//    public static boolean bookexist(String isbn) {
-//      String sql = "select count(*) from Book where ISBN = ?;";
-//      try {
-//        PreparedStatement preparedStatement;
-//        preparedStatement = con.prepareStatement(sql);
-//        preparedStatement.setString(1, isbn);
-//        ResultSet rs = preparedStatement.executeQuery();
-//        if (rs.next()) {
-//          if (rs.getInt("count(*)") > 0) {
-//            return true;
-//          }
-//        }
-//        return false;
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return true;
-//    }
-//
-//    public static ResultSet getAlbumInfo(String albumName) {
-//      String sql = "Select albumName, year, producer_id from music where albumName = ? group by albumName;";
-//      ResultSet rs = null;
-//      PreparedStatement ps;
-//      try {
-//        ps = con.prepareStatement(sql);
-//        ps.setString(1, albumName);
-//        rs = ps.executeQuery();
-//        rs.next();
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return rs;
-//    }
-//
-//    public static ResultSet getAlbums() {
-//      String sql = "Select AlbumName, Year, MusicName, Producer_ID from Music;";
-//      ResultSet albumsInfo = null;
-//      PreparedStatement preparedStatement;
-//      try {
-//        preparedStatement = con.prepareStatement(sql);
-//        albumsInfo = preparedStatement.executeQuery();
-//      } catch (Exception e) {
-//        e.printStackTrace();
-//      }
-//      return albumsInfo;
-//
-//    }
-//
-//    public static int getAlbumMusicsCount(String albumName) {
-//      String sql = "Select count(*) from music where albumName=?;";
-//      ResultSet rs = null;
-//      PreparedStatement ps;
-//      int count = -1;
-//      try {
-//        ps = con.prepareStatement(sql);
-//        ps.setString(1, albumName);
-//        rs = ps.executeQuery();
-//        rs.next();
-//        count = rs.getInt("count(*)");
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return count;
-//    }
-//
-//    public static ResultSet getAlbumMusics(String albumName) {
-//      String sql = "Select MusicName, language, disktype from music where AlbumName=?;";
-//      ResultSet rs = null;
-//      PreparedStatement ps;
-//      try {
-//        ps = con.prepareStatement(sql);
-//        ps.setString(1, albumName);
-//        rs = ps.executeQuery();
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return rs;
-//    }
-//
-//    public static ResultSet getTrackCrewsRs(String albumName, String musicName) {
-//      String sql = "(select peopleinvolved_id, 'songwriter' role_ from peopleinvolvedmusic "
-//          + "where issongwriter = 1 and albumName = ? and musicName = ?) " + "union "
-//          + "(select peopleinvolved_id, 'composer' role_ from peopleinvolvedmusic "
-//          + "where iscomposer = 1 and albumName = ? and musicName = ?)" + "union "
-//          + "(select peopleinvolved_id,'arranger' role_ from peopleinvolvedmusic "
-//          + "where isarranger = 1 and albumName = ? and musicName = ?);";
-//      ResultSet rs = null;
-//      PreparedStatement ps;
-//      try {
-//        ps = con.prepareStatement(sql);
-//        for (int i = 1; i <= 6; i = i + 2) {
-//          ps.setString(i, albumName);
-//          ps.setString(i + 1, musicName);
-//        }
-//        rs = ps.executeQuery();
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return rs;
-//    }
-//
-//    public static Map<String, String> getTrackCrewName(String albumName, String musicName) {
-//      ResultSet rs = SelectHelper.getTrackCrewsRs(albumName, musicName);
-//      Map<String, String> crews = new HashMap<String, String>(); // key: role ; value: people name
-//      try {
-//        while (rs.next()) {
-//          crews.put(rs.getString("role_"), SelectHelper.getPeopleName(rs.getInt("peopleinvolved_id")));
-//        }
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return crews;
-//    }
-//
-//    public static int getNumRoleMusic(String albumName, String musicName, String name) {
-//      String sql = "select (isarranger + issongwriter + iscomposer ) as num from peopleinvolvedmusic where"
-//          + " albumName = ? and musicname = ? and peopleinvolved_id = ?;";
-//      ResultSet rs = null;
-//      int num = -1;
-//      PreparedStatement ps;
-//      try {
-//        ps = con.prepareStatement(sql);
-//        ps.setString(1, albumName);
-//        ps.setString(2, musicName);
-//        ps.setInt(3, SelectHelper.getPeopleID(name));
-//        rs = ps.executeQuery();
-//        rs.next();
-//        num = rs.getInt("num");
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return num;
-//    }
-//
-//    public static ResultSet getSingersRs(String albumName, String musicName) {
-//      String sql = "select * from musicsinger where albumName = ? and musicName = ?;";
-//      ResultSet rs = null;
-//      PreparedStatement ps;
-//      try {
-//        ps = con.prepareStatement(sql);
-//        ps.setString(1, albumName);
-//        ps.setString(2, musicName);
-//        rs = ps.executeQuery();
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return rs;
-//    }
-//
-//    public static Set<String> getSingersName(String albumName, String musicName) {
-//      ResultSet rs = null;
-//      rs = SelectHelper.getSingersRs(albumName, musicName);
-//      String name = null;
-//      Set<String> singers = new HashSet<String>();
-//      try {
-//        while (rs.next()) {
-//          name = SelectHelper.getPeopleName(rs.getInt("peopleinvolved_id"));
-//          singers.add(name);
-//        }
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return singers;
-//    }
-//
-//    public static List<String> getSingersList(String albumName, String musicName) {
-//      ResultSet rs = null;
-//      rs = SelectHelper.getSingersRs(albumName, musicName);
-//      String name = null;
-//      List<String> singers = new ArrayList<String>();
-//      try {
-//        while (rs.next()) {
-//          name = SelectHelper.getPeopleName(rs.getInt("peopleinvolved_id"));
-//          singers.add(name);
-//        }
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return singers;
-//    }
-//
-//    public static int getMovieCount(String movieName) {
-//      String sql = "Select count(*) from Movie where MovieName = ?;";
-//      ResultSet rs = null;
-//      PreparedStatement ps;
-//      try {
-//        ps = con.prepareStatement(sql);
-//        ps.setString(1, movieName);
-//        rs = ps.executeQuery();
-//        rs.next();
-//        return rs.getInt("count(*)");
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return -1;
-//    }
-//
-//    public static ResultSet getMovieInfo(String movieName) {
-//      String sql = "select moviename, year from movie where movieName = ?;";
-//      ResultSet rs = null;
-//      PreparedStatement ps;
-//      try {
-//        ps = con.prepareStatement(sql);
-//        ps.setString(1, movieName);
-//        rs = ps.executeQuery();
-//        rs.next();
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return rs;
-//    }
-//
-//    /**
-//     * get all crews in that movie (pid and roleid)
-//     * 
-//     * @param movieName
-//     * @return rs
-//     */
-//    public static ResultSet getMovieCrewIds(String movieName) {
-//      String sql = "select peopleinvolved_id id, role_id from crewmember where moviename = ?;";
-//      ResultSet rs = null;
-//      PreparedStatement ps;
-//      try {
-//        ps = con.prepareStatement(sql);
-//        ps.setString(1, movieName);
-//        rs = ps.executeQuery();
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return rs;
-//    }
-//
-//    /**
-//     * get one movie crew info (id, gender and award)
-//     * 
-//     * @param movieName
-//     * @param id
-//     * @return rs
-//     */
-//    public static ResultSet getMovieCrewInfo(String movieName, int id) {
-//      String sql = "select a.peopleinvolved_id, a.award, p.gender from peopleinvolved p, award a where "
-//          + "p.id = a.peopleinvolved_id and a.moviename = ? and p.id = ?;";
-//      ResultSet rs = null;
-//      PreparedStatement ps;
-//      try {
-//        ps = con.prepareStatement(sql);
-//        ps.setString(1, movieName);
-//        ps.setInt(2, id);
-//        rs = ps.executeQuery();
-//        rs.next();
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return rs;
-//    }
-//
-//    public static String getMovieRoleName(int roleid) {
-//      String sql = "select description from role where id = ?;";
-//      String role = null;
-//      ResultSet rs = null;
-//      PreparedStatement ps;
-//      try {
-//        ps = con.prepareStatement(sql);
-//        ps.setInt(1, roleid);
-//        rs = ps.executeQuery();
-//        rs.next();
-//        role = rs.getString("description");
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return role;
-//    }
-//
-//    public static int getRoleID(String role) {
-//      String sql = "select ID from role where Description = ?;";
-//      PreparedStatement ps;
-//      try {
-//        ps = con.prepareStatement(sql);
-//        ps.setString(1, role);
-//        ResultSet rs = ps.executeQuery();
-//        if (rs.next()) {
-//          return rs.getInt("ID");
-//        }
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return -1;
-//    }
-//
-//    public static boolean checkMusicCastExist(String albumName, int year, String musicName, int ppl) {
-//      String sql = "Select count(*) from PeopleInvolvedMusic "
-//          + "group by AlbumName, Year, MusicName, PeopleInvolved_ID "
-//          + "having AlbumName = ? and Year = ? and MusicName = ? and PeopleInvolved_ID = ?;";
-//      ResultSet rs = null;
-//      int found = -1;
-//      PreparedStatement ps;
-//      try {
-//        ps = con.prepareStatement(sql);
-//        ps.setString(1, albumName);
-//        ps.setInt(2, year);
-//        ps.setString(3, musicName);
-//        ps.setInt(4, ppl);
-//        rs = ps.executeQuery();
-//        if (rs.next()) {
-//          found = rs.getInt("count(*)");
-//        }
-//        if (found > 0) {
-//          return true;
-//        }
-//      } catch (Exception e) {
-//        e.printStackTrace();
-//      }
-//      return false;
-//    }
-//
-//    public static boolean checkMusicCastExist(String albumName, String musicName, String name) {
-//      String sql = "Select count(*) from PeopleInvolvedMusic " + "group by AlbumName, MusicName, PeopleInvolved_ID "
-//          + "having AlbumName = ? and MusicName = ? and PeopleInvolved_ID = ?;";
-//      ResultSet rs = null;
-//      int found = -1, id = -1;
-//      PreparedStatement ps;
-//      id = SelectHelper.getPeopleID(name);
-//      try {
-//        ps = con.prepareStatement(sql);
-//        ps.setString(1, albumName);
-//        ps.setString(2, musicName);
-//        ps.setInt(3, id);
-//        rs = ps.executeQuery();
-//        if (rs.next()) {
-//          found = rs.getInt("count(*)");
-//        }
-//        if (found > 0) {
-//          return true;
-//        }
-//      } catch (Exception e) {
-//        e.printStackTrace();
-//      }
-//      return false;
-//    }
-//
-//    public static boolean checkMovieExist(String movieName, int movieYear) {
-//      String sql = "select count(*) from Movie where MovieName = ? and Year = ?;";
-//      int found = -1;
-//      PreparedStatement ps;
-//      try {
-//        ps = con.prepareStatement(sql);
-//        ps.setString(1, movieName);
-//        ps.setInt(2, movieYear);
-//        ResultSet rs = null;
-//        rs = ps.executeQuery();
-//        if (rs.next()) {
-//          found = rs.getInt("count(*)");
-//        }
-//        if (found == 0) {
-//          return false;
-//        }
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return true;
-//    }
-//
-//    public static ResultSet getResultByQuery(String name, int year, String sql, int count) {
-//      PreparedStatement ps;
-//      ResultSet rs = null;
-//      try {
-//        ps = con.prepareStatement(sql);
-//        for (int i = 1; i <= count * 2; i = i + 2) {
-//          ps.setString(i, "%" + name + "%");
-//          ps.setInt(i + 1, year);
-//        }
-//        if (count > 0) {
-//          rs = ps.executeQuery();
-//        }
-//      } catch (SQLException e) {
-//        e.printStackTrace();
-//      }
-//      return rs;
-//    }
-//
-//    public static ResultSet createView(String name, int year, Map<String, Boolean> types) {
-//      // build query
-//      String sql = BuildQueryHelper.bulidForView(types);
-//      // count how many box checked
-//      int count = 0;
-//      for (String b : types.keySet()) {
-//        if (types.get(b)) {
-//          count++;
-//        }
-//      }
-//      // run query
-//      ResultSet rs = SelectHelper.getResultByQuery(name, year, sql, count);
-//      return rs;
-//    }
-//  }
-//
-//  public static class InserterHelper {
-//
-//    /* --- Data->insert->book --- */
-//    public static void insertBook(String isbn, String title, String pub, int pages, int year, int edition,
-//        String bookabs) throws SQLException {
-//      String sql = "insert into Book values (?,?,?,?,?,?,?);";
-//      PreparedStatement preparedStatement;
-//      // insert book
-//      preparedStatement = con.prepareStatement(sql);
-//      preparedStatement.setString(1, isbn);
-//      preparedStatement.setString(2, title);
-//      preparedStatement.setString(3, pub);
-//      preparedStatement.setInt(4, pages);
-//      preparedStatement.setInt(5, year);
-//      if (edition == -1) {
-//        preparedStatement.setNull(6, java.sql.Types.NULL);
-//      } else {
-//        preparedStatement.setInt(6, edition);
-//      }
-//      preparedStatement.setString(7, bookabs);
-//      preparedStatement.executeUpdate();
-//    }
-//
-//    /* --- Data->insert->book --- */
-//    public static void insertOneBookAuthor(String isbn, String author) throws SQLException {
-//      String sql = "insert into Bookauthor values (?,?);";
-//      PreparedStatement preparedStatement;
-//      int pplID = -1;
-//      pplID = SelectHelper.getPeopleID(author);
-//      if (pplID == -1) {
-//        // add new author
-//        pplID = InserterHelper.insertNewPeople(author);
-//      }
-//      // insert author after found/added
-//      preparedStatement = con.prepareStatement(sql);
-//      preparedStatement.setString(1, isbn);
-//      preparedStatement.setInt(2, pplID);
-//      preparedStatement.executeUpdate();
-//    }
-//
-//    /* --- Data->insert->book --- */
-//    public static void insertBookAuthor(String isbn, List<String> authors) throws SQLException {
-//      String sql = "insert into Bookauthor values (?,?);";
-//      int count = 0;
-//      PreparedStatement preparedStatement;
-//      int pplID = -1;
-//      for (String author : authors) {
-//        pplID = SelectHelper.getPeopleID(author);
-//        if (pplID == -1) {
-//          // add new author
-//          pplID = InserterHelper.insertNewPeople(author);
-//          if (pplID == -1) {
-//            continue;
-//          }
-//        }
-//        // insert author after found/added
-//        preparedStatement = con.prepareStatement(sql);
-//        preparedStatement.setString(1, isbn);
-//        preparedStatement.setInt(2, pplID);
-//        preparedStatement.executeUpdate();
-//        count++;
-//      }
-//      if (count <= 0) {
-//        throw new SQLException();
-//      }
-//    }
-//
-//    /* --- Data->insert->book --- */
-//    public static void insertBookAuthor(String isbn, Set<String> authors) throws SQLException {
-//      String sql = "insert into Bookauthor values (?,?);";
-//      int count = 0;
-//      PreparedStatement preparedStatement;
-//      int pplID = -1;
-//      for (String author : authors) {
-//        pplID = SelectHelper.getPeopleID(author);
-//        if (pplID == -1) {
-//          // add new author
-//          pplID = InserterHelper.insertNewPeople(author);
-//          if (pplID == -1) {
-//            continue;
-//          }
-//        }
-//        // insert author after found/added
-//        preparedStatement = con.prepareStatement(sql);
-//        preparedStatement.setString(1, isbn);
-//        preparedStatement.setInt(2, pplID);
-//        preparedStatement.executeUpdate();
-//        count++;
-//      }
-//      if (count <= 0) {
-//        throw new SQLException();
-//      }
-//    }
-//
-//    /* --- Data->insert->book --- */
-//    public static void insertBookKeyword(String isbn, int keyID) throws SQLException {
-//      String sql = "insert into BookKeyword values (?,?);";
-//      PreparedStatement preparedStatement;
-//      preparedStatement = con.prepareStatement(sql);
-//      preparedStatement.setString(1, isbn);
-//      preparedStatement.setInt(2, keyID);
-//      preparedStatement.executeUpdate();
-//    }
-//    
-//    public static void getLengthkeyword(String isbn) throws SQLException {
-//      int num = 999;
-//      String sql = "select count(*) from bookkeyword where isbn = ?";
-//      PreparedStatement preparedStatement;
-//      preparedStatement = con.prepareStatement(sql);
-//      preparedStatement.setString(1, isbn);
-//      ResultSet rs = preparedStatement.executeQuery();
-//      if(rs.next()) {
-//        num = rs.getInt("count(*)");
-//      }
-//      
-//    }
-//
-//    /* --- Data->insert->book --- */
-//    public static void insertBookKeyword(String isbn, List<String> keywords) throws SQLException {
-////      String sql = "insert into BookKeyword values (?,?);";
-////      List<String> newKeywords = new ArrayList<String>();
-////      int id = -1;
-////      String[] stringArray = {};
-////      PreparedStatement preparedStatement;
-////      preparedStatement = con.prepareStatement(sql);
-////      preparedStatement.setString(1, isbn);
-////      for (String key : keywords) {
-////        id = SelectHelper.getKeywordID(key);
-////        if (id < 0) {
-////          newKeywords.add(key);
-////        }
-////      }
-////      stringArray = newKeywords.toArray(new String[newKeywords.size()]);
-////
-////      // insert all the new keywords to keyword table
-////      InserterHelper.insertKeyword(isbn, stringArray);
-////      // insert all the keywords to bookkeyword table
-////      for (String key : keywords) {
-////        id = SelectHelper.getKeywordID(key);
-////        preparedStatement.setInt(2, id);
-////        preparedStatement.executeUpdate();
-////      }
-//      
-//    String sql = "insert into BookKeyword values (?,?);";
-////    List<String> newKeywords = new ArrayList<String>();
-//    int id = -1;
-//    String[] stringArray = {};
-//    PreparedStatement preparedStatement;
-//    preparedStatement = con.prepareStatement(sql);
-//    preparedStatement.setString(1, isbn);
-//    stringArray = keywords.toArray(new String[keywords.size()]);
-//
-//    // insert all the new keywords to keyword table
-//    InserterHelper.insertKeyword(isbn, stringArray);
-//    // insert all the keywords to bookkeyword table
-//
-//
-//    }
-//
-//    /* --- Data->insert->book --- */
-//    public static void insertKeyword(String isbn, String[] keywords) throws SQLException {
-//      int keyID = -1;
-//      String sql = "insert into Keyword (tag) values (?);";
-//      PreparedStatement preparedStatement;
-//      if (keywords != null) {
-//        for (String keyword : keywords) {
-//          // nextKeyID = SelectHelper.getNextKeywordID();
-//          keyID = SelectHelper.getKeywordID(keyword);
-//          if (keyID < 0) {
-//            preparedStatement = con.prepareStatement(sql);
-//            // preparedStatement.setInt(1, nextKeyID);
-//            preparedStatement.setString(1, keyword);
-//            preparedStatement.executeUpdate();
-//            // keyID = nextKeyID;
-//            keyID = SelectHelper.getKeywordID(keyword);
-//          }
-//           insertBookKeyword(isbn, keyID);
-//        }
-//      }
-//    }
-//
-//    /* --- Data->insert->peopleinvolved --- */
-//    public static int insertNewPeople(String fullname) throws SQLException {
-//      // int nextID = SelectHelper.getNextPeopleID();
-//      String first = null, mid = null, last = null;
-//      String[] name = fullname.split(" ");
-//      // if (nextID > 0) {
-//      if (name.length == 2) {
-//        first = name[0];
-//        last = name[1];
-//      } else if (name.length >= 3) {
-//        first = name[0];
-//        mid = name[1];
-//        last = name[2];
-//      }
-//      if (name.length >= 2) {
-//        // insert new author
-//        String sql = "insert into PeopleInvolved (firstname, middlename, familyname, gender) values (?,?,?,?);";
-//        try {
-//          PreparedStatement preparedStatement;
-//          preparedStatement = con.prepareStatement(sql);
-//          preparedStatement.setString(1, first);
-//          preparedStatement.setString(2, mid);
-//          preparedStatement.setString(3, last);
-//          preparedStatement.setString(4, null);
-//          preparedStatement.executeUpdate();
-//          return SelectHelper.getPeopleID(fullname);
-//        } catch (SQLException e) {
-//          e.printStackTrace();
-//        }
-//      }
-//      // }
-//      return -1;
-//    }
-//
-//    /* --- Data->insert->movie --- */
-//    public static int insertNewPeople(MovieCrew crew) throws SQLException {
-//      // int nextID = SelectHelper.getNextPeopleID();
-//      String first = null, mid = null, last = null, fullname = null;
-//      String[] name = crew.getCrewName().split(" ");
-//
-//      if (name.length == 2) {
-//        first = name[0];
-//        last = name[1];
-//        fullname = first + " " + last;
-//      } else if (name.length >= 3) {
-//        first = name[0];
-//        mid = name[1];
-//        last = name[2];
-//        fullname = first + " " + mid + " " + last;
-//      }
-//      if (name.length >= 2) {
-//        // insert new author
-//        String sql = "insert into PeopleInvolved (firstname, middlename, familyname, gender) values (?,?,?,?);";
-//        try {
-//          PreparedStatement preparedStatement;
-//          preparedStatement = con.prepareStatement(sql);
-//          // preparedStatement.setInt(1, nextID);
-//          preparedStatement.setString(1, first);
-//          preparedStatement.setString(2, mid);
-//          preparedStatement.setString(3, last);
-//          preparedStatement.setBoolean(4, crew.getGender());
-//          preparedStatement.executeUpdate();
-//          return SelectHelper.getPeopleID(fullname);
-//        } catch (SQLException e) {
-//          e.printStackTrace();
-//        }
-//      }
-//      return -1;
-//    }
-//
-//    /* --- Data->insert->album --- */
-//    public static void insertAlbum(String albumName, int year, String musicName, String language, diskType diskType,
-//        String producer) throws SQLException {
-//      int producerID = SelectHelper.getPeopleID(producer);
-//      String sql = "insert into Music values (?,?,?,?,?,?);";
-//      PreparedStatement ps = con.prepareStatement(sql);
-//      ps.setString(1, albumName);
-//      ps.setInt(2, year);
-//      ps.setString(3, musicName);
-//      ps.setString(4, language);
-//      ps.setInt(5, diskType.getEnumValue());
-//      ps.setInt(6, producerID);
-//      ps.executeUpdate();
-//    }
-//
-//    /* --- Data->insert->album --- */
-//    public static void insertMusicSinger(String albumName, int year, String musicName, int id) throws SQLException {
-//      String sql = "insert into MusicSinger values (?,?,?,?);";
-//      PreparedStatement ps;
-//      ps = con.prepareStatement(sql);
-//      ps.setString(1, albumName);
-//      ps.setInt(2, year);
-//      ps.setString(3, musicName);
-//      ps.setInt(4, id);
-//      ps.executeUpdate();
-//    }
-//
-//    /* --- Data->insert->album --- */
-//    public static void insertMusicSinger(String albumName, int year, String musicName, String sname)
-//        throws SQLException {
-//      String sql = "insert into MusicSinger values (?,?,?,?);";
-//      int id = SelectHelper.getPeopleID(sname);
-//      if (id < 0) {
-//        id = InserterHelper.insertNewPeople(sname);
-//      }
-//      PreparedStatement ps;
-//      ps = con.prepareStatement(sql);
-//      ps.setString(1, albumName);
-//      ps.setInt(2, year);
-//      ps.setString(3, musicName);
-//      ps.setInt(4, id);
-//      ps.executeUpdate();
-//    }
-//
-//    /* --- Data->insert->album --- */
-//    public static void insertMusicPeopleInvolved(String albumName, int year, String musicName, int ppl, int sw, int c,
-//        int a) throws SQLException {
-//      String sql = "insert into PeopleInvolvedMusic values (?,?,?,?,?,?,?);";
-//      PreparedStatement ps;
-//      ps = con.prepareStatement(sql);
-//      ps.setString(1, albumName);
-//      ps.setInt(2, year);
-//      ps.setString(3, musicName);
-//      ps.setInt(4, ppl);
-//      ps.setInt(5, sw);
-//      ps.setInt(6, c);
-//      ps.setInt(7, a);
-//      ps.executeUpdate();
-//    }
-//
-//    /* --- Data->insert->album --- */
-//    public static void insertMusicPeopleInvolved(String albumName, int year, String musicName, String name, int sw,
-//        int c, int a) throws SQLException {
-//      String sql = "insert into PeopleInvolvedMusic values (?,?,?,?,?,?,?);";
-//      int id = SelectHelper.getPeopleID(name);
-//      if (id < 0) {
-//        id = InserterHelper.insertNewPeople(name);
-//        if (id < 0) {
-//          throw new SQLException();
-//        }
-//      }
-//      PreparedStatement ps;
-//      ps = con.prepareStatement(sql);
-//      ps.setString(1, albumName);
-//      ps.setInt(2, year);
-//      ps.setString(3, musicName);
-//      ps.setInt(4, id);
-//      ps.setInt(5, sw);
-//      ps.setInt(6, c);
-//      ps.setInt(7, a);
-//      ps.executeUpdate();
-//    }
-//
-//    /* --- Data->insert->movie --- */
-//    public static void insertMovie(String movieName, int movieYear) throws SQLException {
-//      String sql = "insert into Movie values (?,?);";
-//      PreparedStatement ps;
-//      ps = con.prepareStatement(sql);
-//      ps.setString(1, movieName);
-//      ps.setInt(2, movieYear);
-//      ps.executeUpdate();
-//    }
-//
-//    /* --- Data->insert->movie --- */
-//    public static void insertAward(String movieName, int movieYear, Map<String, List<MovieCrew>> crews)
-//        throws SQLException {
-//      String sql = "insert ignore into award values (?,?,?,?);";
-//      PreparedStatement ps;
-//      ps = con.prepareStatement(sql);
-//      ps.setString(2, movieName);
-//      ps.setInt(3, movieYear);
-//      for (List<MovieCrew> list : crews.values()) {
-//        for (MovieCrew crew : list) {
-//          ps.setInt(1, crew.getPeopleID());
-//          ps.setBoolean(4, crew.getAward());
-//          ps.executeUpdate();
-//        }
-//      }
-//    }
-//
-//    /* --- Data->insert->movie --- */
-//    public static void insertAward(String movieName, int movieYear, MovieCrew mc) throws SQLException {
-//      String sql = "insert ignore into award values (?,?,?,?);";
-//      PreparedStatement ps;
-//      ps = con.prepareStatement(sql);
-//      ps.setString(2, movieName);
-//      ps.setInt(3, movieYear);
-//      ps.setInt(1, mc.getPeopleID());
-//      ps.setBoolean(4, mc.getAward());
-//      ps.executeUpdate();
-//    }
-//
-//    /* --- Data->insert->movie --- */
-//    public static void insertCrewMember(String movieName, int movieYear, Map<String, List<MovieCrew>> crews)
-//        throws SQLException {
-//      String sql = "insert into CrewMember values (?,?,?,?);";
-//      PreparedStatement ps;
-//      int id = -1;
-//      ps = con.prepareStatement(sql);
-//      ps.setString(2, movieName);
-//      ps.setInt(3, movieYear);
-//      for (List<MovieCrew> list : crews.values()) {
-//        for (MovieCrew crew : list) {
-//          // get peopleID for people
-//          id = crew.getPeopleID();
-//          if (id < 0) {
-//            id = InserterHelper.insertNewPeople(crew);
-//            if (id < 0) {
-//              throw new SQLException();
-//            }
-//          }
-//          ps.setInt(1, id);
-//          // for each role the person has
-//          ps.setInt(4, crew.getRoleID());
-//          ps.executeUpdate();
-//        }
-//      }
-//    }
-//
-//    /* --- Data->insert->movie --- */
-//    public static void insertCrewMember(String movieName, int movieYear, MovieCrew mc) throws SQLException {
-//      String sql = "insert into CrewMember values (?,?,?,?);";
-//      PreparedStatement ps;
-//      ps = con.prepareStatement(sql);
-//      // get peopleID for people
-//      ps.setInt(1, mc.getPeopleID());
-//      ps.setString(2, movieName);
-//      ps.setInt(3, movieYear);
-//      ps.setInt(4, mc.getRoleID());
-//      ps.executeUpdate();
-//    }
-//
-//  }
-//
-//  public static class UpdateHelper {
-//
-//    /* --- Data->update->book --- */
-//    public static void updateBookString(String data, String isbn, String type) throws SQLException {
-//      String sql = "Update Book set " + type + " = ? where isbn = ?;";
-//      PreparedStatement ps;
-//      ps = con.prepareStatement(sql);
-//      ps.setString(1, data);
-//      ps.setString(2, isbn);
-//      ps.executeUpdate();
-//    }
-//    
-//    /* --- Data->update->movie --- */
-//    public static void updateMovieInfo(String oldName, String newName, int year) throws SQLException {
-//      String sql = "Update movie set moviename = ?, year = ? where moviename = ?;";
-//      PreparedStatement ps;
-//      ps = con.prepareStatement(sql);
-//      ps.setString(1, newName);
-//      ps.setInt(2, year);
-//      ps.setString(3, oldName);
-//      ps.executeUpdate();
-//    }
-//
-//    /* --- Data->update->book --- */
-//    public static void updateBookInt(int data, String isbn, String type) throws SQLException {
-//      String sql = "Update Book set " + type + " = ? where isbn = ?;";
-//      PreparedStatement ps;
-//      ps = con.prepareStatement(sql);
-//      if (data == -1) {
-//        ps.setNull(1, java.sql.Types.NULL);
-//      } else {
-//        ps.setInt(1, data);
-//      }
-//      ps.setString(2, isbn);
-//      ps.executeUpdate();
-//    }
-//
-//    /* --- Data->update->book --- */
-//    public static void updateBookAuthor(String oldauthor, String author, String isbn) throws SQLException {
-//      String sql = "Update bookauthor set author_id = ? where isbn = ? and author_id = ?;";
-//      int oldid = -1, newid = -1;
-//      PreparedStatement ps;
-//
-//      ps = con.prepareStatement(sql);
-//      ps.setInt(1, newid);
-//      ps.setString(2, isbn);
-//      ps.setInt(3, oldid);
-//      ps.executeUpdate();
-//
-//    }
-//
-//    /* --- Data->update->album --- */
-//    public static void updateMusicTrackString(String newdata, String musicName, String category) throws SQLException {
-//      // use for musicname and language
-//      String sql = "Update music set " + " " + category + " = ? where musicName = ?;";
-//      PreparedStatement ps;
-//
-//      ps = con.prepareStatement(sql);
-//      ps.setString(1, newdata);
-//      ps.setString(2, musicName);
-//      ps.executeUpdate();
-//    }
-//
-//    /* --- Data->update->album --- */
-//    // use when music people already in that music track
-//    public static void updateMusicTrackCrewOn(String newdata, String musicName, String albumName, String role)
-//        throws SQLException {
-//      String sql = "Update peopleinvolvedmusic set " + role
-//          + " = 1 where peopleinvolved_id = ? and albumname = ? and musicname = ?;";
-//      PreparedStatement ps;
-//      int id = SelectHelper.getPeopleID(newdata);
-//      ps = con.prepareStatement(sql);
-//      ps.setInt(1, id);
-//      ps.setString(2, albumName);
-//      ps.setString(3, musicName);
-//      ps.executeUpdate();
-//    }
-//
-//    /* --- Data->update->album --- */
-//    public static void updateMusicTrackCrewOff(String newdata, String musicName, String albumName, String role)
-//        throws SQLException {
-//      String sql = "Update peopleinvolvedmusic set " + role
-//          + " = 0 where peopleinvolved_id = ? and albumname = ? and musicname = ?;";
-//      PreparedStatement ps;
-//      int id = SelectHelper.getPeopleID(newdata);
-//      ps = con.prepareStatement(sql);
-//      ps.setInt(1, id);
-//      ps.setString(2, albumName);
-//      ps.setString(3, musicName);
-//      ps.executeUpdate();
-//    }
-//
-//    /* --- Data->update->album --- */
-//    public static void updateAllMusicName(String oldMusicName, String musicName, String lang, diskType t, Album album)
-//        throws SQLException {
-//      String albumName = album.getAlbumName();
-//      // insert the new music track
-//      InserterHelper.insertAlbum(albumName, album.getYear(), musicName, lang, t, album.getProducer());
-//      // update other
-//      UpdateHelper.updateMusicNameSinger(oldMusicName, musicName, albumName);
-//      UpdateHelper.updateMusicNamePeople(oldMusicName, musicName, albumName);
-//      // delete the old music track
-//      DeleteHelper.removeMusic(albumName, oldMusicName);
-//    }
-//
-//    /* --- Data->update->album --- */
-//    public static void updateMusicNameSinger(String oldMusicName, String musicName, String albumName)
-//        throws SQLException {
-//      String sql = "update musicsinger set musicName = ? where albumName = ? and musicName = ?;";
-//      PreparedStatement ps;
-//      ps = con.prepareStatement(sql);
-//      ps.setString(1, musicName);
-//      ps.setString(2, albumName);
-//      ps.setString(3, oldMusicName);
-//      ps.executeUpdate();
-//    }
-//
-//    /* --- Data->update->album --- */
-//    public static void updateMusicNamePeople(String oldMusicName, String musicName, String albumName)
-//        throws SQLException {
-//      String sql = "update peopleinvolvedmusic set musicName = ? where albumName = ? and musicName = ?;";
-//      PreparedStatement ps;
-//      ps = con.prepareStatement(sql);
-//      ps.setString(1, musicName);
-//      ps.setString(2, albumName);
-//      ps.setString(3, oldMusicName);
-//      ps.executeUpdate();
-//    }
-//
-//    /* --- Data->update->album --- */
-//    public static void updateMusicProducer(String albumName, String producer) throws SQLException {
-//      String sql = "update music set producer_id = ? where albumName = ?";
-//      int id = SelectHelper.getPeopleID(producer);
-//      if (id < 0) {
-//        id = InserterHelper.insertNewPeople(producer);
-//        if (id < 0) {
-//          throw new SQLException();
-//        }
-//      }
-//      PreparedStatement ps;
-//      ps = con.prepareStatement(sql);
-//      ps.setInt(1, id);
-//      ps.setString(2, albumName);
-//      ps.executeUpdate();
-//    }
-//
-//    /* --- Data->update->album --- */
-//    public static void updateAlbumNameSinger(String oldAlbumName, int oldYear, String newName, int newYear,
-//        String musicName) throws SQLException {
-//      String sql = "update musicsinger set albumname = ?, year = ? where albumname = ? and year = ? and musicname = ?";
-//      PreparedStatement ps;
-//      ps = con.prepareStatement(sql);
-//      ps.setString(1, newName);
-//      ps.setInt(2, newYear);
-//      ps.setString(3, oldAlbumName);
-//      ps.setInt(4, oldYear);
-//      ps.setString(5, musicName);
-//      ps.executeUpdate();
-//    }
-//
-//    /* --- Data->update->album --- */
-//    public static void updateAlbumNameCrew(String oldAlbumName, int oldYear, String newName, int newYear,
-//        String musicName) throws SQLException {
-//      String sql = "update peopleinvolvedmusic set albumname = ?, year = ? where albumname = ? and year = ? and musicname = ?";
-//      PreparedStatement ps;
-//      ps = con.prepareStatement(sql);
-//      ps.setString(1, newName);
-//      ps.setInt(2, newYear);
-//      ps.setString(3, oldAlbumName);
-//      ps.setInt(4, oldYear);
-//      ps.setString(5, musicName);
-//      ps.executeUpdate();
-//    }
-//  }
-//  
-//  public static class DeleteHelper {
-//
-//    /* --- Data->update->book --- */
-//    public static void deleteOneBookAuthor(String isbn, String author) throws SQLException {
-//      int id = -1;
-//      String sql = "delete from BookAuthor where isbn = ? and author_id = ?;";
-//      PreparedStatement preparedStatement;
-//      preparedStatement = con.prepareStatement(sql);
-//      preparedStatement.setString(1, isbn);
-//      id = SelectHelper.getPeopleID(author);
-//      if (id > 0) {
-//        preparedStatement.setInt(2, id);
-//        preparedStatement.executeUpdate();
-//      }
-//    }
-//
-//    /* --- Data->delete->book --- */
-//    public static void deleteBookAuthors(String isbn, List<String> authors) throws SQLException {
-//      int id = -1;
-//      String sql = "delete from BookAuthor where isbn = ? and author_id = ?;";
-//      PreparedStatement preparedStatement;
-//      preparedStatement = con.prepareStatement(sql);
-//      preparedStatement.setString(1, isbn);
-//      for (String author : authors) {
-//        id = SelectHelper.getPeopleID(author);
-//        if (id > 0) {
-//          preparedStatement.setInt(2, id);
-//          preparedStatement.executeUpdate();
-//        }
-//      }
-//    }
-//
-//    /* --- Data->delete->book --- */
-//    public static void deleteBookKeywords(String isbn, List<String> keywords) throws SQLException {
-//      int id = -1;
-//      String sql = "delete from BookKeyword where isbn = ? and keyword_id = ?;";
-//      PreparedStatement preparedStatement;
-//      preparedStatement = con.prepareStatement(sql);
-//      preparedStatement.setString(1, isbn);
-//      for (String key : keywords) {
-//        id = SelectHelper.getKeywordID(key);
-//        if (id > 0) {
-//          preparedStatement.setInt(2, id);
-//          preparedStatement.executeUpdate();
-//        }
-//      }
-//    }
-//
-//    /* --- Data->delete->book --- */
-//    public static void removeBook(String isbn) throws SQLException {
-//      String sql = "delete from book where isbn = ?;";
-//      PreparedStatement preparedStatement;
-//      preparedStatement = con.prepareStatement(sql);
-//      preparedStatement.setString(1, isbn);
-//      preparedStatement.executeUpdate();
-//    }
-//
-//    /* --- Data->delete->book --- */
-//    public static void removeBookKeyword(String isbn) throws SQLException {
-//      String sql = "delete from bookkeyword where isbn = ?;";
-//      PreparedStatement preparedStatement;
-//      preparedStatement = con.prepareStatement(sql);
-//      preparedStatement.setString(1, isbn);
-//      preparedStatement.executeUpdate();
-//    }
-//
-//    /* --- Data->delete->book --- */
-//    public static void removeBookAuthor(String isbn) throws SQLException {
-//      String sql = "delete from BookAuthor where isbn = ?;";
-//      PreparedStatement preparedStatement;
-//      preparedStatement = con.prepareStatement(sql);
-//      preparedStatement.setString(1, isbn);
-//      preparedStatement.executeUpdate();
-//    }
-//
-//    /* --- Data->delete->album --- */
-//    public static void removeMusic(String albumName, String musicName) throws SQLException {
-//      String sql = "delete from Music where AlbumName = ? and MusicName = ?;";
-//      PreparedStatement preparedStatement;
-//      preparedStatement = con.prepareStatement(sql);
-//      preparedStatement.setString(1, albumName);
-//      preparedStatement.setString(2, musicName);
-//      preparedStatement.executeUpdate();
-//    }
-//
-//    /* --- Data->delete->album --- */
-//    public static void removeMusicByYear(String albumName, int oldYear, String musicName) throws SQLException {
-//      String sql = "delete from Music where AlbumName = ? and MusicName = ? and year = ?;";
-//      PreparedStatement preparedStatement;
-//      preparedStatement = con.prepareStatement(sql);
-//      preparedStatement.setString(1, albumName);
-//      preparedStatement.setString(2, musicName);
-//      preparedStatement.setInt(3, oldYear);
-//      preparedStatement.executeUpdate();
-//    }
-//
-//    /* --- Data->delete->album --- */
-//    public static void removeMusicSingers(String albumName, String musicName) throws SQLException {
-//      String sql = "delete from MusicSinger where AlbumName = ? and MusicName = ?;";
-//      PreparedStatement preparedStatement;
-//      preparedStatement = con.prepareStatement(sql);
-//      preparedStatement.setString(1, albumName);
-//      preparedStatement.setString(2, musicName);
-//      preparedStatement.executeUpdate();
-//    }
-//
-//    /* --- Data->delete->album --- */
-//    public static void removeMusicSinger(String albumName, String musicName, String singer) throws SQLException {
-//      String sql = "delete from musicsinger where albumname = ? and musicname = ? and peopleinvolved_id = ?;";
-//      PreparedStatement preparedStatement;
-//      preparedStatement = con.prepareStatement(sql);
-//      preparedStatement.setString(1, albumName);
-//      preparedStatement.setString(2, musicName);
-//      preparedStatement.setInt(3, SelectHelper.getPeopleID(singer));
-//      preparedStatement.executeUpdate();
-//    }
-//
-//    /* --- Data->delete->album --- */
-//    public static void removeMusicPeopleInvolved(String albumName, String musicName) throws SQLException {
-//      String sql = "delete from PeopleInvolvedMusic where AlbumName = ? and MusicName = ?;";
-//      PreparedStatement preparedStatement;
-//      preparedStatement = con.prepareStatement(sql);
-//      preparedStatement.setString(1, albumName);
-//      preparedStatement.setString(2, musicName);
-//      preparedStatement.executeUpdate();
-//    }
-//
-//    /* --- Data->delete->album --- */
-//    public static void removeMusicPeopleInvolved(String albumName, String musicName, String name) throws SQLException {
-//      String sql = "delete from PeopleInvolvedMusic where AlbumName = ? and MusicName = ? and peopleinvolved_id = ?;";
-//      int id = SelectHelper.getPeopleID(name);
-//      PreparedStatement preparedStatement;
-//      preparedStatement = con.prepareStatement(sql);
-//      preparedStatement.setString(1, albumName);
-//      preparedStatement.setString(2, musicName);
-//      preparedStatement.setInt(3, id);
-//      preparedStatement.executeUpdate();
-//    }
-//
-//    /* --- Data->delete->album --- */
-//    public static void removeOneMusicTrack(Album album, MusicTrack mt) throws SQLException {
-//      DeleteHelper.removeMusicSingers(album.getAlbumName(), mt.getMusicName());
-//      DeleteHelper.removeMusicPeopleInvolved(album.getAlbumName(), mt.getMusicName());
-//      DeleteHelper.removeMusic(album.getAlbumName(), mt.getMusicName());
-//    }
-//
-//    /* --- Data->delete->movie --- */
-//    public static void removeMovie(String movieName) throws SQLException {
-//      String sql = "delete from Movie where movieName = ?;";
-//      PreparedStatement preparedStatement;
-//      preparedStatement = con.prepareStatement(sql);
-//      preparedStatement.setString(1, movieName);
-//      preparedStatement.executeUpdate();
-//    }
-//
-//    /* --- Data->delete->movie --- */
-//    public static void removeMovieAward(String movieName) throws SQLException {
-//      String sql = "delete from Award where movieName = ?;";
-//      PreparedStatement preparedStatement;
-//      preparedStatement = con.prepareStatement(sql);
-//      preparedStatement.setString(1, movieName);
-//      preparedStatement.executeUpdate();
-//    }
-//
-//    /* --- Data->delete->movie --- */
-//    public static void removeMovieCrew(String movieName) throws SQLException {
-//      String sql = "delete from CrewMember where movieName = ?;";
-//      PreparedStatement preparedStatement;
-//      preparedStatement = con.prepareStatement(sql);
-//      preparedStatement.setString(1, movieName);
-//      preparedStatement.executeUpdate();
-//    }
-//  }
-//
-  public static class BuildQueryHelper {
-
-    public static String bulidForView(Map<String, Boolean> types) {
-      boolean exist = true, success = true;
-      String sql = "";
-      Map<String, String> viewNames = new HashMap<String, String>();
-      viewNames.put("authorView", "a");
-      viewNames.put("SingerView", "s");
-      viewNames.put("crewView", "c");
-      for (String viewname : viewNames.keySet()) {
-        exist = checkHelper.checkIfTableExist(viewname);
-        if (!exist) {
-          switch (viewNames.get(viewname)) {
-          case "a":
-            success = CreateViewHelper.createViewForViewPartAuthor();
-          case "s":
-            success = CreateViewHelper.createViewForViewPartSinger();
-          case "c":
-            success = CreateViewHelper.createViewForViewPartCrew();
-          }
-        }
-      }
-      /* --- View --- */
-      if (success) {
-        // build query
-        sql = "select ProductName, Year, Type, Author_singer_director from (";
-        int count = 0;
-        for (String b : types.keySet()) {
-          // if it's checked
-          if (types.get(b)) {
-            // if there's sql in sql string
-            count++;
-            if (count > 1) {
-              sql += " union ";
-            }
-            if (b.equals("book")) {
-              sql += "select ProductName, Year, Type, Author_singer_director " + "from authorView "
-                  + "where title like ? and year = ?";
-            } else if (b.equals("album")) {
-              sql += "select ProductName, Year, Type, Author_singer_director " + "from singerView "
-                  + "where albumName like ? and year = ?";
-            } else if (b.equals("movie")) {
-              sql += "select ProductName, Year, Type, Author_singer_director " + "from crewView "
-                  + "where moviename like ? and year = ?";
-            }
-
-          }
-        }
-        // end query
-        if (count > 0) {
-          sql += ") t order by Author_singer_director;";
-        }
-      } else {
-        JOptionPane.showMessageDialog(null, "Something wrong when building query", "View - unexpected error",
-            JOptionPane.ERROR_MESSAGE);
-      }
-      return sql;
-    }
   }
 
   public static class TransactionHelper {
@@ -4708,627 +3032,6 @@ public class MainFrame {
           e.printStackTrace();
         }
       }
-    }
-  }
-
-  private static class ReportHelper {
-
-    /* --- report 1: Authors’ Publications --- */
-    public static ResultSet createR1Report(String fullname) {
-      String[] name = fullname.split(" ");
-      ResultSet rs = null;
-      String sql = "select b.ISBN, b.Title, b.YearOfPublication " + "from Book b, bookauthor ba, peopleinvolved p "
-          + "where b.ISBN = ba.ISBN and ba.author_id = p.id and concat(p.firstname,' ',p.familyname) = ? "
-          + "order by ISBN;";
-      if (name.length >= 3) {
-        sql = "select b.ISBN, b.Title, b.YearOfPublication " + "from Book b, bookauthor ba, peopleinvolved p "
-            + "where b.ISBN = ba.ISBN and ba.author_id = p.id and concat(p.firstname,' ',p.middlename,' ',p.familyname) = ? "
-            + "order by ISBN;";
-      }
-      try {
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setString(1, fullname);
-        rs = ps.executeQuery();
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return rs;
-    }
-
-    /* --- report 2: Publications in one Year --- */
-    public static ResultSet createR2Report(int year) {
-      String sql = "select b.ISBN, b.title, b.YearOfPublication, p.familyname, upper(SUBSTRING(p.firstname,1,1)) initials "
-          + "from book b, bookauthor ba, peopleinvolved p "
-          + "where b.isbn = ba.isbn and ba.author_id = p.id and yearOfPublication = ? " + "order by b.title;";
-      ResultSet rs = null;
-      try {
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setInt(1, year);
-        rs = ps.executeQuery();
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return rs;
-    }
-
-    /* --- report 3: Books with Similar Topic --- */
-    public static ResultSet createR3Report(String keyword) {
-      String sql = "select isbn, title, yearofpublication " + "from " + "(select b.isbn, b.title, b.yearofpublication "
-          + "from book b " + "inner join bookkeyword bk " + "on b.isbn = bk.isbn " + "inner join keyword k "
-          + "on k.id = bk.keyword_id " + "where k.tag like ?  " + "union " + "select ISBN, title, yearOfPublication  "
-          + "from book  " + "where abstract like ? or title like ?) a " + "order by isbn;";
-      ResultSet rs = null;
-      try {
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setString(1, "%" + keyword + "%");
-        ps.setString(2, "%" + keyword + "%");
-        ps.setString(3, "%" + keyword + "%");
-        rs = ps.executeQuery();
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return rs;
-    }
-
-    /* --- report 4: Frequent Publishers --- */
-    public static ResultSet createR4Report() {
-      // create a view if not exist yet
-      boolean exist1 = checkHelper.checkIfTableExist("bookAuthorWritten");
-      boolean exist2 = checkHelper.checkIfTableExist("authorPubConsecutiveYear");
-      boolean success1 = true, success2 = true;
-      ResultSet rs = null;
-      if (!exist1) {
-        success1 = CreateViewHelper.createViewForR4BookAuthor();
-      }
-      if (!exist2) {
-        success2 = CreateViewHelper.createViewForR4PubConsecutive();
-      }
-      // execute query if view exist
-      if (success1 && success2) {
-        String sql = "select b.isbn, b.title, CASE WHEN ISNULL(p.MiddleName)  "
-            + "THEN concat(p.firstName, ' ', p.familyname) "
-            + "ELSE concat(p.firstName, ' ',p.middlename, ' ', p.familyname) " + "END author_name, b.yearofpublication "
-            + "from authorPubConsecutiveYear c, book b, bookauthor ba, peopleinvolved p "
-            + "where b.isbn = ba.isbn and p.id = ba.author_id and c.author_id = ba.author_id "
-            + "order by p.familyname, b.yearofpublication;";
-        PreparedStatement ps;
-        try {
-          ps = con.prepareStatement(sql);
-          rs = ps.executeQuery(sql);
-        } catch (SQLException e) {
-          e.printStackTrace();
-        }
-      }
-      return rs;
-    }
-
-    /* --- report 5: Most Popular Subjects --- */
-    public static ResultSet createR5Report() {
-      // create a view if not exist yet
-      boolean exist = checkHelper.checkIfTableExist("keywordFrequency");
-      boolean success = true;
-      ResultSet rs = null;
-      if (!exist) {
-        success = CreateViewHelper.createViewForR5();
-      }
-      // execute query if view exist
-      if (success) {
-        String sql = "select k.tag, kf.frequency " + "from bookkeyword bk, keyword k, keywordFrequency kf "
-            + "where bk.keyword_id = k.id and kf.tag = k.tag and kf.frequency in (select max(frequency) from keywordFrequency) "
-            + "group by k.tag " + "order by k.tag;";
-        PreparedStatement ps;
-        try {
-          ps = con.prepareStatement(sql);
-          rs = ps.executeQuery(sql);
-        } catch (SQLException e) {
-          e.printStackTrace();
-        }
-      }
-      return rs;
-    }
-
-    /* --- report 6: Multi Skills Movie Crew --- */
-    public static ResultSet createR6Report() {
-      // create a view if not exist yet
-      boolean exist = checkHelper.checkIfTableExist("multiSkillsMovieCrew");
-      boolean success = true;
-      ResultSet rs = null;
-      if (!exist) {
-        success = CreateViewHelper.createViewForR6();
-      }
-      // execute query if view exist
-      if (success) {
-        String sql = "select t.familyname, r.description, mc.moviename "
-            + "from multiSkillsMovieCrew t, role r, crewmember mc "
-            + "where t.peopleinvolved_id = mc.peopleinvolved_id and r.id = mc.role_id "
-            + "order by t.familyname;";
-        PreparedStatement ps;
-        try {
-          ps = con.prepareStatement(sql);
-          rs = ps.executeQuery(sql);
-        } catch (SQLException e) {
-          e.printStackTrace();
-        }
-      }
-      return rs;
-    }
-
-    /* --- report 7: Award Winning Movies--- */
-    public static ResultSet createR7Report() {
-      // create a view if not exist yet
-      boolean exist = checkHelper.checkIfTableExist("movieWithAward"),
-          exist2 = checkHelper.checkIfTableExist("movieCrew");
-      ;
-      boolean success = true, success2 = true;
-      ResultSet rs = null;
-      if (!exist) {
-        success = CreateViewHelper.createViewForR7MovieAward();
-      }
-      if (!exist2) {
-        success = CreateViewHelper.createViewForR7MovieCrew();
-      }
-      // execute query if view exist
-      if (success && success2) {
-        String sql = "select cm.moviename, mc.director_name, mwa.numAward "
-            + "from movieWithAward mwa, crewmember cm, movieCrew mc "
-            + "where mwa.moviename = cm.moviename and mc.peopleInvolved_id = cm.peopleinvolved_id "
-            + "and mc.description = 'director' " + "group by mc.director_name, moviename " + "order by mc.familyname;";
-        PreparedStatement ps;
-        try {
-          ps = con.prepareStatement(sql);
-          rs = ps.executeQuery(sql);
-        } catch (SQLException e) {
-          e.printStackTrace();
-        }
-      }
-      return rs;
-    }
-
-    /* --- report 8: Music with Similar Name --- */
-    public static ResultSet createR8Report() {
-      // create a view if not exist yet
-      boolean exist = checkHelper.checkIfTableExist("musicNameDupNum");
-      boolean success = true;
-      ResultSet rs = null;
-      if (!exist) {
-        success = CreateViewHelper.createViewForR8();
-      }
-      // execute query if view exist
-      if (success) {
-        String sql = "select ms.albumname, ms.musicname, ms.year, CASE WHEN ISNULL(p.MiddleName) "
-            + "THEN concat(p.firstName, ' ', p.familyname) "
-            + "ELSE concat(p.firstName, ' ',p.middlename, ' ', p.familyname) " + "END 'Singer name' "
-            + "from musicsinger ms, musicNameDupNum d, peopleinvolved p "
-            + "where ms.musicname = d.musicname and ms.peopleinvolved_id = p.id " + "order by ms.musicname, ms.year;";
-        PreparedStatement ps;
-        try {
-          ps = con.prepareStatement(sql);
-          rs = ps.executeQuery(sql);
-        } catch (SQLException e) {
-          e.printStackTrace();
-        }
-      }
-      return rs;
-    }
-
-    /* --- report 9: Multi Skills Music Crew --- */
-    public static ResultSet createR9Report() {
-      // create a view if not exist yet
-      boolean exist = checkHelper.checkIfTableExist("peopleOnlyNotArrangerMusic");
-      boolean success = true;
-      ResultSet rs = null;
-      if (!exist) {
-        success = CreateViewHelper.createViewForR9();
-      }
-      // execute query if view exist
-      if (success) {
-        String sql = "select p.familyname, upper(SUBSTRING(p.firstname,1,1)) 'First_name_initials', pa.musicname, pa.albumname, pa.year "
-            + "from peopleinvolved p, peopleOnlyNotArrangerMusic pa " + "where p.id = pa.peopleinvolved_id "
-            + "order by pa.year, pa.musicname desc;";
-        PreparedStatement ps;
-        try {
-          ps = con.prepareStatement(sql);
-          rs = ps.executeQuery(sql);
-        } catch (SQLException e) {
-          e.printStackTrace();
-        }
-      }
-      return rs;
-    }
-
-    /* --- report 10: Similar Names --- */
-    public static ResultSet createR10Report() {
-      // create a view if not exist yet
-      boolean exist = checkHelper.checkIfTableExist("lnameofbook");
-      boolean success = true;
-      Map<String, String> viewNames = new HashMap<String, String>();
-      // {"lnameofbook","lnameofmusicproducer","lnameofmusicsinger","lnameofmusiccrews","lnameofmusicSingerProd",
-      // "lnameofmusicallpeople","lnameofmovie","distinctFamilyname"};
-      viewNames.put("lnameofbook", "b");
-      viewNames.put("lnameofmusicproducer", "mupd");
-      viewNames.put("lnameofmusicsinger", "mus");
-      viewNames.put("lnameofmusicsingerprod", "muspd");
-      viewNames.put("lnameofmusiccrews", "muc");
-      viewNames.put("lnameofmusicallpeople", "mup");
-      viewNames.put("lnameofmovie", "mv");
-      viewNames.put("distinctFamilyname", "d");
-      ResultSet rs = null;
-      for (String viewname : viewNames.keySet()) {
-        exist = checkHelper.checkIfTableExist(viewname);
-        if (!exist) {
-          switch (viewNames.get(viewname)) {
-          case "b":
-            success = CreateViewHelper.createViewForR10Book();
-          case "mus":
-            success = CreateViewHelper.createViewForR10MusicProducer();
-            success = CreateViewHelper.createViewForR10MusicSinger();
-            success = CreateViewHelper.createViewForR10MusicSingerProd();
-            success = CreateViewHelper.createViewForR10MusicCrews();
-            success = CreateViewHelper.createViewForR10MusicAllPeople();
-          case "mv":
-            success = CreateViewHelper.createViewForR10Movie();
-          case "d":
-            success = CreateViewHelper.createViewForR10DistinctLname();
-          }
-          if (!success) {
-            break;
-          }
-        }
-      }
-      // execute query if view exist
-      if (success) {
-        String sql = "select familyname, role " + "from " + "(select d.familyname, 'author' role "
-            + "from distinctFamilyname d, bookauthor b, peopleinvolved p "
-            + "where b.author_id = p.id and d.familyname = p.familyname " + "group by d.familyname " + "union "
-            + "select d.familyname, 'producer' role "
-            + "from distinctFamilyname d, lnameofmusicallpeople s, peopleinvolved p "
-            + "where s.id = p.id and d.familyname = p.familyname and s.isproducer = 1 " + "group by d.familyname "
-            + "union " + "select d.familyname, 'singer' role "
-            + "from distinctFamilyname d, lnameofmusicallpeople s, peopleinvolved p "
-            + "where s.id = p.id and d.familyname = p.familyname and s.issinger = 1 " + "group by d.familyname "
-            + "union " + "select d.familyname, 'arranger' role "
-            + "from distinctFamilyname d, lnameofmusicallpeople s, peopleinvolved p "
-            + "where s.id = p.id and d.familyname = p.familyname and s.isarranger = 1 " + "group by d.familyname "
-            + "union " + "select d.familyname, 'composer' role "
-            + "from distinctFamilyname d, lnameofmusicallpeople s, peopleinvolved p "
-            + "where s.id = p.id and d.familyname = p.familyname and s.iscomposer = 1 " + "group by d.familyname "
-            + "union " + "select d.familyname, 'song writer' role "
-            + "from distinctFamilyname d, lnameofmusicallpeople s, peopleinvolved p "
-            + "where s.id = p.id and d.familyname = p.familyname and s.issongwriter = 1 " + "group by d.familyname "
-            + "union " + "select d.familyname, r.description role "
-            + "from distinctFamilyname d, crewmember c, peopleinvolved p, role r "
-            + "where c.peopleinvolved_id = p.id and d.familyname = p.familyname and r.id = c.role_id "
-            + "group by d.familyname) result " + "order by familyname;";
-        PreparedStatement ps;
-        try {
-          ps = con.prepareStatement(sql);
-          rs = ps.executeQuery(sql);
-        } catch (SQLException e) {
-          e.printStackTrace();
-        }
-      } else {
-        JOptionPane.showMessageDialog(null, "Something wrong when creating views", "create view - unexpected error",
-            JOptionPane.ERROR_MESSAGE);
-      }
-      return rs;
-    }
-  }
-
-  public static class CreateViewHelper {
-
-    /* --- View --- */
-    public static boolean createViewForViewPartAuthor() {
-      String sql = "create view authorView as "
-          + "select b.title ProductName, b.YearOfPublication Year, 'B' Type, min(CASE WHEN ISNULL(p.MiddleName) "
-          + "THEN concat(p.firstName, ' ', p.familyname) "
-          + "ELSE concat(p.firstName, ' ',p.middlename, ' ', p.familyname) " + "END) 'Author_singer_director', b.title "
-          + "from book b, bookauthor ba, peopleInvolved p " + "where b.isbn = ba.isbn and ba.author_id = p.id "
-          + "group by ProductName;";
-      PreparedStatement ps;
-      try {
-        ps = con.prepareStatement(sql);
-        ps.executeUpdate(sql);
-        return true;
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return false;
-    }
-
-    /* --- View --- */
-    public static boolean createViewForViewPartSinger() {
-      String sql = "create view SingerView as "
-          + "select mu.albumName ProductName, mu.Year Year, 'M' Type, min(CASE WHEN ISNULL(p.MiddleName) "
-          + "THEN concat(p.firstName, ' ', p.familyname) "
-          + "ELSE concat(p.firstName, ' ',p.middlename, ' ', p.familyname) "
-          + "END) 'Author_singer_director', mu.albumName " + "from music mu, musicsinger mus, peopleinvolved p "
-          + "where (mu.albumName,mu.year,mu.musicName) = (mus.albumName,mus.year,mus.musicName) and mus.peopleInvolved_id = p.id "
-          + "group by ProductName;";
-      PreparedStatement ps;
-      try {
-        ps = con.prepareStatement(sql);
-        ps.executeUpdate(sql);
-        return true;
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return false;
-    }
-
-    /* --- View --- */
-    public static boolean createViewForViewPartCrew() {
-      String sql = "create view crewView as "
-          + "select mv.MovieName ProductName, mv.year Year, 'F' Type, min(CASE WHEN ISNULL(p.MiddleName) "
-          + "THEN concat(p.firstName, ' ', p.familyname) "
-          + "ELSE concat(p.firstName, ' ',p.middlename, ' ', p.familyname) "
-          + "END) 'Author_singer_director', mv.MovieName " + "from movie mv, crewmember cm, peopleinvolved p, role r "
-          + "where (mv.MovieName, mv.year) = (cm.MovieName, cm.ReleaseYear) and cm.PeopleInvolved_id = p.id and cm.role_id = r.id "
-          + "group by ProductName;";
-      PreparedStatement ps;
-      try {
-        ps = con.prepareStatement(sql);
-        ps.executeUpdate(sql);
-        return true;
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return false;
-    }
-
-    /* --- Report 4 - helper view --- */
-    public static boolean createViewForR4BookAuthor() {
-      String sql = "create view bookAuthorWritten as "
-          + "select b2.isbn, b2.title, b2.YearOfPublication year, ba.author_id " + "from book b2, bookauthor ba "
-          + "where b2.isbn = ba.isbn " + "order by yearofpublication;";
-      PreparedStatement ps;
-      try {
-        ps = con.prepareStatement(sql);
-        ps.executeUpdate(sql);
-        return true;
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return false;
-    }
-
-    /* --- Report 4 - helper view --- */
-    public static boolean createViewForR4PubConsecutive() {
-      String sql = "create view authorPubConsecutiveYear as " + "select distinct a.author_id "
-          + "from bookAuthorWritten a, bookAuthorWritten b " + "where a.author_id = b.author_id and a.year = b.year-1 "
-          + "order by a.year, b.year;";
-      PreparedStatement ps;
-      try {
-        ps = con.prepareStatement(sql);
-        ps.executeUpdate(sql);
-        return true;
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return false;
-    }
-
-    /* --- Report 5 - helper view --- */
-    public static boolean createViewForR5() {
-      String sql = "create view keywordFrequency as "
-          + "select k.tag, count(*) frequency from bookkeyword bk, keyword k " + "where bk.keyword_id = k.id "
-          + "group by k.tag;";
-      PreparedStatement ps;
-      try {
-        ps = con.prepareStatement(sql);
-        ps.executeUpdate(sql);
-        return true;
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return false;
-    }
-
-    /* --- Report 6 - helper view --- */
-    public static boolean createViewForR6() {
-      String sql = "create view multiSkillsMovieCrew as " + "select mc.peopleinvolved_id, p.familyname "
-          + "from role r, crewmember mc, peopleinvolved p " + "where r.id = mc.role_id and p.id = mc.peopleinvolved_id "
-          + "group by mc.peopleinvolved_id " + "having count(distinct r.id)>1;";
-      PreparedStatement ps;
-      try {
-        ps = con.prepareStatement(sql);
-        ps.executeUpdate(sql);
-        return true;
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return false;
-    }
-
-    /* --- Report 7 - helper view --- */
-    public static boolean createViewForR7MovieAward() {
-      String sql = "create view movieWithAward as " + "select moviename, sum(award) numAward " + "from award "
-          + "group by moviename " + "having numAward > 0;";
-      PreparedStatement ps;
-      try {
-        ps = con.prepareStatement(sql);
-        ps.executeUpdate(sql);
-        return true;
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return false;
-    }
-
-    /* --- Report 7 - helper view --- */
-    public static boolean createViewForR7MovieCrew() {
-      String sql = "create view movieCrew as "
-          + "select cm.PeopleInvolved_ID, r.description, CASE WHEN ISNULL(p.MiddleName)  "
-          + "THEN concat(p.firstName, ' ', p.familyname) "
-          + "ELSE concat(p.firstName, ' ',p.middlename, ' ', p.familyname) " + "END 'Director_name', p.familyname "
-          + "from crewmember cm, role r, peopleinvolved p "
-          + "where cm.Role_ID = r.id and cm.peopleinvolved_id = p.id;";
-      PreparedStatement ps;
-      try {
-        ps = con.prepareStatement(sql);
-        ps.executeUpdate(sql);
-        return true;
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return false;
-    }
-
-    /* --- Report 8 - helper view --- */
-    public static boolean createViewForR8() {
-      String sql = "create view musicNameDupNum as " + "select musicname, count(*) numberDup " + "from music "
-          + "group by musicname " + "having numberDup > 1;";
-      PreparedStatement ps;
-      try {
-        ps = con.prepareStatement(sql);
-        ps.executeUpdate(sql);
-        return true;
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return false;
-    }
-
-    /* --- Report 9 - helper view --- */
-    public static boolean createViewForR9() {
-      String sql = "create view peopleOnlyNotArrangerMusic as "
-          + "select albumname, year, musicname, peopleinvolved_id " + "from peopleinvolvedmusic "
-          + "where isSongwriter = 1 and iscomposer = 1 and isarranger = 0;";
-      PreparedStatement ps;
-      try {
-        ps = con.prepareStatement(sql);
-        ps.executeUpdate(sql);
-        return true;
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return false;
-    }
-
-    /* --- Report 10 - helper views --- */
-    public static boolean createViewForR10Book() {
-      String sql = "create view lnameofbook as " + "select p.familyname, count(*) "
-          + "from peopleinvolved p, bookauthor b " + "where p.id = b.author_id " + "group by p.familyname;";
-      PreparedStatement ps;
-      try {
-        ps = con.prepareStatement(sql);
-        ps.executeUpdate(sql);
-        return true;
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return false;
-    }
-
-    /* --- Report 10 - helper views --- */
-    public static boolean createViewForR10MusicProducer() {
-      String sql = "create view lnameofmusicproducer as " + "select distinct p.id, p.familyname, 1 'IsProducer' "
-          + "from peopleinvolved p, music m " + "where p.id = m.producer_id;";
-      PreparedStatement ps;
-      try {
-        ps = con.prepareStatement(sql);
-        ps.executeUpdate(sql);
-        return true;
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return false;
-    }
-
-    /* --- Report 10 - helper views --- */
-    public static boolean createViewForR10MusicSinger() {
-      String sql = "create view lnameofmusicsinger as " + "select p.id, p.familyname, 1 'IsSinger' "
-          + "from peopleinvolved p, musicsinger m " + "where p.id = m.peopleinvolved_id;";
-      PreparedStatement ps;
-      try {
-        ps = con.prepareStatement(sql);
-        ps.executeUpdate(sql);
-        return true;
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return false;
-    }
-
-    /* --- Report 10 - helper views --- */
-    public static boolean createViewForR10MusicSingerProd() {
-      String sql = "create view lnameofmusicSingerProd as "
-          + "select distinct p.id, p.familyname, p.IsSinger, pd.isproducer " + "from lnameofmusicsinger p "
-          + "left outer join lnameofmusicproducer pd " + "on p.id = pd.id " + "union "
-          + "select distinct pd.id, pd.familyname, p.IsSinger, pd.isproducer " + "from lnameofmusicproducer pd "
-          + "left outer join lnameofmusicsinger p " + "on p.id = pd.id;";
-      PreparedStatement ps;
-      try {
-        ps = con.prepareStatement(sql);
-        ps.executeUpdate(sql);
-        return true;
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return false;
-    }
-
-    /* --- Report 10 - helper views --- */
-    public static boolean createViewForR10MusicCrews() {
-      String sql = "create view lnameofmusiccrews as "
-          + "select p.id, p.familyname, pm.IsArranger, pm.IsComposer, pm.IsSongwriter "
-          + "from peopleinvolved p, peopleinvolvedmusic pm " + "where p.id = pm.peopleinvolved_id;";
-      PreparedStatement ps;
-      try {
-        ps = con.prepareStatement(sql);
-        ps.executeUpdate(sql);
-        return true;
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return false;
-    }
-
-    /* --- Report 10 - helper views --- */
-    public static boolean createViewForR10MusicAllPeople() {
-      String sql = "create view lnameofmusicallpeople as "
-          + "select distinct p.id, p.familyname, p.IsSinger, p.IsProducer, pm.IsArranger, pm.IsComposer, pm.IsSongWriter "
-          + "from lnameofmusicSingerProd p " + "left outer join lnameofmusiccrews pm " + "on p.id = pm.id;";
-      PreparedStatement ps;
-      try {
-        ps = con.prepareStatement(sql);
-        ps.executeUpdate(sql);
-        return true;
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return false;
-    }
-
-    /* --- Report 10 - helper views --- */
-    public static boolean createViewForR10Movie() {
-      String sql = "create view lnameofmovie as " + "select p.familyname, count(*) "
-          + "from peopleinvolved p, crewmember c " + "where p.id = c.peopleinvolved_id " + "group by p.familyname;";
-      PreparedStatement ps;
-      try {
-        ps = con.prepareStatement(sql);
-        ps.executeUpdate(sql);
-        return true;
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return false;
-    }
-
-    /* --- Report 10 - helper views --- */
-    public static boolean createViewForR10DistinctLname() {
-      String sql = "create view distinctFamilyname as " + "select distinct p.familyname " + "from peopleinvolved p "
-          + "where (p.familyname in (select familyname from lnameofbook) and p.familyname in (select familyname from lnameofmusicallpeople)) "
-          + "or (p.familyname in (select familyname from lnameofbook) and p.familyname in (select familyname from lnameofmovie)) "
-          + "or (p.familyname in (select familyname from lnameofmusicallpeople) and p.familyname in (select familyname from lnameofmovie));";
-      PreparedStatement ps;
-      try {
-        ps = con.prepareStatement(sql);
-        ps.executeUpdate(sql);
-        return true;
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return false;
     }
   }
 
@@ -5753,7 +3456,7 @@ public class MainFrame {
     private JTextField insComposerTx;
     private JTextField insArrangerTx;
     private JTextField insSingerTx1;
-    private ButtonGroup diskTypeTx;
+    private ButtonGroup DiskTypeTx;
 
     private ButtonModel model_cd;
     private ButtonModel model_vinyl;
@@ -5821,9 +3524,9 @@ public class MainFrame {
               }
             }
 
-            // get diskType
+            // get DiskType
             boolean typeBool = false;
-            if (diskTypeTx.getSelection().getActionCommand().equalsIgnoreCase("vinyl")) {
+            if (DiskTypeTx.getSelection().getActionCommand().equalsIgnoreCase("vinyl")) {
               typeBool = true;
             }
             if (update) {
@@ -5848,7 +3551,7 @@ public class MainFrame {
 
             if (valid) {
               // store as music track
-              MusicTrack mt = new MusicTrack(musicName, lang, ((typeBool) ? diskType.VINYL : diskType.AUDIOCD), singer1,
+              MusicTrack mt = new MusicTrack(musicName, lang, ((typeBool) ? DiskType.VINYL : DiskType.AUDIOCD), singer1,
                   singer2, songWriter, composer, arranger);
               if (update) {
                 // insert new music track
@@ -5900,9 +3603,9 @@ public class MainFrame {
 
       model_cd = radioButton_cd.getModel();
       model_vinyl = radioButton_vinyl.getModel();
-      diskTypeTx = new ButtonGroup();
-      diskTypeTx.add(radioButton_cd);
-      diskTypeTx.add(radioButton_vinyl);
+      DiskTypeTx = new ButtonGroup();
+      DiskTypeTx.add(radioButton_cd);
+      DiskTypeTx.add(radioButton_vinyl);
 
       JLabel label_41 = new JLabel("Song writer:");
 
@@ -6036,7 +3739,7 @@ public class MainFrame {
         public void actionPerformed(ActionEvent e) {
           String musicName = null, lang = null, arranger = null, composer = null, songWriter = null, singer1 = null,
               singer2 = null;
-          diskType type = diskType.AUDIOCD;
+          DiskType type = DiskType.AUDIOCD;
           Set<String> singerSet = new HashSet<String>();
           boolean valid = true;
 
@@ -6082,13 +3785,13 @@ public class MainFrame {
               }
             }
 
-            // get diskType
+            // get DiskType
 
-            for (Enumeration<AbstractButton> buttons = diskTypeTx.getElements(); buttons.hasMoreElements();) {
+            for (Enumeration<AbstractButton> buttons = DiskTypeTx.getElements(); buttons.hasMoreElements();) {
               AbstractButton button = buttons.nextElement();
               if (button.isSelected()) {
                 if (button.getText().equalsIgnoreCase("vinyl")) {
-                  type = diskType.VINYL;
+                  type = DiskType.VINYL;
                 }
               }
             }
@@ -6119,7 +3822,7 @@ public class MainFrame {
                 if (!oldmt.compareArranger(arranger)) {
                   // update arranger
                   // check old arranger
-                  if (checkHelper.checkNumRoleMusic(oldAlbum.getAlbumName(), musicName, oldmt.getArranger()) == 1) {
+                  if (checkHelper.checkNumRoleMusic(oldAlbum.getAlbumName(), musicName, oldmt.getArranger(), null) == 1) {
                     // delete
                     DeleteHelper.removeMusicPeopleInvolved(oldAlbum.getAlbumName(), musicName, oldmt.getArranger(), con);
                   } else {
@@ -6128,7 +3831,7 @@ public class MainFrame {
                         "isarranger", con);
                   }
                   // check new aranger
-                  if (checkHelper.checkMusicCrewExist(oldAlbum.getAlbumName(), musicName, arranger)) {
+                  if (checkHelper.checkMusicCrewExist(oldAlbum.getAlbumName(), musicName, arranger, null)) {
                     // set on
                     UpdateHelper.updateMusicTrackCrewOn(arranger, musicName, oldAlbum.getAlbumName(), "isarranger", con);
                   } else {
@@ -6143,7 +3846,7 @@ public class MainFrame {
 
                   // update composer
                   // check old composer
-                  if (checkHelper.checkNumRoleMusic(oldAlbum.getAlbumName(), musicName, oldmt.getComposer()) == 1) {
+                  if (checkHelper.checkNumRoleMusic(oldAlbum.getAlbumName(), musicName, oldmt.getComposer(), null) == 1) {
                     // delete
                     DeleteHelper.removeMusicPeopleInvolved(oldAlbum.getAlbumName(), musicName, oldmt.getComposer(), con);
                   } else {
@@ -6152,7 +3855,7 @@ public class MainFrame {
                         "iscomposer", con);
                   }
                   // check new composer
-                  if (checkHelper.checkMusicCrewExist(oldAlbum.getAlbumName(), musicName, composer)) {
+                  if (checkHelper.checkMusicCrewExist(oldAlbum.getAlbumName(), musicName, composer, null)) {
                     // set on
                     UpdateHelper.updateMusicTrackCrewOn(composer, musicName, oldAlbum.getAlbumName(), "iscomposer", con);
                   } else {
@@ -6167,7 +3870,7 @@ public class MainFrame {
 
                   // update songWriter
                   // check old songWriter
-                  if (checkHelper.checkNumRoleMusic(oldAlbum.getAlbumName(), musicName, oldmt.getSongWriter()) == 1) {
+                  if (checkHelper.checkNumRoleMusic(oldAlbum.getAlbumName(), musicName, oldmt.getSongWriter(), null) == 1) {
                     // delete
                     DeleteHelper.removeMusicPeopleInvolved(oldAlbum.getAlbumName(), musicName, oldmt.getSongWriter(), con);
                   } else {
@@ -6176,7 +3879,7 @@ public class MainFrame {
                         "issongwriter", con);
                   }
                   // check new songWriter
-                  if (checkHelper.checkMusicCrewExist(oldAlbum.getAlbumName(), musicName, songWriter)) {
+                  if (checkHelper.checkMusicCrewExist(oldAlbum.getAlbumName(), musicName, songWriter, null)) {
                     // set on
                     UpdateHelper.updateMusicTrackCrewOn(songWriter, musicName, oldAlbum.getAlbumName(), "issongwriter", con);
                   } else {
@@ -6267,9 +3970,9 @@ public class MainFrame {
       JRadioButton radioButton_vinyl = new JRadioButton("vinyl");
       radioButton_vinyl.setActionCommand("vinyl");
 
-      diskTypeTx = new ButtonGroup();
-      diskTypeTx.add(radioButton_cd);
-      diskTypeTx.add(radioButton_vinyl);
+      DiskTypeTx = new ButtonGroup();
+      DiskTypeTx.add(radioButton_cd);
+      DiskTypeTx.add(radioButton_vinyl);
 
       model_cd = radioButton_cd.getModel();
       model_vinyl = radioButton_vinyl.getModel();
@@ -6297,10 +4000,10 @@ public class MainFrame {
       // set text fields
       insMusicTx.setText(oldmt.getMusicName());
       insLangTx.setText(oldmt.getLanguage());
-      if (oldmt.getTypeString().equalsIgnoreCase(diskType.AUDIOCD.getString())) {
-        diskTypeTx.setSelected(model_cd, true);
+      if (oldmt.getTypeString().equalsIgnoreCase(DiskType.AUDIOCD.getString())) {
+        DiskTypeTx.setSelected(model_cd, true);
       } else {
-        diskTypeTx.setSelected(model_vinyl, true);
+        DiskTypeTx.setSelected(model_vinyl, true);
       }
       insSongWriterTx.setText(oldmt.getSongWriter());
       insComposerTx.setText(oldmt.getComposer());

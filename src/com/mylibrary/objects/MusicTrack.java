@@ -9,15 +9,15 @@ import java.util.Map;
 import java.util.Set;
 
 import com.assignment.gui.MainFrame;
-import com.assignment.gui.MainFrame.diskType;
 import com.mylibrary.dbhelper.SelectHelper;
+import com.mylibrary.type.DiskType;
 
 public class MusicTrack {
   Connection con = MainFrame.con;
   private String musicName, language, singer1, singer2, songWriter, composer, arranger, typeString;
-  private diskType type;
+  private DiskType type;
 
-  public MusicTrack(String musicName, String language, diskType typet, String singer1, String singer2,
+  public MusicTrack(String musicName, String language, DiskType typet, String singer1, String singer2,
       String songWriter, String composer, String arranger) {
     this.musicName = musicName;
     this.language = language;
@@ -46,7 +46,7 @@ public class MusicTrack {
     this.language = lang;
   }
 
-  public void setType(diskType t) {
+  public void setType(DiskType t) {
     this.type = t;
   }
 
@@ -80,7 +80,7 @@ public class MusicTrack {
     return this.language;
   }
 
-  public diskType getType() {
+  public DiskType getType() {
     return this.type;
   }
 
@@ -157,7 +157,7 @@ public class MusicTrack {
     return false;
   }
 
-  public boolean compareType(diskType newType) {
+  public boolean compareType(DiskType newType) {
     if (this.type.compareTo(newType) == 0) {
       return true;
     }

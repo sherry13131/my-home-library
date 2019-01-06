@@ -3,13 +3,12 @@ package com.mylibrary.dbhelper;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.assignment.gui.MainFrame.diskType;
 import com.mylibrary.objects.MovieCrew;
+import com.mylibrary.type.DiskType;
 
 public class InserterHelper {
 
@@ -125,14 +124,8 @@ public class InserterHelper {
     preparedStatement.setString(1, isbn); 
     stringArray = keywords.toArray(new String[keywords.size()]);
 
-    // insert all the new keywords to keyword table
+    // insert all the new keywords to keyword table (and bookkeyword table)
     InserterHelper.insertKeyword(isbn, stringArray, con);
-    // insert all the new keywords to bookkeyword table
-    for (String key : keywords) {
-      id = SelectHelper.getKeywordID(key, con);
-      preparedStatement.setInt(2, id);
-      preparedStatement.executeUpdate();
-    }
 
   }
 
@@ -229,7 +222,7 @@ public class InserterHelper {
   }
 
   /* --- Data->insert->album --- */
-  public static void insertAlbum(String albumName, int year, String musicName, String language, diskType diskType,
+  public static void insertAlbum(String albumName, int year, String musicName, String language, DiskType DiskType,
       String producer, Connection con) throws SQLException {
     int producerID = SelectHelper.getPeopleID(producer, con);
     String sql = "insert into Music values (?,?,?,?,?,?);";
@@ -238,7 +231,7 @@ public class InserterHelper {
     ps.setInt(2, year);
     ps.setString(3, musicName);
     ps.setString(4, language);
-    ps.setInt(5, diskType.getEnumValue());
+    ps.setInt(5, DiskType.getEnumValue());
     ps.setInt(6, producerID);
     ps.executeUpdate();
   }

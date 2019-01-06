@@ -4,8 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import com.assignment.gui.MainFrame.diskType;
 import com.mylibrary.objects.Album;
+import com.mylibrary.type.DiskType;
 
 public class UpdateHelper {
 
@@ -100,7 +100,7 @@ public class UpdateHelper {
   }
 
   /* --- Data->update->album --- */
-  public static void updateAllMusicName(String oldMusicName, String musicName, String lang, diskType t, Album album, Connection con)
+  public static void updateAllMusicName(String oldMusicName, String musicName, String lang, DiskType t, Album album, Connection con)
       throws SQLException {
     String albumName = album.getAlbumName();
     // insert the new music track

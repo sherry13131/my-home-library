@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.assignment.gui.MainFrame.BuildQueryHelper;
+import com.mylibrary.buildhelper.BuildQueryHelper;
 
 public class SelectHelper {
 
@@ -609,7 +609,7 @@ public class SelectHelper {
 
   public static ResultSet createView(String name, int year, Map<String, Boolean> types, Connection con) {
     // build query
-    String sql = BuildQueryHelper.bulidForView(types);
+    String sql = BuildQueryHelper.bulidForView(types, con);
     // count how many box checked
     int count = 0;
     for (String b : types.keySet()) {

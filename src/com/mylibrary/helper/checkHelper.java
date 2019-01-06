@@ -12,9 +12,9 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-import com.assignment.gui.MainFrame.diskType;
 import com.mylibrary.dbhelper.SelectHelper;
 import com.mylibrary.objects.MovieCrew;
+import com.mylibrary.type.DiskType;
 
 public class checkHelper {
 
@@ -150,12 +150,12 @@ public class checkHelper {
     return false;
   }
 
-  public static diskType checkDiskType(Boolean type) {
+  public static DiskType checkDiskType(Boolean type) {
     // 0-> CD, 1 -> vinyl
     if (type) {
-      return diskType.VINYL;
+      return DiskType.VINYL;
     } else {
-      return diskType.AUDIOCD;
+      return DiskType.AUDIOCD;
     }
   }
 
