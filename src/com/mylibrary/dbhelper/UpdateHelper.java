@@ -4,8 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import com.assignment.gui.MainFrame.Album;
 import com.assignment.gui.MainFrame.diskType;
+import com.mylibrary.objects.Album;
 
 public class UpdateHelper {
 

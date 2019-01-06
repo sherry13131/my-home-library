@@ -5,8 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
-import com.assignment.gui.MainFrame.Album;
-import com.assignment.gui.MainFrame.MusicTrack;
+import com.mylibrary.objects.Album;
+import com.mylibrary.objects.MusicTrack;
 
 public class DeleteHelper {
 

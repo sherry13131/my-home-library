@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.assignment.gui.MainFrame.MovieCrew;
 import com.assignment.gui.MainFrame.diskType;
+import com.mylibrary.objects.MovieCrew;
 
 public class InserterHelper {
 
@@ -118,23 +118,16 @@ public class InserterHelper {
   /* --- Data->insert->book --- */
   public static void insertBookKeyword(String isbn, List<String> keywords, Connection con) throws SQLException {
     String sql = "insert into BookKeyword values (?,?);";
-    List<String> newKeywords = new ArrayList<String>();
     int id = -1;
     String[] stringArray = {};
     PreparedStatement preparedStatement;
     preparedStatement = con.prepareStatement(sql);
-    preparedStatement.setString(1, isbn);
-    for (String key : keywords) {
-      id = SelectHelper.getKeywordID(key, con);
-      if (id < 0) {
-        newKeywords.add(key);
-      }
-    }
-    stringArray = newKeywords.toArray(new String[newKeywords.size()]);
+    preparedStatement.setString(1, isbn); 
+    stringArray = keywords.toArray(new String[keywords.size()]);
 
     // insert all the new keywords to keyword table
     InserterHelper.insertKeyword(isbn, stringArray, con);
-    // insert all the keywords to bookkeyword table
+    // insert all the new keywords to bookkeyword table
     for (String key : keywords) {
       id = SelectHelper.getKeywordID(key, con);
       preparedStatement.setInt(2, id);
@@ -160,7 +153,7 @@ public class InserterHelper {
           // keyID = nextKeyID;
           keyID = SelectHelper.getKeywordID(keyword, con);
         }
-        // insertBookKeyword(isbn, keyID);
+         insertBookKeyword(isbn, keyID, con);
       }
     }
   }
