@@ -845,7 +845,7 @@ public class MainFrame {
     btnNewButton_3.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent arg0) {
         // get validate input, put it as a book object
-        String newIsbn = upISBN.getText();
+        String isbn = upISBN.getText();
         String newTitle = upBookTitleTx.getText();
         String newPublisher = upPublisherTx.getText();
         int newPage = checkHelper.checkIfNumerical(upPagesTx);
@@ -907,13 +907,13 @@ public class MainFrame {
         // check if all the mandatory fields are filled in
         // if mandatory field is empty, do nothing
         // if isbn changed, pop up said cannot changed
-        if (!upISBN.getText().equals("")) {
-          if (!oldBook.isbn.equalsIgnoreCase(newIsbn)) {
-            JOptionPane.showMessageDialog(null, "Cannot change book ISBN", "fail update book",
-                JOptionPane.ERROR_MESSAGE);
-            success = false;
-          }
-        }
+//        if (!upISBN.getText().equals("")) {
+//          if (!oldBook.isbn.equalsIgnoreCase(newIsbn)) {
+//            JOptionPane.showMessageDialog(null, "Cannot change book ISBN", "fail update book",
+//                JOptionPane.ERROR_MESSAGE);
+//            success = false;
+//          }
+//        }
 
         if (upAuthorTx1.getText().equals("") && upAuthorTx2.getText().equals("") && upAuthorTx3.getText().equals("")
             && upAuthorTx4.getText().equals("") && upAuthorTx5.getText().equals("")) {
@@ -928,40 +928,39 @@ public class MainFrame {
             con.setAutoCommit(false);
             if (!newTitle.equals("") && !oldBook.compareTitle(newTitle)) {
               // update title
-              UpdateHelper.updateBookString(newTitle, oldBook.isbn, "title");
+              UpdateHelper.updateBookString(newTitle, isbn, "title");
             }
             if (!newPublisher.equals("") && !oldBook.comparePublisher(newPublisher)) {
               // update publisher
-              UpdateHelper.updateBookString(newPublisher, oldBook.isbn, "publisher");
+              UpdateHelper.updateBookString(newPublisher, isbn, "publisher");
             }
             if (!upPagesTx.getText().equals("") && !oldBook.comparePages(newPage)) {
               // update page with check
               if (newPage >= 0) {
-                UpdateHelper.updateBookInt(newPage, oldBook.isbn, "Numberofpages");
+                UpdateHelper.updateBookInt(newPage, isbn, "Numberofpages");
               }
             }
             if (upEditionTx.getText().equals("")) {
               // remove edition
-              UpdateHelper.updateBookInt(-1, oldBook.isbn, "editionnumber");
+              UpdateHelper.updateBookInt(-1, isbn, "editionnumber");
             } else if (!upEditionTx.getText().equals("") && !oldBook.compareEdition(newEdition)) {
               // update edition with check
               if (newEdition >= 0) {
-                UpdateHelper.updateBookInt(newEdition, oldBook.isbn, "editionnumber");
+                UpdateHelper.updateBookInt(newEdition, isbn, "editionnumber");
               }
             }
             if (!oldBook.compareAbstract(newAbstract)) {
               // update abstract
-              UpdateHelper.updateBookString(newAbstract, oldBook.isbn, "abstract");
+              UpdateHelper.updateBookString(newAbstract, isbn, "abstract");
             }
             if (!upBookYearTx.getText().equals("") && !oldBook.compareYear(newYear)) {
               // update year with check
               if (newYear > 0) {
-                UpdateHelper.updateBookInt(newYear, oldBook.isbn, "yearofpublication");
+                UpdateHelper.updateBookInt(newYear, isbn, "yearofpublication");
               }
             }
             List<String> delAuthor = new ArrayList<String>();
             List<String> insertAuthor = new ArrayList<String>(newAuthors);
-
             // check author list
             if (!oldBook.compareAuthor(newAuthors)) {
               if (newAuthors.size() == 0) {
@@ -971,22 +970,30 @@ public class MainFrame {
                 success = false;
               } else {
                 // get the list for update
-                for (String authorName : oldBook.authors) {
-                  if (!newAuthors.contains(authorName)) {
-                    delAuthor.add(authorName);
+                for (String authorName : newAuthors) {
+                  if (!oldBook.authors.contains(authorName)) {
+                    // old book don't have this new name, should be added
+                    
                   } else {
+                    // old book contain this name, no need to insert
                     insertAuthor.remove(authorName);
                   }
                 }
+                for (String authorName : oldBook.authors) {
+                  if (!newAuthors.contains(authorName)) {
+                    // newauthors doesn't have this name from oldbook, should be deleted
+                    delAuthor.add(authorName);
+                  }
+                }
               }
-            }
-            // do update for authors
-            if (delAuthor.size() > 0) {
-              // delete author
-              DeleteHelper.deleteBookAuthors(oldBook.isbn, delAuthor);
-            }
-            if (insertAuthor.size() > 0) {
-              InserterHelper.insertBookAuthor(oldBook.isbn, insertAuthor);
+              // do update for authors
+              if (delAuthor.size() > 0) {
+                // delete author
+                DeleteHelper.deleteBookAuthors(isbn, delAuthor);
+              }
+              if (insertAuthor.size() > 0) {
+                InserterHelper.insertBookAuthor(isbn, insertAuthor);
+              }
             }
 
             List<String> delkey = new ArrayList<String>();
@@ -994,14 +1001,14 @@ public class MainFrame {
             // check keyword list
             // do update for keywords
             if (delkey.size() > 0) {
-              DeleteHelper.deleteBookKeywords(oldBook.isbn, delkey);
+              DeleteHelper.deleteBookKeywords(isbn, delkey);
             }
             if (upKeywordsTx.getText().equals("")) {
-              DeleteHelper.removeBookKeyword(oldBook.isbn);
+              DeleteHelper.removeBookKeyword(isbn);
             }
             if (insertkey.size() > 0) {
-              DeleteHelper.removeBookKeyword(oldBook.isbn);
-              InserterHelper.insertBookKeyword(oldBook.isbn, insertkey);
+              DeleteHelper.removeBookKeyword(isbn);
+              InserterHelper.insertBookKeyword(isbn, insertkey);
             }
 
             con.commit();
@@ -2083,6 +2090,7 @@ public class MainFrame {
             try {
               upBookTitleTx.setText(bookResult.getString("Title"));
               upISBN.setText(bookResult.getString("ISBN"));
+              upISBN.setEditable(false);
               upPublisherTx.setText(bookResult.getString("Publisher"));
               upPagesTx.setText(String.valueOf(bookResult.getInt("NumberOfPages")));
               upBookYearTx.setText(String.valueOf(bookResult.getInt("YearOfPublication")));
@@ -3553,32 +3561,59 @@ public class MainFrame {
       preparedStatement.setInt(2, keyID);
       preparedStatement.executeUpdate();
     }
-
-    /* --- Data->insert->book --- */
-    public static void insertBookKeyword(String isbn, List<String> keywords) throws SQLException {
-      String sql = "insert into BookKeyword values (?,?);";
-      List<String> newKeywords = new ArrayList<String>();
-      int id = -1;
-      String[] stringArray = {};
+    
+    public static void getLengthkeyword(String isbn) throws SQLException {
+      int num = 999;
+      String sql = "select count(*) from bookkeyword where isbn = ?";
       PreparedStatement preparedStatement;
       preparedStatement = con.prepareStatement(sql);
       preparedStatement.setString(1, isbn);
-      for (String key : keywords) {
-        id = SelectHelper.getKeywordID(key);
-        if (id < 0) {
-          newKeywords.add(key);
-        }
+      ResultSet rs = preparedStatement.executeQuery();
+      if(rs.next()) {
+        num = rs.getInt("count(*)");
       }
-      stringArray = newKeywords.toArray(new String[newKeywords.size()]);
+      
+    }
 
-      // insert all the new keywords to keyword table
-      InserterHelper.insertKeyword(isbn, stringArray);
-      // insert all the keywords to bookkeyword table
-      for (String key : keywords) {
-        id = SelectHelper.getKeywordID(key);
-        preparedStatement.setInt(2, id);
-        preparedStatement.executeUpdate();
-      }
+    /* --- Data->insert->book --- */
+    public static void insertBookKeyword(String isbn, List<String> keywords) throws SQLException {
+//      String sql = "insert into BookKeyword values (?,?);";
+//      List<String> newKeywords = new ArrayList<String>();
+//      int id = -1;
+//      String[] stringArray = {};
+//      PreparedStatement preparedStatement;
+//      preparedStatement = con.prepareStatement(sql);
+//      preparedStatement.setString(1, isbn);
+//      for (String key : keywords) {
+//        id = SelectHelper.getKeywordID(key);
+//        if (id < 0) {
+//          newKeywords.add(key);
+//        }
+//      }
+//      stringArray = newKeywords.toArray(new String[newKeywords.size()]);
+//
+//      // insert all the new keywords to keyword table
+//      InserterHelper.insertKeyword(isbn, stringArray);
+//      // insert all the keywords to bookkeyword table
+//      for (String key : keywords) {
+//        id = SelectHelper.getKeywordID(key);
+//        preparedStatement.setInt(2, id);
+//        preparedStatement.executeUpdate();
+//      }
+      
+    String sql = "insert into BookKeyword values (?,?);";
+//    List<String> newKeywords = new ArrayList<String>();
+    int id = -1;
+    String[] stringArray = {};
+    PreparedStatement preparedStatement;
+    preparedStatement = con.prepareStatement(sql);
+    preparedStatement.setString(1, isbn);
+    stringArray = keywords.toArray(new String[keywords.size()]);
+
+    // insert all the new keywords to keyword table
+    InserterHelper.insertKeyword(isbn, stringArray);
+    // insert all the keywords to bookkeyword table
+
 
     }
 
@@ -3599,7 +3634,7 @@ public class MainFrame {
             // keyID = nextKeyID;
             keyID = SelectHelper.getKeywordID(keyword);
           }
-          // insertBookKeyword(isbn, keyID);
+           insertBookKeyword(isbn, keyID);
         }
       }
     }
@@ -5362,6 +5397,11 @@ public class MainFrame {
       // if new author not in authors, insert author
       for (String author : authors) {
         if (!newAuthors.contains(author)) {
+          return false;
+        }
+      }
+      for (String author : newAuthors) {
+        if (!authors.contains(author)) {
           return false;
         }
       }
